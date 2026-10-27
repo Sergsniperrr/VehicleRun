@@ -1,0 +1,46 @@
+{
+    "groupCollection": [
+        {
+            "key": "Editor",
+            "group": {
+                "boolCollection": [],
+                "intCollection": [],
+                "floatCollection": [],
+                "stringCollection": [
+                    {
+                        "key": "Configuration",
+                        "value": "EditorConfiguration"
+                    }
+                ]
+            }
+        },
+        {
+            "key": "Build",
+            "group": {
+                "boolCollection": [],
+                "intCollection": [],
+                "floatCollection": [],
+                "stringCollection": [
+                    {
+                        "key": "Configuration",
+                        "value": "PrimeWebConfiguration"
+                    }
+                ]
+            }
+        },
+        {
+            "key": "PrimeWebConfiguration",
+            "group": {
+                "boolCollection": [
+                    {
+                        "key": "YandexGames_PropertyGroup.Visible",
+                        "value": true
+                    }
+                ],
+                "intCollection": [],
+                "floatCollection": [],
+                "stringCollection": []
+            }
+        }
+    ]
+}

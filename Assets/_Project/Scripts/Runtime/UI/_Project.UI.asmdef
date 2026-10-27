@@ -1,0 +1,20 @@
+{
+    "name": "_Project.UI",
+    "rootNamespace": "_Project.UI",
+    "references": [
+        "_Project.Core",
+        "_Project.Features",
+        "VContainer",
+        "UniTask",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

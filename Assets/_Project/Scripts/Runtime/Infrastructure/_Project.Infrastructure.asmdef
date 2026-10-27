@@ -1,0 +1,20 @@
+{
+    "name": "_Project.Infrastructure",
+    "rootNamespace": "_Project.Infrastructure",
+    "references": [
+        "_Project.Core",
+        "VContainer",
+        "UniTask",
+        "PrimeGames.SDK",
+        "PrimeGames.SDK.Common"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

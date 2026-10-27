@@ -1,0 +1,11 @@
+{
+  "name": "com.primesdk.primegames.template",
+  "version": "1.0.7",
+  "displayName": "PrimeGames WebGL Template",
+  "unity": "2021.3",
+  "author": {
+    "name": "Prime Pilshing",
+    "url": "https://github.com/Prime-SDK"
+  },
+  "description": "PrimeGames WebGL template for Unity builds."
+}

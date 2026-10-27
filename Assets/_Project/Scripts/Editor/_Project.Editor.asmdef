@@ -1,0 +1,22 @@
+{
+    "name": "_Project.Editor",
+    "rootNamespace": "_Project.Editor",
+    "references": [
+        "_Project.Core",
+        "_Project.Infrastructure",
+        "_Project.Features",
+        "_Project.UI",
+        "_Project.Composition"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
