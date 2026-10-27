@@ -1,6 +1,6 @@
 # UnityTemplate: устройство шаблона
 
-Заготовка Unity-проекта под WebGL для площадок, подключённых через PrimeSDK. В шаблоне готовы контейнер зависимостей, конечный автомат запуска, загрузка сцен и платформенные сервисы. Игрового кода нет: он пишется в сборках `Features` и `UI`.
+Заготовка Unity-проекта под WebGL для площадок, подключённых через JTL SDK (Яндекс Игры, YouTube Playables). В шаблоне готовы контейнер зависимостей, конечный автомат запуска, загрузка сцен и платформенные сервисы. Игрового кода нет: он пишется в сборках `Features` и `UI`.
 
 Unity 2022.3.62f2 (LTS), цель сборки WebGL, 3D-проект на Built-in Render Pipeline.
 
@@ -18,8 +18,7 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 3D-проект на Built
 |---|---|---|---|
 | VContainer | 1.19.0 | контейнер зависимостей, композиция | [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) |
 | UniTask | 2.5.11 | async/await без аллокаций | [github.com/Cysharp/UniTask](https://github.com/Cysharp/UniTask) |
-| PrimeSDK | 5.2.6 | реклама, покупки, сохранения, язык, аналитика площадки | [prime-publisher.com/sdk](https://prime-publisher.com/sdk/) |
-| PrimeGames WebGL Template | 1.0.7 | страница WebGL-сборки и экран загрузки | [github.com/Prime-SDK/PrimeGamesTemplate](https://github.com/Prime-SDK/PrimeGamesTemplate) |
+| JTL SDK | 1.7.2 | реклама, покупки, сохранения, язык, пауза, игровые события площадки; свой WebGL-шаблон с экраном загрузки | [meepifiev.github.io/com.jtlstudio.sdk](https://meepifiev.github.io/com.jtlstudio.sdk/) |
 | Яндекс.Метрика | jslib | свои события в WebGL-сборке | [yandex.com/support/metrica](https://yandex.com/support/metrica/) |
 | TextMeshPro | 3.0.7 | текст, TMP Essentials импортированы | [docs.unity3d.com](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/manual/index.html) |
 | DOTween Pro | 1.0.430 (DOTween 1.3.030) | твины и анимации | [dotween.demigiant.com](https://dotween.demigiant.com/documentation.php) |
@@ -28,7 +27,7 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 3D-проект на Built
 | SceneSwitcher Pro | 1.x | переключение сцен из тулбара редактора | [Asset Store](https://assetstore.unity.com/packages/tools/gui/scene-switcher-pro-313355) |
 | MCP for Unity (CoplayDev) | git, ветка main | управление открытым редактором из AI-агента | [github.com/CoplayDev/unity-mcp](https://github.com/CoplayDev/unity-mcp) |
 
-Наши системы: Audio (`Core/Audio` + `Infrastructure/Audio`), Analytics (`Core/Analytics` + `Infrastructure/Prime`, репортеры Яндекс.Метрика и PrimeSDK), FSM (`Core/StateMachine` + `Composition/Startup`).
+Наши системы: Audio (`Core/Audio` + `Infrastructure/Audio`), Analytics (`Core/Analytics` + `Infrastructure/JTL`, репортеры Яндекс.Метрика и JTL SDK), FSM (`Core/StateMachine` + `Composition/Startup`).
 
 ---
 
@@ -45,25 +44,27 @@ Assets/
 │       ├── Editor/                    сборка _Project.Editor, пока пустая
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
-│           ├── Infrastructure/        реализации: PrimeSDK, аудио, сцены, время, FSM
+│           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
 │           ├── Features/              игровые механики, пока пустая
 │           ├── UI/                    интерфейс, сейчас LocalizedText
 │           └── Composition/           LifetimeScope и стартовые состояния
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают
 ├── Plugins/                           DOTween Pro, Odin Inspector, UniTask
-├── Resources/                         DOTweenSettings.asset, настройки PrimeSDK
+├── Resources/                         DOTweenSettings.asset; JTLSDK/JTLSDKSettings.asset после создания конфигурации
 ├── SceneSwitcherPro/                  редакторская тулза
-├── Settings/                          VContainerSettings.asset
+├── Settings/                          VContainerSettings.asset; JTLSDK/Configurations, конфигурации площадок
 ├── TextMesh Pro/                      ресурсы TMP Essentials
-└── WebGLTemplates/PrimeGames/         шаблон страницы WebGL
+└── WebGLTemplates/JTLSDK/             шаблон страницы WebGL, ставится из окна JTL SDK
 ```
+
+Папки `JTLSDK` в `Resources`, `Settings` и `WebGLTemplates` создаёт окно JTL SDK, в свежем шаблоне их нет (см. раздел 7).
 
 Сборки (asmdef) и их ссылки:
 
 | Сборка | Ссылается на | Что сюда кладём |
 |---|---|---|
 | `_Project.Core` | UniTask | интерфейсы сервисов, события аналитики, модели данных, ScriptableObject-конфиги |
-| `_Project.Infrastructure` | Core, VContainer, UniTask, PrimeGames.SDK | реализации интерфейсов Core, обёртки над SDK и Unity API |
+| `_Project.Infrastructure` | Core, VContainer, UniTask, JTLStudio.SDK | реализации интерфейсов Core, обёртки над SDK и Unity API |
 | `_Project.Features` | Core, VContainer, UniTask | игровые механики: уровни, персонажи, экономика |
 | `_Project.UI` | Core, Features, VContainer, UniTask, Unity.TextMeshPro | экраны, окна, компоненты интерфейса |
 | `_Project.Composition` | Core, Infrastructure, Features, UI, VContainer, UniTask | регистрация в контейнере, состояния запуска |
@@ -72,7 +73,7 @@ Assets/
 Правила, которые держат структуру:
 
 - интерфейс лежит в `Core`, реализация в `Infrastructure`, регистрация в `Composition`;
-- `Core` не ссылается на PrimeSDK. Если интерфейсу нужен тип из SDK, заведите свой класс данных в `Core`;
+- `Core` не ссылается на JTL SDK. Если интерфейсу нужен тип из SDK, заведите свой класс данных в `Core`;
 - игровой код (`Features`, `UI`) работает только через интерфейсы из `Core`;
 - namespace повторяет путь папки: `Core/Localization` даёт `_Project.Core.Localization`, `UI/Localization` даёт `_Project.UI.Localization`.
 
@@ -112,11 +113,11 @@ protected override void Configure(IContainerBuilder builder)
 | `ISceneLoader` | `SceneLoader` | Singleton | `RegisterServices` |
 | `IAudioService` | `AudioService` | Singleton | `RegisterServices` |
 | `ITimeService` | `TimeService` | Singleton | `RegisterServices` |
-| `IPlatformInitializer` | `PrimeSDKInitializer` | Singleton | `RegisterPlatform` |
-| `IAnalyticsService` | `PrimeAnalyticsService` | Singleton | `RegisterPlatform` |
-| `ILocalizationService` | `PrimeLocalizationService` | Singleton | `RegisterPlatform` |
-| `IPurchaseService` | `PrimePurchaseService` | Singleton | `RegisterPlatform` |
-| `IAdvertisingService` | `PrimeAdvertisingService` | EntryPoint | `RegisterPlatform` |
+| `IPlatformInitializer` | `JTLSDKInitializer` | Singleton | `RegisterPlatform` |
+| `IAnalyticsService` | `JTLAnalyticsService` | Singleton | `RegisterPlatform` |
+| `ILocalizationService` | `JTLLocalizationService` | Singleton | `RegisterPlatform` |
+| `IPurchaseService` | `JTLPurchaseService` | EntryPoint | `RegisterPlatform` |
+| `IAdvertisingService` | `JTLAdvertisingService` | EntryPoint | `RegisterPlatform` |
 | `IExampleStorage` | `ExampleStorage` | Singleton | `RegisterStorage` |
 | `IStateFactory` | `StateFactory` | Singleton | `RegisterStateMachine` |
 | `IGameStateMachine` | `GameStateMachine` | Singleton | `RegisterStateMachine` |
@@ -140,7 +141,7 @@ builder.RegisterEntryPoint<Bootstrapper>();
 | Объект только для игровой сцены | `GameLifetimeScope` | `builder.Register<LevelSession>(Lifetime.Singleton);` |
 | Компонент со сцены | `GameLifetimeScope` | `builder.RegisterComponentInHierarchy<Hud>();` |
 
-Точка входа (`RegisterEntryPoint`) нужна классу, который должен получать `Start()`, `Tick()` или `Dispose()` от контейнера без своего MonoBehaviour. Так зарегистрирован `PrimeAdvertisingService`: в `Start()` он ждёт SDK и подписывается на покупки, в `Dispose()` отписывается.
+Точка входа (`RegisterEntryPoint`) нужна классу, который должен получать `Start()`, `Tick()` или `Dispose()` от контейнера без своего MonoBehaviour. Так зарегистрированы `JTLAdvertisingService` и `JTLPurchaseService`: в `Start()` они ждут SDK (реклама скрывает баннер, если куплено «без рекламы», покупки восстанавливают невыданные товары), реклама ещё подписывается на покупки и отписывается в `Dispose()`.
 
 ### 3.4 Зависимости в MonoBehaviour
 
@@ -171,11 +172,13 @@ VContainer внедряет зависимости только в объект�
 |---|---|---|
 | 1 | сцена `Bootstrap` | создаётся `RootLifetimeScope` со всеми сервисами, затем `BootstrapLifetimeScope` регистрирует `Bootstrapper` |
 | 2 | `Bootstrapper.Start()` | вход в `BootstrapState` |
-| 3 | `BootstrapState` | `await IPlatformInitializer.InitializeAsync()`, внутри `PrimeSDK.WaitForProviders` |
+| 3 | `BootstrapState` | `await IPlatformInitializer.InitializeAsync()`, внутри `JTLSDK.Create()` и ожидание `JTLSDK.WhenReady` |
 | 4 | `LoadRunState` | `await ISceneLoader.LoadAsync(SceneId.Game)` |
-| 5 | `RunState` | `IAnalyticsService.ReportEvent(new GameReadyEvent())` |
+| 5 | `RunState` | `IAnalyticsService.ReportEvent(new GameReadyEvent())`, площадка получает `GameReady` |
 
-Пока не отработал шаг 3, методы PrimeSDK вызывать нельзя. Весь код, который живёт на сцене `Game`, запускается уже после него.
+До `JTLSDK.Create()` любое обращение к модулям SDK бросает `InvalidOperationException`. Весь код, который живёт на сцене `Game`, запускается уже после шага 3. `InitializeAsync` можно вызывать сколько угодно раз: SDK создаётся один раз, все вызовы ждут одну и ту же готовность. Этим пользуются сервисы рекламы и покупок в своём `Start()`.
+
+`WhenReady` приходит всегда: модуль, который не ответил за 15 секунд, помечается `Failed` и дальше отвечает безопасными значениями.
 
 ```csharp
 public async UniTask Enter()
@@ -288,7 +291,7 @@ public class LoadLevelState : IPayloadState<int>
 3. Добавьте сцену в File, Build Settings.
 4. Положите на сцену объект с `LifetimeScope` (свой класс в `Composition`), иначе внедрение на этой сцене работать не будет.
 
-Play Mode запускайте со сцены `Bootstrap`, переключаться удобно через тулбар SceneSwitcher Pro. Если стартовать сразу с `Game`, корневой контейнер создастся, но `Bootstrapper` не запустится: SDK не проинициализируется, автомат не стартует.
+Play Mode запускайте со сцены `Bootstrap`, переключаться удобно через тулбар SceneSwitcher Pro. Если стартовать сразу с `Game`, корневой контейнер создастся, но `Bootstrapper` не запустится: автомат не стартует и `GameReady` площадке не уйдёт.
 
 ---
 
@@ -296,14 +299,16 @@ Play Mode запускайте со сцены `Bootstrap`, переключат
 
 | Интерфейс | Реализация | Где описан |
 |---|---|---|
-| `IAnalyticsService`, `IAdvertisingService`, `IPurchaseService`, `IExampleStorage` | `Infrastructure/Prime/*` | [Аналитика, реклама и сохранения](Docs/Analytics-Ads-Saves.md) |
-| `ILocalizationService` | `PrimeLocalizationService` | [Локализация](Docs/Localization.md) |
+| `IAnalyticsService`, `IAdvertisingService`, `IPurchaseService`, `IExampleStorage` | `Infrastructure/JTL/*` | [Аналитика, реклама и сохранения](Docs/Analytics-Ads-Saves.md) |
+| `ILocalizationService` | `JTLLocalizationService` | [Локализация](Docs/Localization.md) |
 | `IAudioService` | `AudioService` | [Звук: AudioService](Docs/Audio.md) |
 | `ISceneLoader` | `SceneLoader` | раздел 5 |
-| `IPlatformInitializer` | `PrimeSDKInitializer` | раздел 4.1 |
+| `IPlatformInitializer` | `JTLSDKInitializer` | раздел 4.1 |
 | `ITimeService` | `TimeService` | ниже |
 
 `ITimeService` отдаёт `DeltaTime` и `Time` из `UnityEngine.Time`. Смысл обёртки в том, что игровая логика не зависит от статики Unity: в тестах сервис подменяется, а замедление времени делается в одном месте.
+
+`Time.timeScale`, `AudioListener.volume` и `AudioListener.pause` принадлежат JTL SDK: он останавливает игру на время рекламы, оплаты и паузы площадки, а потом возвращает значения игры. Прямая запись в них перезапишется при следующей паузе. Понадобится замедление или своё меню паузы, добавьте в `ITimeService` свойство `Scale` и реализуйте его через `JTLSDK.Time.Scale`; громкость и тишину меню так же через `JTLSDK.Audio.Volume` и `JTLSDK.Audio.Paused`.
 
 ```csharp
 public class TimeService : ITimeService
@@ -332,14 +337,18 @@ public class TimeService : ITimeService
     git remote remove origin
     ```
 
-2. Project Settings, Player: `Product Name`, `Company Name` (сейчас `GOLTECH STUDIO`), `Version`. Шаблон WebGL уже выбран: `PrimeGames`.
+2. Project Settings, Player: `Product Name`, `Company Name` (сейчас `GOLTECH STUDIO`), `Version`.
 3. Для 2D-игры переключите `Edit, Project Settings, Editor, Default Behavior Mode` на 2D, сделайте камеру на сцене `Game` ортографической и добавьте пакет `com.unity.feature.2d` через Package Manager.
-4. PrimeSDK: меню `PrimeSDK, Open Toolkit`, задайте идентификаторы игры и провайдеров площадки.
-5. Яндекс.Метрика: на сцене `Bootstrap` у `YandexMetricaInitializer` впишите номер счётчика в поле `_counterId`. Пустое поле выключает Метрику.
-6. Картинки страницы: замените `gameIcon.png` (256×256), `gameBackground.png` и `thumbnail.png` в `Assets/WebGLTemplates/PrimeGames/`.
+4. В Unity Hub у редактора 2022.3.62f2 должен стоять модуль WebGL Build Support.
+5. JTL SDK, окно `JTL SDK, Toolkit`:
+    - Configurations, New configuration: выберите площадку. Первая конфигурация становится активной, ставит define-символ (`JTLSDK_YANDEX_GAMES` или `JTLSDK_YOUTUBE_PLAYABLES`) и пресет Player Settings, создаёт `Resources/JTLSDK/JTLSDKSettings.asset`;
+    - Template, Install: шаблон страницы в `Assets/WebGLTemplates/JTLSDK`, там же логотип, фон и прогресс-бар;
+    - Languages: языки проекта Russian и English, Default language English (см. [Локализация](Docs/Localization.md));
+    - Purchases: товар `no_ads`, тип Non-consumable, если в игре будет покупка «без рекламы».
+6. Яндекс.Метрика: на сцене `Bootstrap` у `YandexMetricaInitializer` впишите номер счётчика в поле `_counterId`. Пустое поле выключает Метрику.
 7. Заполните `LocalizationConfig.asset`, создайте микшер и ассеты звуков.
 8. FlatKit: импортирован вариант Built-in RP. Файлы `[Render Pipeline] *.unitypackage` в git не хранятся (`.gitignore`), при необходимости берите их из Asset Store.
-9. Сборка: File, Build Settings, WebGL. Отчёт PrimeSDK по размеру билда появляется в папке `BuildReports/`.
+9. Сборка: окно JTL SDK, раздел Build, кнопка Build Project. Красная проверка в этом разделе блокирует сборку.
 
 Бинарные файлы (`png`, `psd`, `fbx`, `wav`, `dll`, `pdf` и другие) идут через Git LFS по правилам из `.gitattributes`. `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.sln` в git не попадают.
 
@@ -349,6 +358,7 @@ public class TimeService : ITimeService
 
 | Инструмент | Как пользоваться |
 |---|---|
+| JTL SDK Toolkit | меню `JTL SDK, Toolkit`: конфигурации площадок, сборка, симуляция ответов площадки в редакторе, шаблон страницы, товары, языки, просмотр и очистка сейва |
 | SceneSwitcher Pro | кнопки сцен в тулбаре редактора, список настраивается в `Assets/SceneSwitcherPro/` |
 | Odin Inspector | атрибуты `[Button]`, `[ShowInInspector]`, `[Required]` в любых MonoBehaviour и ScriptableObject |
 | DOTween Pro | настройки в `Assets/Resources/DOTweenSettings.asset`; после обновления пакета откройте `Tools, Demigiant, DOTween Utility Panel` и нажмите Setup |
@@ -363,10 +373,9 @@ public class TimeService : ITimeService
 |---|---|
 | Запуск | Play со сцены `Bootstrap`: через секунду загружается `Game`, ошибок в консоли нет |
 | Контейнер | в иерархии в `DontDestroyOnLoad` есть объект `RootLifetimeScope` |
-| SDK | в консоли строка PrimeSDK «Hello! Don't forget to WaitForProviders before using my API», это нормальное сообщение о старте |
-| Аналитика | в консоли предупреждение заглушки PrimeSDK про `GameIsReady` после загрузки `Game` |
+| SDK | в консоли строки с префиксом `[JTL SDK]`: старт с версией и площадкой, состояние модулей. Ошибка `Settings were not found at Resources/JTLSDK/JTLSDKSettings` значит, что конфигурация ещё не создана, SDK работает без площадки |
 | Компиляция | предупреждения «Assembly for Assembly Definition File ... will not be compiled» для `_Project.Features` и `_Project.Editor` исчезнут после первого скрипта в этих папках |
-| WebGL | собранная страница показывает экран загрузки PrimeGames: иконка, прогресс-бар, затем игра |
+| WebGL | собранная страница показывает экран загрузки JTL SDK, затем игру |
 
 ---
 
@@ -378,6 +387,8 @@ public class TimeService : ITimeService
 | `VContainerException: No such registration of type` при `Enter<T>` | состояние не зарегистрировано | добавьте `builder.Register<T>(Lifetime.Transient)` в `RegisterStates` |
 | `InvalidOperationException` из `SceneLoader` | имя сцены не совпадает с `SceneId` или сцены нет в Build Settings | проверьте имя файла и Build Settings |
 | `VContainerParentTypeReferenceNotFound`, сцена не стартует | у `LifetimeScope` заполнено поле `Parent` типом, которого нет на сцене | очистите поле, родитель приходит из `VContainerSettings` |
-| Предупреждения PrimeSDK о вызове до инициализации | код обратился к SDK раньше `BootstrapState` | вызывайте SDK только через сервисы и только со сцены `Game` |
+| `InvalidOperationException: JTLSDK.Create() must run before the SDK is used.` | код обратился к `JTLSDK` раньше `IPlatformInitializer.InitializeAsync()` | вызывайте SDK только через сервисы и только со сцены `Game` или после `await InitializeAsync()` |
+| `[JTL SDK] Settings were not found at Resources/JTLSDK/JTLSDKSettings` | не создана конфигурация площадки | окно JTL SDK, Configurations, New configuration |
+| Покупка сразу уходит в ошибку | товара нет в каталоге JTL SDK | объявите его в окне JTL SDK, раздел Purchases |
 | Play со сцены `Game` ничего не запускает | `Bootstrapper` живёт на сцене `Bootstrap` | стартуйте с `Bootstrap` |
 | Ошибки компиляции после добавления папки в `Features` | скрипт ссылается на сборку, которой нет в asmdef | добавьте ссылку в `_Project.Features.asmdef` или вынесите интерфейс в `Core` |

@@ -10,7 +10,7 @@ using _Project.Core.SceneManagement;
 using _Project.Core.StateMachine;
 using _Project.Core.Time;
 using _Project.Infrastructure.Audio;
-using _Project.Infrastructure.Prime;
+using _Project.Infrastructure.JTL;
 using _Project.Infrastructure.SceneManagement;
 using _Project.Infrastructure.StateMachine;
 using _Project.Infrastructure.Time;
@@ -46,11 +46,11 @@ namespace _Project.Composition
 
         private void RegisterPlatform(IContainerBuilder builder)
         {
-            builder.Register<PrimeSDKInitializer>(Lifetime.Singleton).As<IPlatformInitializer>();
-            builder.Register<PrimeAnalyticsService>(Lifetime.Singleton).As<IAnalyticsService>();
-            builder.Register<PrimeLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
-            builder.Register<PrimePurchaseService>(Lifetime.Singleton).As<IPurchaseService>();
-            builder.RegisterEntryPoint<PrimeAdvertisingService>().As<IAdvertisingService>();
+            builder.Register<JTLSDKInitializer>(Lifetime.Singleton).As<IPlatformInitializer>();
+            builder.Register<JTLAnalyticsService>(Lifetime.Singleton).As<IAnalyticsService>();
+            builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
+            builder.RegisterEntryPoint<JTLPurchaseService>().As<IPurchaseService>();
+            builder.RegisterEntryPoint<JTLAdvertisingService>().As<IAdvertisingService>();
         }
 
         private void RegisterServices(IContainerBuilder builder)

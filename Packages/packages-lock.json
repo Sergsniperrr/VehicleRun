@@ -17,28 +17,12 @@
       },
       "hash": "4ce7dd3cc54e37e2ed6dc59cb5a047f3dccb3f50"
     },
-    "com.primesdk": {
-      "version": "https://github.com/Prime-SDK/PrimeSDK.git",
+    "com.jtlstudio.sdk": {
+      "version": "https://github.com/meepifiev/com.jtlstudio.sdk.git#v1.7.2",
       "depth": 0,
       "source": "git",
-      "dependencies": {
-        "com.unity.addressables": "1.0.0"
-      },
-      "hash": "ebf2367df645c4d826e6a3f92a41b9b632d219cd"
-    },
-    "com.unity.addressables": {
-      "version": "1.22.3",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.assetbundle": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.imageconversion": "1.0.0",
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.scriptablebuildpipeline": "1.21.25",
-        "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+      "dependencies": {},
+      "hash": "1921e7103a23c90cf1ddc9a3500eb5cbeaa3b037"
     },
     "com.unity.collab-proxy": {
       "version": "2.12.4",
@@ -110,13 +94,6 @@
     "com.unity.performance.profile-analyzer": {
       "version": "1.2.3",
       "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.scriptablebuildpipeline": {
-      "version": "1.21.25",
-      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"

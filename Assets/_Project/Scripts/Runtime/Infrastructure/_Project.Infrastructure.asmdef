@@ -5,8 +5,7 @@
         "_Project.Core",
         "VContainer",
         "UniTask",
-        "PrimeGames.SDK",
-        "PrimeGames.SDK.Common"
+        "JTLStudio.SDK"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

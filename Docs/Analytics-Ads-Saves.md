@@ -2,38 +2,38 @@
 
 Как устроены три платформенных сервиса, как ими пользоваться из игрового кода и как их дополнять.
 
-PrimeSDK 5.2.6 (пакет `com.primesdk`), контейнер зависимостей VContainer 1.19.0, асинхронность на UniTask.
+JTL SDK 1.7.2 (пакет `com.jtlstudio.sdk`), контейнер зависимостей VContainer 1.19.0, асинхронность на UniTask.
 
-Документация PrimeSDK: [prime-publisher.com/sdk](https://prime-publisher.com/sdk/)
+Документация JTL SDK: [meepifiev.github.io/com.jtlstudio.sdk](https://meepifiev.github.io/com.jtlstudio.sdk/), всё одним файлом для ИИ-ассистента: [llms.txt](https://meepifiev.github.io/com.jtlstudio.sdk/llms.txt)
 
 ---
 
 ## 1. Как всё устроено
 
-Правило одно: **интерфейс лежит в `Core`, реализация в `Infrastructure`, регистрация в `Composition`**. Игровой код никогда не обращается к `PrimeSDK` напрямую, только через интерфейсы из `_Project.Core`.
+Правило одно: **интерфейс лежит в `Core`, реализация в `Infrastructure`, регистрация в `Composition`**. Игровой код никогда не обращается к `JTLSDK` напрямую, только через интерфейсы из `_Project.Core`.
 
 ```
 Assets/_Project/Scripts/Runtime/
-├── Core/                          сборка _Project.Core, на PrimeSDK НЕ ссылается
+├── Core/                          сборка _Project.Core, на JTL SDK НЕ ссылается
 │   ├── Advertising/IAdvertisingService.cs
 │   ├── Analytics/IAnalyticsService.cs, IAnalyticsReporter.cs, IAnalyticsEvent.cs
 │   ├── Analytics/Events/GameReadyEvent.cs, GameplayStartedEvent.cs, GameplayStoppedEvent.cs
 │   ├── Purchasing/IPurchaseService.cs
 │   ├── Storage/IExampleStorage.cs
 │   └── Platform/IPlatformInitializer.cs
-├── Infrastructure/                сборка _Project.Infrastructure, ссылается на PrimeGames.SDK
-│   ├── Prime/PrimeAdvertisingService.cs
-│   ├── Prime/PrimeAnalyticsService.cs
-│   ├── Prime/PrimePurchaseService.cs
-│   ├── Prime/ExampleStorage.cs
-│   ├── Prime/PrimeSDKInitializer.cs
+├── Infrastructure/                сборка _Project.Infrastructure, ссылается на JTLStudio.SDK
+│   ├── JTL/JTLAdvertisingService.cs
+│   ├── JTL/JTLAnalyticsService.cs
+│   ├── JTL/JTLPurchaseService.cs
+│   ├── JTL/ExampleStorage.cs
+│   ├── JTL/JTLSDKInitializer.cs
 │   └── Analytics/YandexMetrica.cs, YandexMetricaInitializer.cs
 └── Composition/
     ├── RootLifetimeScope.cs       здесь регистрируются все сервисы
     └── Startup/                   BootstrapState → LoadRunState → RunState
 ```
 
-**Почему так.** У сборки `_Project.Core` нет ссылки на `PrimeGames.SDK`, это сделано специально, чтобы типы SDK не попадали в игровой код. Если новому интерфейсу в `Core` вдруг понадобился тип из SDK, значит интерфейс спроектирован неправильно: заведите свой простой класс с данными в `Core`.
+**Почему так.** У сборки `_Project.Core` нет ссылки на `JTLStudio.SDK`, это сделано специально, чтобы типы SDK не попадали в игровой код. Если новому интерфейсу в `Core` вдруг понадобился тип из SDK, значит интерфейс спроектирован неправильно: заведите свой простой класс с данными в `Core`.
 
 ### Порядок запуска
 
@@ -41,13 +41,15 @@ Assets/_Project/Scripts/Runtime/
 |---|---|---|
 | 1 | Сцена `Bootstrap` | `BootstrapLifetimeScope` регистрирует `Bootstrapper`; `RootLifetimeScope` (префаб `Assets/_Project/Prefabs/RootLifetimeScope.prefab`) регистрирует все сервисы |
 | 2 | `Bootstrapper.Start()` | Вход в состояние `BootstrapState` |
-| 3 | `BootstrapState` | `await IPlatformInitializer.InitializeAsync()`, внутри `PrimeSDK.WaitForProviders(...)` |
+| 3 | `BootstrapState` | `await IPlatformInitializer.InitializeAsync()`, внутри `JTLSDK.Create()` и `JTLSDK.WhenReady(...)` |
 | 4 | `LoadRunState` | Загрузка сцены `Game` |
 | 5 | `RunState` | `analytics.ReportEvent(new GameReadyEvent())` |
 
-Главное правило PrimeSDK: **пока не отработал `WaitForProviders`, ни один метод SDK вызывать нельзя**. Этот вызов спрятан в `PrimeSDKInitializer`, а ожидание стоит в `BootstrapState`, поэтому весь код, который запускается со сцены `Game`, уже в безопасности.
+Главное правило JTL SDK: **до `JTLSDK.Create()` любое обращение к модулям бросает `InvalidOperationException`**. Без исключений читаются только `JTLSDK.IsCreated`, `IsReady`, `Version` и `LogLevel`. Создание SDK спрятано в `JTLSDKInitializer`, а ожидание стоит в `BootstrapState`, поэтому весь код, который запускается со сцены `Game`, уже в безопасности.
 
-Отдельно от этого работает `YandexMetricaInitializer`: обычный MonoBehaviour на сцене `Bootstrap`, который в `Awake()` поднимает счётчик Яндекс.Метрики. От PrimeSDK он не зависит.
+`InitializeAsync` можно вызывать сколько угодно раз: SDK создаётся один раз, все вызовы ждут одну и ту же готовность. Сервисы рекламы и покупок пользуются этим в своём `Start()`. Готовность приходит всегда: модуль, который не ответил за 15 секунд, помечается `Failed` и дальше отвечает безопасными значениями, без исключений.
+
+Отдельно от этого работает `YandexMetricaInitializer`: обычный MonoBehaviour на сцене `Bootstrap`, который в `Awake()` поднимает счётчик Яндекс.Метрики. От JTL SDK он не зависит.
 
 ---
 
@@ -57,10 +59,10 @@ Assets/_Project/Scripts/Runtime/
 
 | Канал | Через что | Что отправляет | Где работает |
 |---|---|---|---|
-| PrimeSDK | `PrimeSDK.Analytics` | Ход игры: `GameIsReady`, `GameplayStart`, `GameplayStop` | Везде. В редакторе заглушки, пишут предупреждение в консоль |
+| JTL SDK | `JTLSDK.GameEvents` | Ход игры: `GameReady`, `GameplayStarted`, `GameplayStopped` | Везде. В редакторе работает симуляция SDK |
 | Яндекс.Метрика | `YandexMetrica` → вызов JS-функций из `YandexMetrica.jslib` | Любые свои цели с параметрами | Только в WebGL-сборке. В редакторе пишет в `Debug.Log` |
 
-Оба канала спрятаны за одним классом `PrimeAnalyticsService`. Он реализует сразу два интерфейса: `IAnalyticsService` (его видит игровой код) и `IAnalyticsReporter` (через него события отправляют себя).
+Оба канала спрятаны за одним классом `JTLAnalyticsService`. Он реализует сразу два интерфейса: `IAnalyticsService` (его видит игровой код) и `IAnalyticsReporter` (через него события отправляют себя).
 
 ### 2.2 Как это работает
 
@@ -69,9 +71,9 @@ Assets/_Project/Scripts/Runtime/
                     ↓
               событие.Report(reporter)      ← событие само знает, ЧТО и с какими данными отправить
                     ↓
-              PrimeAnalyticsService         ← сервис знает, КУДА отправить
+              JTLAnalyticsService           ← сервис знает, КУДА отправить
                     ↓
-              PrimeSDK.Analytics | YandexMetrica
+              JTLSDK.GameEvents | YandexMetrica
 ```
 
 Каждое событие это отдельный маленький класс. Данные передаются ему в конструкторе. Игровому коду не нужно знать ни названий событий, ни того, в какую систему они уходят.
@@ -118,7 +120,7 @@ public class ResultScreen : MonoBehaviour
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-`GameplayStart` и `GameplayStop` вызываются при старте и завершении уровня, удобное место для этого: класс в `Features`, который запускает и завершает уровень. На Яндекс Играх вызывать их не обязательно, игра прекрасно работает и без этого. Это просто подсказка площадке, что сейчас идёт активный игровой процесс: зная это, площадка аккуратнее выбирает момент для показа рекламы. Требования других площадок уточняйте отдельно.
+`GameplayStarted` и `GameplayStopped` вызываются при старте и завершении уровня, а также при открытии и закрытии своего меню паузы. Удобное место для этого: класс в `Features`, который запускает и завершает уровень. Яндекс получает их как `GameplayAPI.start()` и `stop()`, на YouTube меняется только внутреннее состояние SDK. На время рекламы и паузы площадки SDK сам останавливает геймплей и возобновляет его после, вручную это делать не нужно. Повторный вызов с тем же состоянием ничего не отправляет.
 
 ### 2.4 Как добавить своё событие
 
@@ -165,9 +167,9 @@ _analytics.ReportEvent(new LevelCompletedEvent(3, session.CurrentDamage, session
 
 Всё. Регистрировать событие в контейнере не нужно, оно создаётся обычным `new`.
 
-> **А когда добавлять новый метод в `IAnalyticsReporter`?** Почти никогда. Свой метод нужен, только если событие должно уйти в особый метод SDK, как `GameplayStart`, который площадка понимает по-своему. Обычные игровые события отправляйте через `ReportDesignEvent`, иначе интерфейс разрастётся до сотни методов.
+> **А когда добавлять новый метод в `IAnalyticsReporter`?** Почти никогда. Свой метод нужен, только если событие должно уйти в особый метод SDK, как `GameplayStarted`, который площадка понимает по-своему. Обычные игровые события отправляйте через `ReportDesignEvent`, иначе интерфейс разрастётся до сотни методов.
 >
-> Если всё же добавили метод в `IAnalyticsReporter`, не забудьте реализовать его в `PrimeAnalyticsService`, иначе проект не соберётся.
+> Если всё же добавили метод в `IAnalyticsReporter`, не забудьте реализовать его в `JTLAnalyticsService`, иначе проект не соберётся.
 
 Значения параметров всегда строки. Числа приводите к строке сами (`ToString()`).
 
@@ -178,6 +180,8 @@ _analytics.ReportEvent(new LevelCompletedEvent(3, session.CurrentDamage, session
 > ⚠️ Сейчас поле пустое, поэтому Метрика фактически выключена: при пустом номере `Init` сразу выходит. Перед сборкой на площадку впишите туда номер счётчика.
 
 JS-часть лежит в `Assets/_Project/Plugins/WebGL/YandexMetrica.jslib`: она подключает скрипт Метрики на страницу и вызывает `ym(номер, 'reachGoal', имя, данные)`. Трогать её обычно не нужно.
+
+У JTL SDK есть свой пакет аналитики `com.jtlstudio.sdk.analytics`, он тоже шлёт цели в Метрику, а счётчик хранит в конфигурации площадки. В проекте он не установлен. Если решите на него перейти, уберите `YandexMetrica.jslib` и `YandexMetricaInitializer`, иначе скрипт Метрики поднимется на странице дважды.
 
 ---
 
@@ -199,22 +203,24 @@ public interface IAdvertisingService
 
 ### 3.2 Реализация
 
-`Infrastructure/Prime/PrimeAdvertisingService.cs`, обёртка над `PrimeSDK.Ads`. Зарегистрирована как точка входа, поэтому VContainer сам вызывает у неё `Start()` и `Dispose()`:
+`Infrastructure/JTL/JTLAdvertisingService.cs`, обёртка над `JTLSDK.Ads`. Зарегистрирована как точка входа, поэтому VContainer сам вызывает у неё `Start()` и `Dispose()`:
 
 ```csharp
-builder.RegisterEntryPoint<PrimeAdvertisingService>().As<IAdvertisingService>();
+builder.RegisterEntryPoint<JTLAdvertisingService>().As<IAdvertisingService>();
 ```
 
 *Это фактический код проекта, а не пример.*
 
 Что она делает сверх простого проброса вызовов:
 
-1. **Ждёт SDK.** В `Start()` вызывает `PrimeSDK.WaitForProviders(...)`.
-2. **Следит за покупками.** Подписана на `IPurchaseService.Changed`. Если игрок купил «без рекламы», баннер выключается, а `ShowInterstitial()` просто ничего не делает.
+1. **Ждёт SDK.** В `Start()` ждёт `IPlatformInitializer.InitializeAsync()` и, если куплено «без рекламы», прячет баннер.
+2. **Следит за покупками.** Подписана на `IPurchaseService.Changed`. Если игрок купил «без рекламы», баннер прячется через `HideBanner()`, а `ShowInterstitial()` просто ничего не делает.
 3. **Отписывается** в `Dispose()`, иначе останется висеть подписка на уничтоженный объект.
-4. **Упрощает награду.** SDK отдаёт один общий обработчик `onClose(bool успех)`. Сервис превращает его в два понятных: `rewarded` (вызывается только при успешном просмотре) и `closed` (вызывается всегда).
+4. **Упрощает награду.** SDK отдаёт один колбэк с `AdResult`. Сервис превращает его в два понятных: `rewarded` (вызывается только при `AdResult.Rewarded`) и `closed` (вызывается всегда).
 
 Обратите внимание: реклама за награду **не** проверяет «без рекламы». Так и задумано: покупка не должна отбирать у игрока возможность получить награду за просмотр.
+
+Остальное SDK делает сам. Пока реклама на экране, игра стоит на паузе: `Time.timeScale` равен 0, звук выключен, ввод не доходит до игры, геймплей для площадки остановлен. Интервалы на Яндексе задаются в конфигурации площадки: по умолчанию interstitial не чаще раза в 60 секунд и не раньше 60 секунд после досмотренной рекламы за награду. Внутри интервала `ShowInterstitial()` ничего не показывает. Там же включается sticky banner, который показывается сразу при старте.
 
 ### 3.3 Как пользоваться
 
@@ -259,25 +265,29 @@ _ads.ShowInterstitial();   // ничего не вернёт: если купл�
 
 **Что важно помнить:**
 
-- `rewardId` это метка, которую площадка показывает в своей статистике. Храните такие метки константами в одном месте, не пишите строки прямо в местах вызова.
+- `rewardId` обязателен: пустая строка даёт `ArgumentException` из SDK. На YouTube он уходит в `requestRewardedAd`, на Яндексе не используется. Храните такие метки константами в одном месте, не пишите строки прямо в местах вызова.
 - `rewarded` обязателен: если передать `null`, вылетит `ArgumentNullException`. `closed` можно не передавать.
 - Награду выдавайте **только** в `rewarded`, а кнопки и интерфейс возвращайте в рабочее состояние в `closed`. После успешного просмотра вызываются оба.
 - Не показывайте рекламу между уровнями сразу после рекламы за награду и не ставьте её на каждый перезапуск уровня: площадки за это снижают доход.
 
 ### 3.4 Рядом: покупки
 
-`Core/Purchasing/IPurchaseService.cs` → `Infrastructure/Prime/PrimePurchaseService.cs`. Сейчас поддержан один товар:
+`Core/Purchasing/IPurchaseService.cs` → `Infrastructure/JTL/JTLPurchaseService.cs`. Сейчас поддержан один товар:
 
 ```csharp
-private const string NoAdsProductId = "no_ads";        // метка товара на площадке
-private const string NoAdsOwnedKey  = "no_ads.owned";  // локальная отметка в сохранениях
+private const string NoAdsProductId = "no_ads";        // id товара в каталоге JTL SDK
+private const string NoAdsOwnedKey  = "no_ads.owned";  // отметка в сохранениях
 ```
 
 *Это фактический код проекта, а не пример.*
 
-Свойство `AdsDisabled` возвращает `true`, если сработало хотя бы одно из двух: есть локальная отметка или площадка подтверждает покупку через `IsAlreadyPurchased`. После успешной покупки отметка записывается, вызывается сохранение и поднимается событие `Changed`, на него реагирует рекламный сервис и убирает баннер.
+Товар `no_ads` нужно объявить в окне JTL SDK, раздел Purchases, с типом Non-consumable. Без этого `Purchase` сразу уходит в ошибку: товара нет в каталоге. Если id на Яндексе другой, он задаётся в поле Yandex Games id. Кнопка Generate constants в том же разделе пишет классы `ProductIds` в `Assets/Scripts/Generated/`, но этот файл попадает в `Assembly-CSharp`, а наши сборки на неё сослаться не могут, поэтому id храните константами в `Infrastructure`.
 
-Если понадобится второй товар, вынесите метки товаров в настройку (ScriptableObject) и замените `BuyRemoveAds()` на `BuyProduct(string productId, Action onSuccess)`. В нынешнем виде метод рассчитан ровно на один товар.
+Свойство `AdsDisabled` возвращает `true`, если сработало хотя бы одно из двух: в сохранениях есть отметка или площадка подтверждает покупку через `IsAlreadyPurchased`. После успешной покупки отметка записывается в `JTLSDK.Data` и поднимается событие `Changed`, на него реагирует рекламный сервис и прячет баннер. Сохраняет сейв и помечает покупку выданной сам SDK.
+
+Сервис зарегистрирован как точка входа: в `Start()` он ждёт SDK и вызывает `RestorePurchases`. Так возвращается покупка, которую игрок оплатил, но не получил: оборвалась связь или закрылась вкладка. На площадках без покупок (YouTube) восстановление пропускается.
+
+Если понадобится второй товар, вынесите id товаров в настройку (ScriptableObject) и замените `BuyRemoveAds()` на `BuyProduct(string productId, Action onSuccess)`. Восстановление при этом тоже должно уметь выдавать любой товар, а не только `no_ads`. Расходуемые товары (монеты) начисляйте прибавлением к значению в `JTLSDK.Data`, а не присваиванием: SDK списывает такую покупку только после сохранения.
 
 ---
 
@@ -297,44 +307,49 @@ public interface IExampleStorage
 
 *Это фактический код проекта, а не пример.*
 
-Реализация `Infrastructure/Prime/ExampleStorage.cs`, тонкая обёртка над `PrimeSDK.Data`:
+Реализация `Infrastructure/JTL/ExampleStorage.cs`, тонкая обёртка над `JTLSDK.Data`:
 
 ```csharp
 public int Coins
 {
-    get =>
-        PrimeSDK.Data.GetInt(CoinsKey, 0);
-
-    set =>
-        PrimeSDK.Data.SetInt(CoinsKey, value, important: false);
+    get => JTLSDK.Data.GetInt(CoinsKey);
+    set => JTLSDK.Data.SetInt(CoinsKey, value);
 }
 
-public void Save() =>
-    PrimeSDK.Data.Save();
+public void Save()
+{
+    JTLSDK.Data.Save();
+}
 ```
 
 *Это фактический код проекта, а не пример.*
 
 Имя `ExampleStorage` говорит само за себя: это образец из заготовки проекта. Настоящие сохранения (прогресс уровней, звёзды, настройки) пишутся по его примеру, см. 4.3.
 
-### 4.2 Как работает `PrimeSDK.Data`
+### 4.2 Как работает `JTLSDK.Data`
 
-Все значения лежат в памяти в четырёх словарях (`bool`, `int`, `float`, `string`), а при сохранении превращаются в одну строку JSON и уходят в хранилище платформы:
+Все ключи лежат в памяти и уходят на площадку одним JSON-документом целиком:
 
-| Где запускаем | Кто сохраняет | Куда физически попадает |
+| Где запускаем | Куда физически попадает | Лимит |
 |---|---|---|
-| Редактор Unity | `UnityEngineData` | `PlayerPrefs`, ключ `PrimeGames.SDK.Data` |
-| WebGL-сборка на площадке | `PrimeWebData` | В облако площадки через JS |
-| Заглушка | `FallbackData` | Никуда не пишет |
+| Редактор Unity | `PlayerPrefs`, ключ `JTLSDK.Data` | как у площадки активной конфигурации |
+| Яндекс Игры | Облако игрока: `player.getData` и `player.setData` | 200 KiB, предупреждение после 100 KiB |
+| YouTube Playables | Облако: `ytgame.game.loadData` и `saveData` | 3 MiB, предупреждение после 500 KiB |
 
-**Параметр `important`:**
+Документ больше лимита не отправляется, в консоли будет ошибка. Резервной копии в `localStorage` нет.
 
-- `important: true`: сразу после записи запрашивается сохранение;
-- `important: false`: значение меняется только в памяти и попадёт в хранилище при ближайшем вызове `Save()`.
+**Загрузка.** SDK загружает сейв при старте, модуль становится готовым только после первой загрузки, а `InitializeAsync` ждёт и его. До готовности чтение возвращает значение по умолчанию с предупреждением, а запись не выполняется. Если загрузка не удалась, запись блокируется, чтобы не затереть прогресс в облаке, и загрузка повторяется каждые 30 секунд.
 
-**`Save()` не пишет мгновенно.** Он только поднимает флаг «надо сохранить». Отдельная корутина внутри SDK записывает данные на ближайшем кадре и потом не чаще, чем раз в **3 секунды**. Поэтому вызывать `Save()` часто не страшно, но и рассчитывать, что данные окажутся в хранилище сию секунду, нельзя.
+**Параметр `important`** (по умолчанию `true`):
 
-**Правило на практике:** обычные значения пишите с `important: false` и вызывайте `Save()` один раз в конце важного момента: завершение уровня, выход в меню. Монеты и покупки пишите с `important: true`, чтобы не потерять их при внезапном закрытии вкладки.
+- `important: true`: значение меняется в памяти и запускает автосохранение, документ уйдёт на площадку через 2 секунды после последнего важного изменения;
+- `important: false`: значение меняется только в памяти и уйдёт на площадку со следующим важным изменением, при `Save()` или когда игрок скроет вкладку.
+
+**`Save(onSaved)` отправляет сразу**, вместе со всеми неважными изменениями. Колбэк получает `false`, если сейв ещё не загружен или загрузился с ошибкой. Если уже идёт другая запись, новая встаёт в очередь.
+
+**Правило на практике:** монеты, открытые уровни и покупки пишите как есть, с `important` по умолчанию. С `important: false` пишите то, что меняется часто: прогресс внутри уровня, позицию игрока, счётчики. В конце важного момента (завершение уровня, выход в меню) вызывайте `Save()`.
+
+Закрытие вкладки SDK ловит сам: когда страница скрывается, изменённый сейв уходит на площадку. Если игрок на Яндексе войдёт в аккаунт, SDK перечитает сейв уже с аккаунта.
 
 ### 4.3 Как добавить своё сохраняемое значение
 
@@ -344,16 +359,13 @@ public void Save() =>
 // Core/Storage/IExampleStorage.cs
 int BestScore { get; set; }
 
-// Infrastructure/Prime/ExampleStorage.cs
+// Infrastructure/JTL/ExampleStorage.cs
 private const string BestScoreKey = "best_score";
 
 public int BestScore
 {
-    get =>
-        PrimeSDK.Data.GetInt(BestScoreKey, 0);
-
-    set =>
-        PrimeSDK.Data.SetInt(BestScoreKey, value, important: false);
+    get => JTLSDK.Data.GetInt(BestScoreKey);
+    set => JTLSDK.Data.SetInt(BestScoreKey, value);
 }
 ```
 
@@ -378,7 +390,7 @@ namespace _Project.Core.Storage
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
 ```csharp
-// Infrastructure/Prime/LevelProgressStorage.cs
+// Infrastructure/JTL/LevelProgressStorage.cs
 public class LevelProgressStorage : ILevelProgressStorage
 {
     private const string LastUnlockedKey = "progress.last_unlocked";
@@ -386,21 +398,24 @@ public class LevelProgressStorage : ILevelProgressStorage
 
     public int LastUnlockedLevel
     {
-        get =>
-            PrimeSDK.Data.GetInt(LastUnlockedKey, 0);
-
-        set =>
-            PrimeSDK.Data.SetInt(LastUnlockedKey, value, important: false);
+        get => JTLSDK.Data.GetInt(LastUnlockedKey);
+        set => JTLSDK.Data.SetInt(LastUnlockedKey, value);
     }
 
-    public int GetStars(int levelIndex) =>
-        PrimeSDK.Data.GetInt(StarsKeyPrefix + levelIndex, 0);
+    public int GetStars(int levelIndex)
+    {
+        return JTLSDK.Data.GetInt(StarsKeyPrefix + levelIndex);
+    }
 
-    public void SetStars(int levelIndex, int stars) =>
-        PrimeSDK.Data.SetInt(StarsKeyPrefix + levelIndex, stars, important: false);
+    public void SetStars(int levelIndex, int stars)
+    {
+        JTLSDK.Data.SetInt(StarsKeyPrefix + levelIndex, stars);
+    }
 
-    public void Save() =>
-        PrimeSDK.Data.Save();
+    public void Save()
+    {
+        JTLSDK.Data.Save();
+    }
 }
 ```
 
@@ -414,11 +429,11 @@ builder.Register<LevelProgressStorage>(Lifetime.Singleton).As<ILevelProgressStor
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Ключи именуйте с префиксом области (`progress.`, `settings.`), так их легко найти и не пересечься с чужими.
+Ключи именуйте с префиксом области (`progress.`, `settings.`), так их легко найти и не пересечься с чужими. Ключи `jtlsdk.*` занимает сам SDK.
 
 ### 4.4 Сохранение сложных данных
 
-Для целых структур есть `GetObject<T>` и `SetObject<T>`. Внутри обычный `JsonUtility`, со всеми его ограничениями: класс должен быть помечен `[Serializable]`, сохраняются только открытые поля (не свойства), `Dictionary` не поддерживается.
+Для целых структур есть `GetObject<T>` и `SetObject<T>`. Внутри обычный `JsonUtility`, со всеми его ограничениями: класс должен быть помечен `[Serializable]`, сохраняются только поля, которые сериализует `JsonUtility` (открытые и `[SerializeField]`, не свойства), `Dictionary` не поддерживается.
 
 ```csharp
 [Serializable]
@@ -430,35 +445,35 @@ public class ProfileData
 }
 
 // запись
-PrimeSDK.Data.SetObject("profile", profile, important: false);
-PrimeSDK.Data.Save();
+JTLSDK.Data.SetObject("profile", profile);
+JTLSDK.Data.Save();
 
 // чтение
-ProfileData profile = PrimeSDK.Data.GetObject("profile", new ProfileData());
+ProfileData profile = JTLSDK.Data.GetObject("profile", new ProfileData());
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Ещё есть `HasKey`, `DeleteKey` и `DeleteAll`, удобно для кнопки «сбросить прогресс» в отладочном меню. Учтите: `DeleteAll` сотрёт и отметку о покупке `no_ads.owned`.
+Ещё есть `HasKey`, `DeleteKey` и `DeleteAll`, удобно для кнопки «сбросить прогресс» в отладочном меню. Учтите: `DeleteAll` сотрёт и отметку о покупке `no_ads.owned`, и служебную отметку SDK о выданных покупках `jtlsdk.granted`.
 
 ### 4.5 Как очистить сохранения
 
-Во время разработки постоянно нужно пройти игру «с нуля»: проверить первый запуск, туториал, выдачу стартовых монет. В редакторе все сохранения лежат в `PlayerPrefs`, и чистятся они одним пунктом меню:
+Во время разработки постоянно нужно пройти игру «с нуля»: проверить первый запуск, туториал, выдачу стартовых монет. В редакторе сейв лежит в `PlayerPrefs`, а смотреть и чистить его удобнее всего в окне SDK:
 
-**Edit → Clear All PlayerPrefs**
+**JTL SDK → Toolkit → Saves**: значения можно поправить руками, очистить, выгрузить и загрузить JSON. В разделе Simulation есть `Simulate load failure` и `Empty save on start`.
 
-Пункт стирает вообще все сохранённые данные проекта: и прогресс, и отметку о покупке «без рекламы», и настройки. Игру после этого нужно перезапустить: `PrimeSDK.Data` читает данные один раз при старте и дальше держит их в памяти, поэтому пока сцена играет, старые значения останутся.
+Пункт **Edit → Clear All PlayerPrefs** тоже работает, но стирает вообще всё: сейв, симуляцию покупок редактора (`JTLSDK.Prototype.Purchases`) и настройки. Игру после очистки нужно перезапустить: SDK читает сейв один раз при старте и дальше держит его в памяти.
 
 Если нужно стереть не всё, а только часть, сделайте кнопку в отладочном меню:
 
 ```csharp
 // стереть одно значение
-PrimeSDK.Data.DeleteKey("progress.last_unlocked");
+JTLSDK.Data.DeleteKey("progress.last_unlocked");
 
-// стереть все данные PrimeSDK
-PrimeSDK.Data.DeleteAll();
+// стереть все данные
+JTLSDK.Data.DeleteAll();
 
-PrimeSDK.Data.Save();
+JTLSDK.Data.Save();
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
@@ -471,12 +486,12 @@ PrimeSDK.Data.Save();
 
 | Что проверяем | Как |
 |---|---|
-| Реклама | Запустите Play Mode: поверх игры появится окно «рекламы» с кнопкой закрытия, обработчики вызовутся по-настоящему |
-| Аналитика PrimeSDK | В консоли редактора появится предупреждение от заглушки, значит событие дошло до сервиса. Дальше в редакторе оно никуда не уходит, это нормально |
+| Реклама | В Play Mode SDK показывает во вкладке Game окно с вариантами ответа площадки, обработчики вызываются по-настоящему. Ответы настраиваются в окне JTL SDK, раздел Simulation |
+| Игровые события | В консоли строки `[JTL SDK]` о `GameReady` и смене геймплея (при уровне логов «Всё») |
 | Яндекс.Метрика | В редакторе: строка `[YandexMetrica] (sim) ym(...)` в консоли. В WebGL-сборке: вкладка Network в браузере, запросы на `mc.yandex.ru`, и отчёт «Конверсии» в кабинете Метрики |
-| Сохранения | В редакторе всё лежит в `PlayerPrefs` под ключом `PrimeGames.SDK.Data` одной строкой JSON. Как сбросить, см. 4.5 |
-| Покупки | В редакторе покупка проходит без настоящей оплаты, можно проверять логику «без рекламы» |
+| Сохранения | Окно JTL SDK, раздел Saves. Как сбросить, см. 4.5 |
+| Покупки | Без настоящей оплаты: Simulation, Purchases, `Ask every time` или `Use selected result`. Вариант `paid, restored on next launch` проверяет восстановление: товар придёт через `RestorePurchases` при следующем запуске Play Mode |
 
-Сообщения самого SDK в консоли начинаются с имени его части. Строка «Hello! Don't forget to WaitForProviders before using my API» означает, что SDK запустился: она появляется всегда и ошибкой не является.
+Сообщения SDK в консоли начинаются с `[JTL SDK]`. Уровень логов задаётся в окне SDK (Configurations, General settings, Logging level) или из кода через `JTLSDK.LogLevel`.
 
-Если ответа на вопрос нет в этом документе, смотрите официальную документацию PrimeSDK: [prime-publisher.com/sdk](https://prime-publisher.com/sdk/).
+Если ответа на вопрос нет в этом документе, смотрите официальную документацию JTL SDK: [meepifiev.github.io/com.jtlstudio.sdk](https://meepifiev.github.io/com.jtlstudio.sdk/).
