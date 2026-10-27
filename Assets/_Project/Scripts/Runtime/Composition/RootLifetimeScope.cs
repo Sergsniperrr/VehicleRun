@@ -9,6 +9,7 @@ using _Project.Composition.Startup;
 using _Project.Core.SceneManagement;
 using _Project.Core.StateMachine;
 using _Project.Core.Time;
+using _Project.Infrastructure.Analytics;
 using _Project.Infrastructure.Audio;
 using _Project.Infrastructure.JTL;
 using _Project.Infrastructure.SceneManagement;
@@ -23,11 +24,13 @@ namespace _Project.Composition
     public class RootLifetimeScope : LifetimeScope
     {
         [SerializeField] private LocalizationConfig _localizationConfig;
+        [SerializeField] private string _yandexMetricaCounterId;
 
         protected override void Configure(IContainerBuilder builder)
         {
             RegisterConfigs(builder);
             RegisterServices(builder);
+            RegisterAnalytics(builder);
             RegisterPlatform(builder);
             RegisterStorage(builder);
             RegisterStateMachine(builder);
@@ -42,6 +45,11 @@ namespace _Project.Composition
         private void RegisterStorage(IContainerBuilder builder)
         {
             builder.Register<ExampleStorage>(Lifetime.Singleton).As<IExampleStorage>();
+        }
+
+        private void RegisterAnalytics(IContainerBuilder builder)
+        {
+            builder.RegisterEntryPoint<YandexMetrica>().AsSelf().WithParameter(_yandexMetricaCounterId);
         }
 
         private void RegisterPlatform(IContainerBuilder builder)

@@ -14,12 +14,6 @@ namespace _Project.UI.Localization
         private TMP_Text _label;
         private ILocalizationService _localization;
 
-        [Inject]
-        public void Construct(ILocalizationService localization)
-        {
-            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        }
-
         private void Awake()
         {
             _label = GetComponent<TMP_Text>();
@@ -28,6 +22,12 @@ namespace _Project.UI.Localization
         private void Start()
         {
             _label.text = _localization.Get(_key);
+        }
+
+        [Inject]
+        public void Construct(ILocalizationService localization)
+        {
+            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
     }
 }

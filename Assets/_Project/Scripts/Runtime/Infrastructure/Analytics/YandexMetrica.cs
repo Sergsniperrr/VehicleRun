@@ -1,42 +1,36 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
+using VContainer.Unity;
 
 namespace _Project.Infrastructure.Analytics
 {
-    public static class YandexMetrica
+    public class YandexMetrica : IInitializable
     {
-        private static string _counterId;
+        private readonly string _counterId;
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-        [DllImport("__Internal")]
-        private static extern void InitYandexMetrica(string counterId);
-
-        [DllImport("__Internal")]
-        private static extern void YandexMetricaSend_js(string eventName);
-
-        [DllImport("__Internal")]
-        private static extern void YandexMetricaSend2_js(string eventName, string eventDataJson);
-#endif
-
-        public static void Init(string counterId)
+        public YandexMetrica(string counterId)
         {
-            _counterId = counterId;
+            _counterId = counterId ?? throw new ArgumentNullException(nameof(counterId));
+        }
 
-            if (string.IsNullOrEmpty(counterId))
+        public void Initialize()
+        {
+            if (string.IsNullOrEmpty(_counterId))
             {
                 return;
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            InitYandexMetrica(counterId);
+            InitYandexMetrica(_counterId);
 #else
-            Debug.Log($"[YandexMetrica] (sim) init: ym({counterId}, \"init\", {{...}})");
+            Debug.Log($"[YandexMetrica] (sim) init: ym({_counterId}, \"init\", {{...}})");
 #endif
         }
 
-        public static void ReachGoal(string eventName)
+        public void ReachGoal(string eventName)
         {
             if (string.IsNullOrEmpty(eventName))
             {
@@ -50,7 +44,7 @@ namespace _Project.Infrastructure.Analytics
 #endif
         }
 
-        public static void ReachGoal(string eventName, Dictionary<string, string> eventData)
+        public void ReachGoal(string eventName, Dictionary<string, string> eventData)
         {
             if (string.IsNullOrEmpty(eventName))
             {
@@ -66,9 +60,9 @@ namespace _Project.Infrastructure.Analytics
 #endif
         }
 
-        private static string ToJson(Dictionary<string, string> data)
+        private string ToJson(Dictionary<string, string> eventData)
         {
-            if (data == null || data.Count == 0)
+            if (eventData == null || eventData.Count == 0)
             {
                 return "{}";
             }
@@ -77,7 +71,7 @@ namespace _Project.Infrastructure.Analytics
             builder.Append('{');
             bool first = true;
 
-            foreach (KeyValuePair<string, string> pair in data)
+            foreach (KeyValuePair<string, string> pair in eventData)
             {
                 if (first == false)
                 {
@@ -94,7 +88,7 @@ namespace _Project.Infrastructure.Analytics
             return builder.ToString();
         }
 
-        private static void AppendString(StringBuilder builder, string value)
+        private void AppendString(StringBuilder builder, string value)
         {
             builder.Append('"');
 
@@ -102,19 +96,52 @@ namespace _Project.Infrastructure.Analytics
             {
                 foreach (char symbol in value)
                 {
-                    switch (symbol)
-                    {
-                        case '"': builder.Append("\\\""); break;
-                        case '\\': builder.Append("\\\\"); break;
-                        case '\n': builder.Append("\\n"); break;
-                        case '\r': builder.Append("\\r"); break;
-                        case '\t': builder.Append("\\t"); break;
-                        default: builder.Append(symbol); break;
-                    }
+                    AppendEscaped(builder, symbol);
                 }
             }
 
             builder.Append('"');
         }
+
+        private void AppendEscaped(StringBuilder builder, char symbol)
+        {
+            switch (symbol)
+            {
+                case '"':
+                    builder.Append("\\\"");
+                    break;
+
+                case '\\':
+                    builder.Append("\\\\");
+                    break;
+
+                case '\n':
+                    builder.Append("\\n");
+                    break;
+
+                case '\r':
+                    builder.Append("\\r");
+                    break;
+
+                case '\t':
+                    builder.Append("\\t");
+                    break;
+
+                default:
+                    builder.Append(symbol);
+                    break;
+            }
+        }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        [DllImport("__Internal")]
+        private static extern void InitYandexMetrica(string counterId);
+
+        [DllImport("__Internal")]
+        private static extern void YandexMetricaSend_js(string eventName);
+
+        [DllImport("__Internal")]
+        private static extern void YandexMetricaSend2_js(string eventName, string eventDataJson);
+#endif
     }
 }

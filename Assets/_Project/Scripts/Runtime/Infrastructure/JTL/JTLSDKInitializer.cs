@@ -1,3 +1,4 @@
+using System.Threading;
 using _Project.Core.Platform;
 using Cysharp.Threading.Tasks;
 using JTLStudio.SDK;
@@ -8,23 +9,30 @@ namespace _Project.Infrastructure.JTL
     {
         private UniTaskCompletionSource _initialization;
 
-        public UniTask InitializeAsync()
+        public UniTask InitializeAsync(CancellationToken cancellationToken = default)
         {
-            if (_initialization != null)
+            if (_initialization == null)
             {
-                return _initialization.Task;
+                _initialization = new UniTaskCompletionSource();
+                CreateSdk();
             }
 
-            _initialization = new UniTaskCompletionSource();
+            return _initialization.Task.AttachExternalCancellation(cancellationToken);
+        }
 
+        private void CreateSdk()
+        {
             if (JTLSDK.IsCreated == false)
             {
                 JTLSDK.Create();
             }
 
-            JTLSDK.WhenReady(() => _initialization.TrySetResult());
+            JTLSDK.WhenReady(OnSdkReady);
+        }
 
-            return _initialization.Task;
+        private void OnSdkReady()
+        {
+            _initialization.TrySetResult();
         }
     }
 }

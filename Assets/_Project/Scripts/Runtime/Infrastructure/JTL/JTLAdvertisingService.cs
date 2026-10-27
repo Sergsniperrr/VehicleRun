@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using _Project.Core.Advertising;
 using _Project.Core.Platform;
 using _Project.Core.Purchasing;
@@ -12,6 +13,7 @@ namespace _Project.Infrastructure.JTL
     {
         private readonly IPlatformInitializer _platformInitializer;
         private readonly IPurchaseService _purchases;
+        private readonly CancellationTokenSource _lifetimeCancellation = new CancellationTokenSource();
 
         public JTLAdvertisingService(IPlatformInitializer platformInitializer, IPurchaseService purchases)
         {
@@ -21,13 +23,15 @@ namespace _Project.Infrastructure.JTL
 
         public void Start()
         {
-            _purchases.Changed += ApplyBannerPolicy;
-            ApplyBannerPolicyWhenReady().Forget();
+            _purchases.Changed += OnPurchasesChanged;
+            ApplyBannerPolicyWhenReady(_lifetimeCancellation.Token).Forget();
         }
 
         public void Dispose()
         {
-            _purchases.Changed -= ApplyBannerPolicy;
+            _purchases.Changed -= OnPurchasesChanged;
+            _lifetimeCancellation.Cancel();
+            _lifetimeCancellation.Dispose();
         }
 
         public void ShowInterstitial()
@@ -58,9 +62,9 @@ namespace _Project.Infrastructure.JTL
             });
         }
 
-        private async UniTaskVoid ApplyBannerPolicyWhenReady()
+        private async UniTaskVoid ApplyBannerPolicyWhenReady(CancellationToken cancellationToken)
         {
-            await _platformInitializer.InitializeAsync();
+            await _platformInitializer.InitializeAsync(cancellationToken);
 
             ApplyBannerPolicy();
         }
@@ -71,6 +75,11 @@ namespace _Project.Infrastructure.JTL
             {
                 JTLSDK.Ads.HideBanner();
             }
+        }
+
+        private void OnPurchasesChanged()
+        {
+            ApplyBannerPolicy();
         }
     }
 }

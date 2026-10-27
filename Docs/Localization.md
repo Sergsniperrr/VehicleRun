@@ -79,16 +79,28 @@ public class LocalizedText : MonoBehaviour
 {
     [SerializeField] private string _key;
 
-    [Inject]
-    public void Construct(ILocalizationService localization) =>
-        ...
+    private TMP_Text _label;
+    private ILocalizationService _localization;
 
-    private void Start() =>
+    private void Awake()
+    {
+        _label = GetComponent<TMP_Text>();
+    }
+
+    private void Start()
+    {
         _label.text = _localization.Get(_key);
+    }
+
+    [Inject]
+    public void Construct(ILocalizationService localization)
+    {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+    }
 }
 ```
 
-*Это фактический код проекта, приведён сокращённо.*
+*Это фактический код проекта, а не пример.*
 
 **Важный шаг, без которого компонент не заработает.** Сервис приходит в компонент через `[Inject]`, а VContainer сам по себе не раздаёт зависимости всем объектам сцены. Он внедряет их только в те объекты, которые указаны в списке `Auto Inject Game Objects` у `LifetimeScope` на сцене.
 
@@ -109,16 +121,23 @@ public class LocalizedText : MonoBehaviour
 ```csharp
 public class ResultScreen : MonoBehaviour
 {
+    private const string VictoryTitleKey = "level.victory.title";
+
     [SerializeField] private TMP_Text _title;
 
     private ILocalizationService _localization;
 
     [Inject]
-    public void Construct(ILocalizationService localization) =>
-        _localization = localization;
+    public void Construct(ILocalizationService localization)
+    {
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+    }
 
-    public void ShowVictory(int levelIndex) =>
-        _title.text = string.Format(_localization.Get("level.victory.title"), levelIndex);
+    public void ShowVictory(int levelIndex)
+    {
+        string title = string.Format(_localization.Get(VictoryTitleKey), levelIndex);
+        _title.text = title;
+    }
 }
 ```
 
@@ -180,34 +199,52 @@ _title.text = _localization.Localize("Победа", "Victory");
 **Добавить третий язык.** Сейчас в записи два текстовых поля. Для третьего языка добавьте поле в `Entry`, разберите язык в сервисе и включите язык в окне JTL SDK, раздел Languages:
 
 ```csharp
-private string Pick(LocalizationConfig.Entry entry) =>
-    _language switch
+private string Pick(LocalizationConfig.Entry entry)
+{
+    return _language switch
     {
         Language.Russian => entry.Russian,
         Language.Turkish => entry.Turkish,
         _ => entry.English,
     };
+}
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
 Если языков становится больше трёх, поля в инспекторе перестают быть удобными. Тогда лучше перейти на список пар «язык и текст» внутри записи, на таблицу из внешнего файла или на пакет JTL SDK `com.jtlstudio.sdk.localization`: в нём таблицы ключей, компонент `Localized Text`, шрифты по языкам и автоперевод пустых строк. Пакет ставится из окна SDK, раздел Package Manager.
 
-**Обновлять текст при смене языка.** Нужно, если появится переключатель языка в настройках. Сервис подписывается на `JTLSDK.Language.Changed`, пересобирает словарь и поднимает своё событие, а `LocalizedText` подписывается на него и перечитывает свой ключ:
+**Обновлять текст при смене языка.** Нужно, если появится переключатель языка в настройках. Сервис подписывается на `JTLSDK.Language.Changed`, пересобирает словарь и поднимает своё событие. В интерфейс `Core/Localization/ILocalizationService.cs` добавляется:
 
 ```csharp
-// Core/Localization/ILocalizationService.cs
 event Action LanguageChanged;
+```
 
-// UI/Localization/LocalizedText.cs
-private void OnEnable() =>
-    _localization.LanguageChanged += Refresh;
+*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-private void OnDisable() =>
-    _localization.LanguageChanged -= Refresh;
+А `UI/Localization/LocalizedText.cs` подписывается на него и перечитывает свой ключ. Подписка стоит в `Start`, а не в `OnEnable`: к `Start` сервис уже внедрён, а `OnEnable` может сработать раньше внедрения.
 
-private void Refresh() =>
+```csharp
+private void Start()
+{
+    _localization.LanguageChanged += OnLanguageChanged;
+    ApplyText();
+}
+
+private void OnDestroy()
+{
+    _localization.LanguageChanged -= OnLanguageChanged;
+}
+
+private void ApplyText()
+{
     _label.text = _localization.Get(_key);
+}
+
+private void OnLanguageChanged()
+{
+    ApplyText();
+}
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*

@@ -8,6 +8,13 @@ namespace _Project.Infrastructure.JTL
 {
     public class JTLAnalyticsService : IAnalyticsService, IAnalyticsReporter
     {
+        private readonly YandexMetrica _yandexMetrica;
+
+        public JTLAnalyticsService(YandexMetrica yandexMetrica)
+        {
+            _yandexMetrica = yandexMetrica ?? throw new ArgumentNullException(nameof(yandexMetrica));
+        }
+
         public void ReportEvent(IAnalyticsEvent analyticsEvent)
         {
             if (analyticsEvent == null)
@@ -20,12 +27,12 @@ namespace _Project.Infrastructure.JTL
 
         public void ReportDesignEvent(string eventName)
         {
-            YandexMetrica.ReachGoal(eventName);
+            _yandexMetrica.ReachGoal(eventName);
         }
 
         public void ReportDesignEvent(string eventName, Dictionary<string, string> eventData)
         {
-            YandexMetrica.ReachGoal(eventName, eventData);
+            _yandexMetrica.ReachGoal(eventName, eventData);
         }
 
         public void ReportGameReady()

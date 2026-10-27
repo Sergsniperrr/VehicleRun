@@ -27,7 +27,7 @@ Assets/_Project/Scripts/Runtime/
 │   ├── JTL/JTLPurchaseService.cs
 │   ├── JTL/ExampleStorage.cs
 │   ├── JTL/JTLSDKInitializer.cs
-│   └── Analytics/YandexMetrica.cs, YandexMetricaInitializer.cs
+│   └── Analytics/YandexMetrica.cs
 └── Composition/
     ├── RootLifetimeScope.cs       здесь регистрируются все сервисы
     └── Startup/                   BootstrapState → LoadRunState → RunState
@@ -49,7 +49,7 @@ Assets/_Project/Scripts/Runtime/
 
 `InitializeAsync` можно вызывать сколько угодно раз: SDK создаётся один раз, все вызовы ждут одну и ту же готовность. Сервисы рекламы и покупок пользуются этим в своём `Start()`. Готовность приходит всегда: модуль, который не ответил за 15 секунд, помечается `Failed` и дальше отвечает безопасными значениями, без исключений.
 
-Отдельно от этого работает `YandexMetricaInitializer`: обычный MonoBehaviour на сцене `Bootstrap`, который в `Awake()` поднимает счётчик Яндекс.Метрики. От JTL SDK он не зависит.
+Отдельно от этого работает `YandexMetrica`: точка входа в `RootLifetimeScope`, которая в `Initialize()` поднимает счётчик Яндекс.Метрики, как только собран корневой контейнер. От JTL SDK она не зависит.
 
 ---
 
@@ -86,20 +86,24 @@ Assets/_Project/Scripts/Runtime/
 using _Project.Core.Analytics;
 using _Project.Core.Analytics.Events;
 
-public class LevelFlow
+public class LevelSession
 {
     private readonly IAnalyticsService _analytics;
 
-    public LevelFlow(IAnalyticsService analytics)
+    public LevelSession(IAnalyticsService analytics)
     {
         _analytics = analytics ?? throw new ArgumentNullException(nameof(analytics));
     }
 
-    public void StartLevel() =>
+    public void StartLevel()
+    {
         _analytics.ReportEvent(new GameplayStartedEvent());
+    }
 
-    public void StopLevel() =>
+    public void StopLevel()
+    {
         _analytics.ReportEvent(new GameplayStoppedEvent());
+    }
 }
 ```
 
@@ -113,8 +117,10 @@ public class ResultScreen : MonoBehaviour
     private IAnalyticsService _analytics;
 
     [Inject]
-    public void Construct(IAnalyticsService analytics) =>
-        _analytics = analytics;
+    public void Construct(IAnalyticsService analytics)
+    {
+        _analytics = analytics ?? throw new ArgumentNullException(nameof(analytics));
+    }
 }
 ```
 
@@ -160,7 +166,7 @@ namespace _Project.Core.Analytics.Events
 **Шаг 2.** Вызовите его из игрового кода:
 
 ```csharp
-_analytics.ReportEvent(new LevelCompletedEvent(3, session.CurrentDamage, session.ThrowsLeft));
+_analytics.ReportEvent(new LevelCompletedEvent(_levelIndex, _session.CurrentDamage, _session.ThrowsLeft));
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
@@ -175,13 +181,21 @@ _analytics.ReportEvent(new LevelCompletedEvent(3, session.CurrentDamage, session
 
 ### 2.5 Настройка Яндекс.Метрики
 
-`YandexMetricaInitializer` лежит на сцене `Assets/_Project/Scenes/Bootstrap.unity`, номер счётчика задаётся в поле `_counterId` в инспекторе.
+Номер счётчика задаётся на префабе `Assets/_Project/Prefabs/RootLifetimeScope.prefab`, поле `Yandex Metrica Counter Id`. Контейнер передаёт его в конструктор `YandexMetrica`:
 
-> ⚠️ Сейчас поле пустое, поэтому Метрика фактически выключена: при пустом номере `Init` сразу выходит. Перед сборкой на площадку впишите туда номер счётчика.
+```csharp
+builder.RegisterEntryPoint<YandexMetrica>().AsSelf().WithParameter(_yandexMetricaCounterId);
+```
+
+*Это фактический код проекта, а не пример.*
+
+`JTLAnalyticsService` получает `YandexMetrica` через конструктор, как любую другую зависимость.
+
+> ⚠️ Сейчас поле пустое, поэтому Метрика фактически выключена: при пустом номере `Initialize` сразу выходит. Перед сборкой на площадку впишите туда номер счётчика.
 
 JS-часть лежит в `Assets/_Project/Plugins/WebGL/YandexMetrica.jslib`: она подключает скрипт Метрики на страницу и вызывает `ym(номер, 'reachGoal', имя, данные)`. Трогать её обычно не нужно.
 
-У JTL SDK есть свой пакет аналитики `com.jtlstudio.sdk.analytics`, он тоже шлёт цели в Метрику, а счётчик хранит в конфигурации площадки. В проекте он не установлен. Если решите на него перейти, уберите `YandexMetrica.jslib` и `YandexMetricaInitializer`, иначе скрипт Метрики поднимется на странице дважды.
+У JTL SDK есть свой пакет аналитики `com.jtlstudio.sdk.analytics`, он тоже шлёт цели в Метрику, а счётчик хранит в конфигурации площадки. В проекте он не установлен. Если решите на него перейти, уберите `YandexMetrica.jslib` и класс `YandexMetrica`, иначе скрипт Метрики поднимется на странице дважды.
 
 ---
 
@@ -194,12 +208,14 @@ JS-часть лежит в `Assets/_Project/Plugins/WebGL/YandexMetrica.jslib`:
 ```csharp
 public interface IAdvertisingService
 {
-    void ShowInterstitial();                                              // реклама между уровнями
-    void ShowRewarded(string rewardId, Action rewarded, Action closed);   // реклама за награду
+    void ShowInterstitial();
+    void ShowRewarded(string rewardId, Action rewarded, Action closed);
 }
 ```
 
 *Это фактический код проекта, а не пример.*
+
+`ShowInterstitial` показывает рекламу между уровнями, `ShowRewarded` рекламу за награду.
 
 ### 3.2 Реализация
 
@@ -213,7 +229,7 @@ builder.RegisterEntryPoint<JTLAdvertisingService>().As<IAdvertisingService>();
 
 Что она делает сверх простого проброса вызовов:
 
-1. **Ждёт SDK.** В `Start()` ждёт `IPlatformInitializer.InitializeAsync()` и, если куплено «без рекламы», прячет баннер.
+1. **Ждёт SDK.** В `Start()` ждёт `IPlatformInitializer.InitializeAsync()` и, если куплено «без рекламы», прячет баннер. Ожидание получает токен отмены, который отменяется в `Dispose()`.
 2. **Следит за покупками.** Подписана на `IPurchaseService.Changed`. Если игрок купил «без рекламы», баннер прячется через `HideBanner()`, а `ShowInterstitial()` просто ничего не делает.
 3. **Отписывается** в `Dispose()`, иначе останется висеть подписка на уничтоженный объект.
 4. **Упрощает награду.** SDK отдаёт один колбэк с `AdResult`. Сервис превращает его в два понятных: `rewarded` (вызывается только при `AdResult.Rewarded`) и `closed` (вызывается всегда).
@@ -229,6 +245,9 @@ builder.RegisterEntryPoint<JTLAdvertisingService>().As<IAdvertisingService>();
 ```csharp
 public class ExtraThrowsButton : MonoBehaviour
 {
+    private const string RewardId = "extra_throws";
+    private const int RewardedThrows = 3;
+
     [SerializeField] private Button _button;
 
     private IAdvertisingService _ads;
@@ -237,8 +256,8 @@ public class ExtraThrowsButton : MonoBehaviour
     [Inject]
     public void Construct(IAdvertisingService ads, LevelSession session)
     {
-        _ads = ads;
-        _session = session;
+        _ads = ads ?? throw new ArgumentNullException(nameof(ads));
+        _session = session ?? throw new ArgumentNullException(nameof(session));
     }
 
     public void OnClick()
@@ -246,8 +265,8 @@ public class ExtraThrowsButton : MonoBehaviour
         _button.interactable = false;
 
         _ads.ShowRewarded(
-            rewardId: "extra_throws",
-            rewarded: () => _session.AddThrows(3),
+            rewardId: RewardId,
+            rewarded: () => _session.AddThrows(RewardedThrows),
             closed: () => _button.interactable = true);
     }
 }
@@ -255,10 +274,10 @@ public class ExtraThrowsButton : MonoBehaviour
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Реклама между уровнями:
+Реклама между уровнями вызывается одной строкой и ничего не возвращает. Если куплено «без рекламы», вызов просто не сработает:
 
 ```csharp
-_ads.ShowInterstitial();   // ничего не вернёт: если куплено «без рекламы», вызов просто не сработает
+_ads.ShowInterstitial();
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
@@ -272,11 +291,11 @@ _ads.ShowInterstitial();   // ничего не вернёт: если купл�
 
 ### 3.4 Рядом: покупки
 
-`Core/Purchasing/IPurchaseService.cs` → `Infrastructure/JTL/JTLPurchaseService.cs`. Сейчас поддержан один товар:
+`Core/Purchasing/IPurchaseService.cs` → `Infrastructure/JTL/JTLPurchaseService.cs`. Сейчас поддержан один товар: `NoAdsProductId` это id товара в каталоге JTL SDK, `NoAdsOwnedKey` это отметка в сохранениях.
 
 ```csharp
-private const string NoAdsProductId = "no_ads";        // id товара в каталоге JTL SDK
-private const string NoAdsOwnedKey  = "no_ads.owned";  // отметка в сохранениях
+private const string NoAdsProductId = "no_ads";
+private const string NoAdsOwnedKey = "no_ads.owned";
 ```
 
 *Это фактический код проекта, а не пример.*
@@ -285,7 +304,7 @@ private const string NoAdsOwnedKey  = "no_ads.owned";  // отметка в со
 
 Свойство `AdsDisabled` возвращает `true`, если сработало хотя бы одно из двух: в сохранениях есть отметка или площадка подтверждает покупку через `IsAlreadyPurchased`. После успешной покупки отметка записывается в `JTLSDK.Data` и поднимается событие `Changed`, на него реагирует рекламный сервис и прячет баннер. Сохраняет сейв и помечает покупку выданной сам SDK.
 
-Сервис зарегистрирован как точка входа: в `Start()` он ждёт SDK и вызывает `RestorePurchases`. Так возвращается покупка, которую игрок оплатил, но не получил: оборвалась связь или закрылась вкладка. На площадках без покупок (YouTube) восстановление пропускается.
+Сервис зарегистрирован как точка входа: в `Start()` он ждёт SDK и вызывает `RestorePurchases`, а в `Dispose()` отменяет ожидание. Так возвращается покупка, которую игрок оплатил, но не получил: оборвалась связь или закрылась вкладка. На площадках без покупок (YouTube) восстановление пропускается.
 
 Если понадобится второй товар, вынесите id товаров в настройку (ScriptableObject) и замените `BuyRemoveAds()` на `BuyProduct(string productId, Action onSuccess)`. Восстановление при этом тоже должно уметь выдавать любой товар, а не только `no_ads`. Расходуемые товары (монеты) начисляйте прибавлением к значению в `JTLSDK.Data`, а не присваиванием: SDK списывает такую покупку только после сохранения.
 
@@ -301,6 +320,7 @@ private const string NoAdsOwnedKey  = "no_ads.owned";  // отметка в со
 public interface IExampleStorage
 {
     int Coins { get; set; }
+
     void Save();
 }
 ```
@@ -353,13 +373,17 @@ public void Save()
 
 ### 4.3 Как добавить своё сохраняемое значение
 
-Быстро: добавить поле в существующий класс:
+Быстро: добавить поле в существующий класс. В интерфейс `Core/Storage/IExampleStorage.cs`:
 
 ```csharp
-// Core/Storage/IExampleStorage.cs
 int BestScore { get; set; }
+```
 
-// Infrastructure/JTL/ExampleStorage.cs
+*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
+
+И в реализацию `Infrastructure/JTL/ExampleStorage.cs`:
+
+```csharp
 private const string BestScoreKey = "best_score";
 
 public int BestScore
@@ -371,15 +395,15 @@ public int BestScore
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Правильно: завести отдельный класс под свою область. Так и делайте, вместо того чтобы раздувать `ExampleStorage`:
+Правильно: завести отдельный класс под свою область. Так и делайте, вместо того чтобы раздувать `ExampleStorage`. Интерфейс `Core/Storage/ILevelProgressStorage.cs`:
 
 ```csharp
-// Core/Storage/ILevelProgressStorage.cs
 namespace _Project.Core.Storage
 {
     public interface ILevelProgressStorage
     {
         int LastUnlockedLevel { get; set; }
+
         int GetStars(int levelIndex);
         void SetStars(int levelIndex, int stars);
         void Save();
@@ -389,12 +413,13 @@ namespace _Project.Core.Storage
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
+Реализация `Infrastructure/JTL/LevelProgressStorage.cs`:
+
 ```csharp
-// Infrastructure/JTL/LevelProgressStorage.cs
 public class LevelProgressStorage : ILevelProgressStorage
 {
     private const string LastUnlockedKey = "progress.last_unlocked";
-    private const string StarsKeyPrefix  = "progress.stars.";
+    private const string StarsKeyPrefix = "progress.stars.";
 
     public int LastUnlockedLevel
     {
@@ -435,21 +460,35 @@ builder.Register<LevelProgressStorage>(Lifetime.Singleton).As<ILevelProgressStor
 
 Для целых структур есть `GetObject<T>` и `SetObject<T>`. Внутри обычный `JsonUtility`, со всеми его ограничениями: класс должен быть помечен `[Serializable]`, сохраняются только поля, которые сериализует `JsonUtility` (открытые и `[SerializeField]`, не свойства), `Dictionary` не поддерживается.
 
+Такой класс это чистая модель данных, поэтому открытые поля в нём допустимы:
+
 ```csharp
 [Serializable]
 public class ProfileData
 {
-    public int coins;
-    public int lastLevel;
-    public int[] stars;
+    public int Coins;
+    public int LastLevel;
+    public int[] Stars;
+}
+```
+
+*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
+
+Запись и чтение внутри класса хранилища в `Infrastructure`:
+
+```csharp
+private const string ProfileKey = "profile";
+
+public void SaveProfile(ProfileData profile)
+{
+    JTLSDK.Data.SetObject(ProfileKey, profile);
+    JTLSDK.Data.Save();
 }
 
-// запись
-JTLSDK.Data.SetObject("profile", profile);
-JTLSDK.Data.Save();
-
-// чтение
-ProfileData profile = JTLSDK.Data.GetObject("profile", new ProfileData());
+public ProfileData LoadProfile()
+{
+    return JTLSDK.Data.GetObject(ProfileKey, new ProfileData());
+}
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
@@ -464,16 +503,20 @@ ProfileData profile = JTLSDK.Data.GetObject("profile", new ProfileData());
 
 Пункт **Edit → Clear All PlayerPrefs** тоже работает, но стирает вообще всё: сейв, симуляцию покупок редактора (`JTLSDK.Prototype.Purchases`) и настройки. Игру после очистки нужно перезапустить: SDK читает сейв один раз при старте и дальше держит его в памяти.
 
-Если нужно стереть не всё, а только часть, сделайте кнопку в отладочном меню:
+Если нужно стереть не всё, а только часть, сделайте кнопку в отладочном меню. `DeleteKey` стирает одно значение, `DeleteAll` все данные; после них вызывайте `Save()`. Методы живут в классе хранилища в `Infrastructure`, а кнопка вызывает их через интерфейс из `Core`:
 
 ```csharp
-// стереть одно значение
-JTLSDK.Data.DeleteKey("progress.last_unlocked");
+public void ResetProgress()
+{
+    JTLSDK.Data.DeleteKey(LastUnlockedKey);
+    JTLSDK.Data.Save();
+}
 
-// стереть все данные
-JTLSDK.Data.DeleteAll();
-
-JTLSDK.Data.Save();
+public void ResetAll()
+{
+    JTLSDK.Data.DeleteAll();
+    JTLSDK.Data.Save();
+}
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*

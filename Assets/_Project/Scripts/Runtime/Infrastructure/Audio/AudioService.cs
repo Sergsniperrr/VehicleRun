@@ -23,7 +23,9 @@ namespace _Project.Infrastructure.Audio
         public void PlayOneShot(AudioAsset asset)
         {
             if (asset.Category != AudioCategories.SFX)
-                throw new InvalidOperationException();
+            {
+                throw new InvalidOperationException(nameof(asset));
+            }
 
             AudioSource source = CreateSource(asset);
             source.Play();
@@ -34,10 +36,14 @@ namespace _Project.Infrastructure.Audio
         public void PlayMusic(AudioAsset asset)
         {
             if (asset.Category != AudioCategories.Music)
-                throw new InvalidOperationException();
+            {
+                throw new InvalidOperationException(nameof(asset));
+            }
 
             if (asset == _currentMusicAsset && _musicSource != null && _musicSource.isPlaying)
+            {
                 return;
+            }
 
             StopMusic();
 
@@ -52,7 +58,9 @@ namespace _Project.Infrastructure.Audio
         private void StopMusic()
         {
             if (_musicSource == null)
+            {
                 return;
+            }
 
             _musicSource.Stop();
 

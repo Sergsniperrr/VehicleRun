@@ -64,6 +64,7 @@ builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
 Запросите `IAudioService` через `[Inject]` или конструктор, а сам звук положите в поле `[SerializeField]`:
 
 ```csharp
+using System;
 using _Project.Core.Audio;
 using UnityEngine;
 using VContainer;
@@ -75,11 +76,15 @@ public class HitFeedback : MonoBehaviour
     private IAudioService _audio;
 
     [Inject]
-    public void Construct(IAudioService audio) =>
-        _audio = audio;
+    public void Construct(IAudioService audio)
+    {
+        _audio = audio ?? throw new ArgumentNullException(nameof(audio));
+    }
 
-    public void OnHit() =>
+    public void OnHit()
+    {
         _audio.PlayOneShot(_hitSound);
+    }
 }
 ```
 
@@ -118,8 +123,7 @@ _audio.PlayMusic(_menuMusic);
 |---|---|---|
 | `InvalidOperationException` при `PlayOneShot` | У ассета категория `Music` | Поставьте `SFX` или играйте через `PlayMusic` |
 | `InvalidOperationException` при `PlayMusic` | У ассета категория `SFX` | Поставьте `Music` |
-| `InvalidOperationException` при любом вызове | В ассете пустой массив клипов | Добавьте хотя бы один файл |
-| `ArgumentNullException` | В массиве есть пустая строка | Уберите пустой элемент или заполните его |
+| `InvalidOperationException: _audioClips` при любом вызове | В ассете пустой массив клипов или в нём есть пустой элемент | Добавьте хотя бы один файл, уберите или заполните пустые строки |
 | `NullReferenceException` | Поле `AudioAsset` не заполнено в инспекторе | Перетащите ассет в поле |
 | Звука нет, ошибок тоже | Громкость 0, либо не назначена группа микшера, либо группа приглушена в микшере | Проверьте `Volume` у ассета и ползунки в `AudioMixer` |
 
@@ -143,16 +147,28 @@ _audio.PlayMusic(_menuMusic);
 ```csharp
 public class VolumeSettings : MonoBehaviour
 {
+    private const string MusicVolumeParameter = "MusicVolume";
+    private const float MinLinearVolume = 0.0001f;
+    private const float DecibelsPerDecade = 20f;
+
     [SerializeField] private AudioMixer _mixer;
 
-    public void SetMusicVolume(float value01) =>
-        _mixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Max(value01, 0.0001f)) * 20f);
+    public void SetMusicVolume(float linearVolume)
+    {
+        float decibels = ToDecibels(linearVolume);
+        _mixer.SetFloat(MusicVolumeParameter, decibels);
+    }
+
+    private float ToDecibels(float linearVolume)
+    {
+        return Mathf.Log10(Mathf.Max(linearVolume, MinLinearVolume)) * DecibelsPerDecade;
+    }
 }
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Громкость у микшера задаётся в децибелах, а не долями от нуля до единицы, поэтому значение ползунка переводят через логарифм. Если передать напрямую, половина ползунка на слух окажется почти тишиной. Значение 0.0001 в примере нужно, чтобы не брать логарифм от нуля.
+Громкость у микшера задаётся в децибелах, а не долями от нуля до единицы, поэтому значение ползунка переводят через логарифм. Если передать напрямую, половина ползунка на слух окажется почти тишиной. Константа `MinLinearVolume` нужна, чтобы не брать логарифм от нуля.
 
 Сохранять выбранную громкость между запусками удобно через `JTLSDK.Data`, как и остальные настройки.
 
@@ -164,30 +180,32 @@ public class VolumeSettings : MonoBehaviour
 
 Сервис намеренно маленький, в нём ровно два метода. Ниже частые доработки.
 
-**Остановить или приглушить музыку.** Внутри уже есть приватный `StopMusic`, наружу он не выведен. Добавьте метод в интерфейс и реализацию:
+**Остановить или приглушить музыку.** Внутри уже есть приватный `StopMusic`, наружу он не выведен. Добавьте метод в интерфейс `Core/Audio/IAudioService.cs`, а в `AudioService` сделайте существующий метод публичным:
 
 ```csharp
-// Core/Audio/IAudioService.cs
 void StopMusic();
-
-// Infrastructure/Audio/AudioService.cs
-public void StopMusic()
-{
-    // существующий приватный метод достаточно сделать публичным
-}
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-**Звук в точке мира.** Сейчас все источники создаются в одном месте и звучат одинаково громко, откуда бы ни шли. Для трёхмерного звука добавьте перегрузку с позицией:
+**Звук в точке мира.** Сейчас все источники создаются в одном месте и звучат одинаково громко, откуда бы ни шли. Для трёхмерного звука добавьте перегрузку с позицией в интерфейс `Core/Audio/IAudioService.cs`:
 
 ```csharp
-// Core/Audio/IAudioService.cs
 void PlayOneShot(AudioAsset asset, Vector3 position);
+```
 
-// Infrastructure/Audio/AudioService.cs
+*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
+
+И её реализацию в `Infrastructure/Audio/AudioService.cs`:
+
+```csharp
 public void PlayOneShot(AudioAsset asset, Vector3 position)
 {
+    if (asset.Category != AudioCategories.SFX)
+    {
+        throw new InvalidOperationException(nameof(asset));
+    }
+
     AudioSource source = CreateSource(asset);
 
     source.transform.position = position;

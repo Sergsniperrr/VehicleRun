@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using _Project.Core.Platform;
 using _Project.Core.Purchasing;
 using Cysharp.Threading.Tasks;
@@ -7,19 +8,20 @@ using VContainer.Unity;
 
 namespace _Project.Infrastructure.JTL
 {
-    public class JTLPurchaseService : IPurchaseService, IStartable
+    public class JTLPurchaseService : IPurchaseService, IStartable, IDisposable
     {
         private const string NoAdsProductId = "no_ads";
         private const string NoAdsOwnedKey = "no_ads.owned";
 
         private readonly IPlatformInitializer _platformInitializer;
-
-        public event Action Changed;
+        private readonly CancellationTokenSource _lifetimeCancellation = new CancellationTokenSource();
 
         public JTLPurchaseService(IPlatformInitializer platformInitializer)
         {
             _platformInitializer = platformInitializer ?? throw new ArgumentNullException(nameof(platformInitializer));
         }
+
+        public event Action Changed;
 
         public bool AdsDisabled =>
             JTLSDK.Data.GetBool(NoAdsOwnedKey) ||
@@ -36,7 +38,13 @@ namespace _Project.Infrastructure.JTL
 
         public void Start()
         {
-            RestorePurchasesWhenReady().Forget();
+            RestorePurchasesWhenReady(_lifetimeCancellation.Token).Forget();
+        }
+
+        public void Dispose()
+        {
+            _lifetimeCancellation.Cancel();
+            _lifetimeCancellation.Dispose();
         }
 
         public void BuyRemoveAds()
@@ -44,9 +52,9 @@ namespace _Project.Infrastructure.JTL
             JTLSDK.Payments.Purchase(NoAdsProductId, GrantRemoveAds);
         }
 
-        private async UniTaskVoid RestorePurchasesWhenReady()
+        private async UniTaskVoid RestorePurchasesWhenReady(CancellationToken cancellationToken)
         {
-            await _platformInitializer.InitializeAsync();
+            await _platformInitializer.InitializeAsync(cancellationToken);
 
             if (JTLSDK.Payments.IsSupported == false)
             {
@@ -54,6 +62,12 @@ namespace _Project.Infrastructure.JTL
             }
 
             JTLSDK.Payments.RestorePurchases(OnRestoreData);
+        }
+
+        private void GrantRemoveAds()
+        {
+            JTLSDK.Data.SetBool(NoAdsOwnedKey, true);
+            Changed?.Invoke();
         }
 
         private void OnRestoreData(IRestoreData restoreData)
@@ -70,12 +84,6 @@ namespace _Project.Infrastructure.JTL
                     restoreData.RestoreProduct(productId, GrantRemoveAds);
                 }
             }
-        }
-
-        private void GrantRemoveAds()
-        {
-            JTLSDK.Data.SetBool(NoAdsOwnedKey, true);
-            Changed?.Invoke();
         }
     }
 }

@@ -10,6 +10,7 @@ WebGL-игра на Unity 2022.3.62f2 (Built-in Render Pipeline) для площ
 | [Docs/Analytics-Ads-Saves.md](Docs/Analytics-Ads-Saves.md) | аналитика (JTL SDK + Яндекс.Метрика), реклама, покупки, сохранения `JTLSDK.Data` |
 | [Docs/Localization.md](Docs/Localization.md) | `LocalizationConfig`, ключи, `LocalizedText`, `ILocalizationService` |
 | [Docs/Audio.md](Docs/Audio.md) | `AudioService`, `AudioAsset`, микшер и громкость |
+| [.claude/CODE_STYLE.md](.claude/CODE_STYLE.md) | стиль C#/Unity-кода: именование, порядок членов, скобки, события, UniTask, VContainer, ошибки, запрещённые запахи |
 | [JTL SDK](https://meepifiev.github.io/com.jtlstudio.sdk/) | официальная документация SDK; полный справочник API одним файлом: [llms.txt](https://meepifiev.github.io/com.jtlstudio.sdk/llms.txt) |
 
 Перед изменением системы прочитай её документ. Если меняешь поведение системы, обнови документ. Примеры кода в документах подписываются строкой «*Это фактический код проекта, а не пример.*» или «*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*».
@@ -45,6 +46,7 @@ WebGL-игра на Unity 2022.3.62f2 (Built-in Render Pipeline) для площ
 
 - Порядок: сцена `Bootstrap` → `Bootstrapper` → `BootstrapState` (`IPlatformInitializer.InitializeAsync`: `JTLSDK.Create()` и `JTLSDK.WhenReady`) → `LoadRunState` (загрузка `Game`) → `RunState` (`GameReadyEvent`).
 - До `JTLSDK.Create()` любое обращение к модулям SDK бросает `InvalidOperationException`. Сервис, которому SDK нужен раньше сцены `Game`, сначала делает `await IPlatformInitializer.InitializeAsync()`: метод идемпотентный, SDK создаётся один раз.
+- Колбэки SDK превращай в `UniTask` через `UniTaskCompletionSource`.
 - `Time.timeScale`, `AudioListener.volume`/`pause`, `Cursor` и `PlayerPrefs` принадлежат JTL SDK. Не пиши в них напрямую: используй `JTLSDK.Time.Scale`, `JTLSDK.Audio`, `JTLSDK.Device`, `JTLSDK.Data`, обёрнутые сервисом из `Core`.
 - Id товаров храни константами в `Infrastructure`: сгенерированный SDK файл `Assets/Scripts/Generated/JTLSDKIds.cs` попадает в `Assembly-CSharp`, и наши сборки его не видят. Каждый товар нужно объявить в окне JTL SDK, раздел Purchases.
 - Настройки SDK (`Assets/Resources/JTLSDK`, `Assets/Settings/JTLSDK`) и шаблон страницы (`Assets/WebGLTemplates/JTLSDK`) создаёт окно `JTL SDK › Toolkit`, вручную их не правь.
@@ -56,11 +58,9 @@ WebGL-игра на Unity 2022.3.62f2 (Built-in Render Pipeline) для площ
 
 ## Стиль кода
 
-- Явные типы вместо `var`.
-- Приватные поля `_camelCase`, константы `PascalCase`, поля инспектора `[SerializeField] private`.
-- Зависимости в конструкторе и в `Construct` проверяются через `?? throw new ArgumentNullException(nameof(x))`.
-- Асинхронность на UniTask, а не на `Task` и корутинах. Колбэки SDK оборачивай в `UniTaskCompletionSource`.
-- `if` пишется с фигурными скобками, логические блоки разделяются пустой строкой.
+Стиль C#/Unity-кода описан в `.claude/CODE_STYLE.md` (перенесён из проекта IJ-SmashAndHit). Он действует при любом написании и ревью кода:
+
+@.claude/CODE_STYLE.md
 
 ## Чего не трогать
 

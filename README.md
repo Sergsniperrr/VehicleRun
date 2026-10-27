@@ -98,6 +98,7 @@ protected override void Configure(IContainerBuilder builder)
 {
     RegisterConfigs(builder);
     RegisterServices(builder);
+    RegisterAnalytics(builder);
     RegisterPlatform(builder);
     RegisterStorage(builder);
     RegisterStateMachine(builder);
@@ -113,6 +114,7 @@ protected override void Configure(IContainerBuilder builder)
 | `ISceneLoader` | `SceneLoader` | Singleton | `RegisterServices` |
 | `IAudioService` | `AudioService` | Singleton | `RegisterServices` |
 | `ITimeService` | `TimeService` | Singleton | `RegisterServices` |
+| `YandexMetrica` (сам класс) | `YandexMetrica`, номер счётчика из поля `_yandexMetricaCounterId` | EntryPoint | `RegisterAnalytics` |
 | `IPlatformInitializer` | `JTLSDKInitializer` | Singleton | `RegisterPlatform` |
 | `IAnalyticsService` | `JTLAnalyticsService` | Singleton | `RegisterPlatform` |
 | `ILocalizationService` | `JTLLocalizationService` | Singleton | `RegisterPlatform` |
@@ -141,7 +143,10 @@ builder.RegisterEntryPoint<Bootstrapper>();
 | Объект только для игровой сцены | `GameLifetimeScope` | `builder.Register<LevelSession>(Lifetime.Singleton);` |
 | Компонент со сцены | `GameLifetimeScope` | `builder.RegisterComponentInHierarchy<Hud>();` |
 
-Точка входа (`RegisterEntryPoint`) нужна классу, который должен получать `Start()`, `Tick()` или `Dispose()` от контейнера без своего MonoBehaviour. Так зарегистрированы `JTLAdvertisingService` и `JTLPurchaseService`: в `Start()` они ждут SDK (реклама скрывает баннер, если куплено «без рекламы», покупки восстанавливают невыданные товары), реклама ещё подписывается на покупки и отписывается в `Dispose()`.
+Точка входа (`RegisterEntryPoint`) нужна классу, который должен получать `Initialize()`, `Start()`, `Tick()` или `Dispose()` от контейнера без своего MonoBehaviour. Так зарегистрированы:
+
+- `YandexMetrica`: в `Initialize()` поднимает счётчик Метрики;
+- `JTLAdvertisingService` и `JTLPurchaseService`: в `Start()` ждут SDK (реклама скрывает баннер, если куплено «без рекламы», покупки восстанавливают невыданные товары), в `Dispose()` отменяют ожидание, реклама ещё отписывается от покупок.
 
 ### 3.4 Зависимости в MonoBehaviour
 
@@ -153,8 +158,10 @@ public class ResultScreen : MonoBehaviour
     private IAnalyticsService _analytics;
 
     [Inject]
-    public void Construct(IAnalyticsService analytics) =>
-        _analytics = analytics;
+    public void Construct(IAnalyticsService analytics)
+    {
+        _analytics = analytics ?? throw new ArgumentNullException(nameof(analytics));
+    }
 }
 ```
 
@@ -233,8 +240,10 @@ public class MenuState : IState
         return UniTask.CompletedTask;
     }
 
-    public UniTask Exit() =>
-        UniTask.CompletedTask;
+    public UniTask Exit()
+    {
+        return UniTask.CompletedTask;
+    }
 }
 ```
 
@@ -257,6 +266,15 @@ _stateMachine.Enter<MenuState>();
 ```csharp
 public class LoadLevelState : IPayloadState<int>
 {
+    private readonly IGameStateMachine _stateMachine;
+    private readonly ISceneLoader _sceneLoader;
+
+    public LoadLevelState(IGameStateMachine stateMachine, ISceneLoader sceneLoader)
+    {
+        _stateMachine = stateMachine ?? throw new ArgumentNullException(nameof(stateMachine));
+        _sceneLoader = sceneLoader ?? throw new ArgumentNullException(nameof(sceneLoader));
+    }
+
     public async UniTask Enter(int levelIndex)
     {
         await _sceneLoader.LoadAsync(SceneId.Game);
@@ -264,8 +282,10 @@ public class LoadLevelState : IPayloadState<int>
         _stateMachine.Enter<PlayState, int>(levelIndex);
     }
 
-    public UniTask Exit() =>
-        UniTask.CompletedTask;
+    public UniTask Exit()
+    {
+        return UniTask.CompletedTask;
+    }
 }
 ```
 
@@ -279,7 +299,7 @@ public class LoadLevelState : IPayloadState<int>
 
 | Сцена | Индекс в Build Settings | Что на ней |
 |---|---|---|
-| `Bootstrap` | 0 | `BootstrapLifetimeScope`, `YandexMetricaInitializer` |
+| `Bootstrap` | 0 | `BootstrapLifetimeScope` |
 | `Game` | 1 | `Main Camera` (перспективная), `Directional Light`, `GameLifetimeScope` |
 
 Сцены загружаются по имени: `SceneLoader` вызывает `SceneManager.LoadSceneAsync(sceneId.ToString(), LoadSceneMode.Single)`. Значение перечисления `SceneId` обязано совпадать с именем файла сцены.
@@ -313,11 +333,9 @@ Play Mode запускайте со сцены `Bootstrap`, переключат
 ```csharp
 public class TimeService : ITimeService
 {
-    public float DeltaTime =>
-        UnityEngine.Time.deltaTime;
+    public float DeltaTime => UnityEngine.Time.deltaTime;
 
-    public float Time =>
-        UnityEngine.Time.time;
+    public float Time => UnityEngine.Time.time;
 }
 ```
 
@@ -345,7 +363,7 @@ public class TimeService : ITimeService
     - Template, Install: шаблон страницы в `Assets/WebGLTemplates/JTLSDK`, там же логотип, фон и прогресс-бар;
     - Languages: языки проекта Russian и English, Default language English (см. [Локализация](Docs/Localization.md));
     - Purchases: товар `no_ads`, тип Non-consumable, если в игре будет покупка «без рекламы».
-6. Яндекс.Метрика: на сцене `Bootstrap` у `YandexMetricaInitializer` впишите номер счётчика в поле `_counterId`. Пустое поле выключает Метрику.
+6. Яндекс.Метрика: на префабе `RootLifetimeScope` впишите номер счётчика в поле `Yandex Metrica Counter Id`. Пустое поле выключает Метрику.
 7. Заполните `LocalizationConfig.asset`, создайте микшер и ассеты звуков.
 8. FlatKit: импортирован вариант Built-in RP. Файлы `[Render Pipeline] *.unitypackage` в git не хранятся (`.gitignore`), при необходимости берите их из Asset Store.
 9. Сборка: окно JTL SDK, раздел Build, кнопка Build Project. Красная проверка в этом разделе блокирует сборку.

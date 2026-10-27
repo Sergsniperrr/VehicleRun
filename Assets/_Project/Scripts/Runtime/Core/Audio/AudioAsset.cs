@@ -1,5 +1,4 @@
 using System;
-using _Project.Core.Audio;
 using UnityEngine;
 using UnityEngine.Audio;
 using Random = UnityEngine.Random;
@@ -23,11 +22,17 @@ namespace _Project.Core.Audio
         public AudioClip GetRandomClip()
         {
             if (_audioClips == null || _audioClips.Length == 0)
-                throw new InvalidOperationException();
+            {
+                throw new InvalidOperationException(nameof(_audioClips));
+            }
 
             int index = Random.Range(0, _audioClips.Length);
+            AudioClip clip = _audioClips[index];
 
-            AudioClip clip = _audioClips[index] ?? throw new ArgumentNullException();
+            if (clip == null)
+            {
+                throw new InvalidOperationException(nameof(_audioClips));
+            }
 
             return clip;
         }
