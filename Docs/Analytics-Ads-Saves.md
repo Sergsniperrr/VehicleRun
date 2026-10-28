@@ -291,7 +291,24 @@ _ads.ShowInterstitial();
 
 ### 3.4 Рядом: покупки
 
-`Core/Purchasing/IPurchaseService.cs` → `Infrastructure/JTL/JTLPurchaseService.cs`. Сейчас поддержан один товар: `NoAdsProductId` это id товара в каталоге JTL SDK, `NoAdsOwnedKey` это отметка в сохранениях.
+`Core/Purchasing/IPurchaseService.cs`:
+
+```csharp
+public interface IPurchaseService
+{
+    bool AdsDisabled { get; }
+
+    string RemoveAdsPrice { get; }
+
+    event Action Changed;
+
+    void BuyRemoveAds();
+}
+```
+
+*Это фактический код проекта, а не пример.*
+
+Реализация `Infrastructure/JTL/JTLPurchaseService.cs`. Сейчас поддержан один товар: `NoAdsProductId` это id товара в каталоге JTL SDK, `NoAdsOwnedKey` это отметка в сохранениях.
 
 ```csharp
 private const string NoAdsProductId = "no_ads";
@@ -303,6 +320,8 @@ private const string NoAdsOwnedKey = "no_ads.owned";
 Товар `no_ads` нужно объявить в окне JTL SDK, раздел Purchases, с типом Non-consumable. Без этого `Purchase` сразу уходит в ошибку: товара нет в каталоге. Если id на Яндексе другой, он задаётся в поле Yandex Games id. Кнопка Generate constants в том же разделе пишет классы `ProductIds` в `Assets/Scripts/Generated/`, но этот файл попадает в `Assembly-CSharp`, а наши сборки на неё сослаться не могут, поэтому id храните константами в `Infrastructure`.
 
 Свойство `AdsDisabled` возвращает `true`, если сработало хотя бы одно из двух: в сохранениях есть отметка или площадка подтверждает покупку через `IsAlreadyPurchased`. После успешной покупки отметка записывается в `JTLSDK.Data` и поднимается событие `Changed`, на него реагирует рекламный сервис и прячет баннер. Сохраняет сейв и помечает покупку выданной сам SDK.
+
+Свойство `RemoveAdsPrice` отдаёт цену `no_ads` строкой, которую уже отформатировала площадка: её выводят на кнопку покупки как есть. Вернётся пустая строка, если товара нет в каталоге JTL SDK, модуль покупок не в состоянии Ready (ещё не готов, не ответил или площадка без покупок, как YouTube) или площадка не вернула этот товар. Кнопку с пустой ценой лучше спрятать, чем показывать без цены.
 
 Сервис зарегистрирован как точка входа: в `Start()` он ждёт SDK и вызывает `RestorePurchases`, а в `Dispose()` отменяет ожидание. Так возвращается покупка, которую игрок оплатил, но не получил: оборвалась связь или закрылась вкладка. На площадках без покупок (YouTube) восстановление пропускается.
 

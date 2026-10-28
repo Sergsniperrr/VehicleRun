@@ -1,6 +1,6 @@
 # VehicleRun
 
-WebGL-игра на Unity 2022.3.62f2 (Built-in Render Pipeline) для площадок, подключённых через JTL SDK (Яндекс Игры, YouTube Playables). Проект собран из шаблона UnityTemplate. Каркас уже готов: VContainer, конечный автомат запуска, загрузка сцен, сервисы площадки. Игровой код пишется в сборках `Features` и `UI`.
+2D WebGL-игра на Unity 2022.3.62f2 (Built-in Render Pipeline, пакет `com.unity.feature.2d`) для площадок, подключённых через JTL SDK (Яндекс Игры, YouTube Playables). Проект собран из шаблона UnityTemplate. Каркас уже готов: VContainer, конечный автомат запуска, загрузка сцен, сервисы площадки. Игровой код пишется в сборках `Features` и `UI`.
 
 ## Документация
 
@@ -71,7 +71,7 @@ WebGL-игра на Unity 2022.3.62f2 (Built-in Render Pipeline) для площ
 
 ## Проверка
 
-- Компиляцию и консоль проверяй в открытом редакторе через MCP for Unity. Если редактор закрыт, компиляцию проверяет запуск в batchmode: `Unity.exe -batchmode -nographics -quit -projectPath <проект> -logFile <лог>`, ошибки ищи в логе по `error CS`.
+- Компиляцию и консоль проверяй в открытом редакторе через MCP for Unity (сервер `UnityMCP`, `http://127.0.0.1:8080/mcp`; подключается кнопкой Configure для Claude Code в окне `Window › MCP for Unity`, настройка локальная и в репозиторий не попадает). Если редактор закрыт, компиляцию проверяет запуск в batchmode: `Unity.exe -batchmode -nographics -quit -projectPath <проект> -logFile <лог>`, ошибки ищи в логе по `error CS`.
 - Play со сцены `Bootstrap`: через секунду загружается `Game`, ошибок в консоли нет.
 - Это нормальные сообщения, не ошибки:
   - строки с префиксом `[JTL SDK]` о старте и состоянии модулей;

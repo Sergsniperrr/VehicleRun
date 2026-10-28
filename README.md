@@ -2,7 +2,7 @@
 
 Заготовка Unity-проекта под WebGL для площадок, подключённых через JTL SDK (Яндекс Игры, YouTube Playables). В шаблоне готовы контейнер зависимостей, конечный автомат запуска, загрузка сцен и платформенные сервисы. Игрового кода нет: он пишется в сборках `Features` и `UI`.
 
-Unity 2022.3.62f2 (LTS), цель сборки WebGL, 3D-проект на Built-in Render Pipeline.
+Unity 2022.3.62f2 (LTS), цель сборки WebGL, 2D-проект на Built-in Render Pipeline.
 
 Здесь описан каркас: структура, композиция, запуск, сцены и старт нового проекта. Отдельные документы по системам лежат в `Docs/`:
 
@@ -20,6 +20,7 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 3D-проект на Built
 | UniTask | 2.5.11 | async/await без аллокаций | [github.com/Cysharp/UniTask](https://github.com/Cysharp/UniTask) |
 | JTL SDK | 1.7.2 | реклама, покупки, сохранения, язык, пауза, игровые события площадки; свой WebGL-шаблон с экраном загрузки | [meepifiev.github.io/com.jtlstudio.sdk](https://meepifiev.github.io/com.jtlstudio.sdk/) |
 | Яндекс.Метрика | jslib | свои события в WebGL-сборке | [yandex.com/support/metrica](https://yandex.com/support/metrica/) |
+| 2D (`com.unity.feature.2d`) | 2.0.1 | спрайты, Sprite Atlas, Tilemap, Sprite Shape, 2D Animation, импорт PSD и Aseprite, Pixel Perfect | [docs.unity3d.com](https://docs.unity3d.com/2022.3/Documentation/Manual/2DFeature.html) |
 | TextMeshPro | 3.0.7 | текст, TMP Essentials импортированы | [docs.unity3d.com](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/manual/index.html) |
 | DOTween Pro | 1.0.430 (DOTween 1.3.030) | твины и анимации | [dotween.demigiant.com](https://dotween.demigiant.com/documentation.php) |
 | Odin Inspector | 4.0.2.3 | инспекторы, сериализация, editor-тулзы | [odininspector.com](https://odininspector.com/documentation) |
@@ -300,9 +301,22 @@ public class LoadLevelState : IPayloadState<int>
 | Сцена | Индекс в Build Settings | Что на ней |
 |---|---|---|
 | `Bootstrap` | 0 | `BootstrapLifetimeScope` |
-| `Game` | 1 | `Main Camera` (перспективная), `Directional Light`, `GameLifetimeScope` |
+| `Game` | 1 | `Main Camera` (ортографическая, size 5, позиция (0, 0, -10), фон Solid Color), `GameLifetimeScope` |
+
+Проект настроен под 2D. В Project Settings, Editor стоят Default Behavior Mode 2D (картинки импортируются как спрайты, новые сцены создаются с ортографической камерой и без света) и Sprite Packer Mode Sprite Atlas V2. На сцене `Game` нет `Directional Light` и скайбокса, Environment Lighting задан цветом. 2D-света (`Light 2D`) в Built-in RP нет, он работает только в URP с 2D Renderer, поэтому спрайты рисуются материалом `Sprites-Default` без освещения.
 
 Сцены загружаются по имени: `SceneLoader` вызывает `SceneManager.LoadSceneAsync(sceneId.ToString(), LoadSceneMode.Single)`. Значение перечисления `SceneId` обязано совпадать с именем файла сцены.
+
+```csharp
+public interface ISceneLoader
+{
+    UniTask LoadAsync(SceneId sceneId, Action loaded = null, CancellationToken cancellationToken = default);
+}
+```
+
+*Это фактический код проекта, а не пример.*
+
+Колбэк `loaded` вызывается после загрузки сцены, если ожидание не отменили. Внутри состояний автомата он не нужен: код после `await` выполняется в тот же момент. При отмене `cancellationToken` метод бросает `OperationCanceledException`, но сцена всё равно догрузится: Unity не умеет прерывать `LoadSceneAsync`, отменяется только ожидание.
 
 Как добавить сцену:
 
@@ -356,7 +370,7 @@ public class TimeService : ITimeService
     ```
 
 2. Project Settings, Player: `Product Name`, `Company Name` (сейчас `GOLTECH STUDIO`), `Version`.
-3. Для 2D-игры переключите `Edit, Project Settings, Editor, Default Behavior Mode` на 2D, сделайте камеру на сцене `Game` ортографической и добавьте пакет `com.unity.feature.2d` через Package Manager.
+3. Проект уже настроен под 2D (см. раздел 5). Для 3D-игры верните `Edit, Project Settings, Editor, Default Behavior Mode` в 3D, сделайте камеру на сцене `Game` перспективной, добавьте `Directional Light` и уберите пакет `com.unity.feature.2d`, если он не нужен.
 4. В Unity Hub у редактора 2022.3.62f2 должен стоять модуль WebGL Build Support.
 5. JTL SDK, окно `JTL SDK, Toolkit`:
     - Configurations, New configuration: выберите площадку. Первая конфигурация становится активной, ставит define-символ (`JTLSDK_YANDEX_GAMES` или `JTLSDK_YOUTUBE_PLAYABLES`) и пресет Player Settings, создаёт `Resources/JTLSDK/JTLSDKSettings.asset`;
@@ -381,7 +395,7 @@ public class TimeService : ITimeService
 | Odin Inspector | атрибуты `[Button]`, `[ShowInInspector]`, `[Required]` в любых MonoBehaviour и ScriptableObject |
 | DOTween Pro | настройки в `Assets/Resources/DOTweenSettings.asset`; после обновления пакета откройте `Tools, Demigiant, DOTween Utility Panel` и нажмите Setup |
 | TextMeshPro | шрифт по умолчанию `LiberationSans SDF`; для кириллицы создайте свой Font Asset через `Window, TextMeshPro, Font Asset Creator` |
-| MCP for Unity | пакет `com.coplaydev.unity-mcp` подключает открытый редактор к AI-агенту: сцены, объекты, консоль, тесты |
+| MCP for Unity | пакет `com.coplaydev.unity-mcp` подключает открытый редактор к AI-агенту: сцены, объекты, консоль, тесты. Сервер запускается вместе с редактором и слушает `http://127.0.0.1:8080/mcp`. Claude Code подключается к нему локальной настройкой: откройте `Window, MCP for Unity, Toggle MCP Window` (Ctrl+Shift+M), выберите Claude Code и нажмите Configure. Окно выполнит `claude mcp add --scope local` для сервера `UnityMCP` и уберёт его из остальных областей, в том числе из `.mcp.json`, поэтому в репозитории этой настройки нет и каждый делает её у себя. Инструменты появляются в сессии, начатой при открытом редакторе |
 
 ---
 
