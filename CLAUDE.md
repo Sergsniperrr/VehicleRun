@@ -6,6 +6,7 @@
 
 | Документ | О чём |
 |---|---|
+| [Docs/TechPlan.md](Docs/TechPlan.md) | тех.план игры: принятые решения, изменения ГДД, что берём из референса Merge Dinosaurs, архитектура, этапы и задачи |
 | [README.md](README.md) | стек, структура, сборки, композиция VContainer, запуск, сцены, новый проект из шаблона, типичные ошибки |
 | [Docs/Analytics-Ads-Saves.md](Docs/Analytics-Ads-Saves.md) | аналитика (JTL SDK + Яндекс.Метрика), реклама, покупки, сохранения `JTLSDK.Data` |
 | [Docs/Localization.md](Docs/Localization.md) | `LocalizationConfig`, ключи, `LocalizedText`, `ILocalizationService` |
