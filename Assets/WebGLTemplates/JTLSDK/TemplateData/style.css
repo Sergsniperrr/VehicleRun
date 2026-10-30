@@ -1,0 +1,124 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--jtlsdk-page-background, #0E0E10);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  touch-action: none;
+}
+
+img {
+  pointer-events: none;
+}
+
+#jtlsdk-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#unity-canvas {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  outline: none;
+}
+
+.jtlsdk-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: var(--jtlsdk-loader-background, #1A1A1A);
+  z-index: 10;
+  transition: opacity 0.25s ease;
+}
+
+.jtlsdk-loader--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#jtlsdk-logo {
+  display: var(--jtlsdk-logo-display, block);
+  width: var(--jtlsdk-logo-size, 160px);
+  height: auto;
+  max-width: 70vw;
+  max-height: 40vh;
+  object-fit: contain;
+}
+
+.jtlsdk-progress {
+  box-sizing: border-box;
+  width: var(--jtlsdk-progress-width, 40%);
+  max-width: 82vw;
+  height: var(--jtlsdk-progress-height, 8px);
+  padding: var(--jtlsdk-progress-padding, 0px);
+  border: var(--jtlsdk-progress-border-width, 0px) solid var(--jtlsdk-progress-border-color, transparent);
+  border-radius: var(--jtlsdk-progress-radius, 0px);
+  background: var(--jtlsdk-progress-track, #333333);
+  overflow: hidden;
+}
+
+.jtlsdk-progress__fill {
+  width: 0%;
+  height: 100%;
+  border-radius: var(--jtlsdk-progress-radius, 0px);
+  background: linear-gradient(90deg, var(--jtlsdk-progress-fill, #FFFFFF), var(--jtlsdk-progress-fill-to, #FFFFFF));
+  transition: width 0.12s linear;
+}
+
+.jtlsdk-loader--bottom .jtlsdk-progress {
+  position: absolute;
+  bottom: 48px;
+}
+
+.jtlsdk-loading-text {
+  color: #F2F2F3;
+  font: 500 14px/1.4 Inter, system-ui, sans-serif;
+}
+
+.jtlsdk-loading-text:empty {
+  display: none;
+}
+
+.jtlsdk-dev-badge {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  padding: 2px 8px;
+  border: 1px solid #33333A;
+  border-radius: 4px;
+  background: rgba(14, 14, 16, 0.8);
+  color: #9A9AA3;
+  font: 11px/18px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.jtlsdk-dev-badge:empty {
+  display: none;
+}
+
+.jtlsdk-input-block {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: transparent;
+  touch-action: none;
+}
+
+.jtlsdk-input-block--on {
+  display: block;
+}

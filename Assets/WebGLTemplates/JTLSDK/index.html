@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" style="--jtlsdk-page-background: %JTLSDK_PAGE_BACKGROUND%; --jtlsdk-loader-background: %JTLSDK_LOADER_BACKGROUND%; --jtlsdk-logo-size: %JTLSDK_LOGO_SIZE%px; --jtlsdk-logo-display: %JTLSDK_LOGO_DISPLAY%; --jtlsdk-progress-fill: %JTLSDK_PROGRESS_FILL%; --jtlsdk-progress-fill-to: %JTLSDK_PROGRESS_FILL_TO%; --jtlsdk-progress-border-width: %JTLSDK_PROGRESS_BORDER_WIDTH%px; --jtlsdk-progress-border-color: %JTLSDK_PROGRESS_BORDER_COLOR%; --jtlsdk-progress-padding: %JTLSDK_PROGRESS_PADDING%px; --jtlsdk-progress-track: %JTLSDK_PROGRESS_TRACK%; --jtlsdk-progress-width: %JTLSDK_PROGRESS_WIDTH%%; --jtlsdk-progress-height: %JTLSDK_PROGRESS_HEIGHT%px; --jtlsdk-progress-radius: %JTLSDK_PROGRESS_RADIUS%px;">
+  <head>
+    <meta charset="utf-8">
+    %JTLSDK_PLATFORM_HEAD%
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body
+    data-platform="%JTLSDK_PLATFORM%"
+    data-loader="Build/{{{ LOADER_FILENAME }}}"
+    data-data="Build/{{{ DATA_FILENAME }}}"
+    data-framework="Build/{{{ FRAMEWORK_FILENAME }}}"
+#if USE_WASM
+    data-code="Build/{{{ CODE_FILENAME }}}"
+#endif
+#if MEMORY_FILENAME
+    data-memory="Build/{{{ MEMORY_FILENAME }}}"
+#endif
+#if SYMBOLS_FILENAME
+    data-symbols="Build/{{{ SYMBOLS_FILENAME }}}"
+#endif
+    data-company="{{{ COMPANY_NAME }}}"
+    data-product="{{{ PRODUCT_NAME }}}"
+    data-version="{{{ PRODUCT_VERSION }}}"
+    data-dpr-desktop="%JTLSDK_DPR_DESKTOP%"
+    data-dpr-mobile="%JTLSDK_DPR_MOBILE%"
+    data-aspect="%JTLSDK_ASPECT%"
+    data-aspect-mobile="%JTLSDK_ASPECT_MOBILE%">
+    <div id="jtlsdk-container">
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
+    </div>
+    <div id="jtlsdk-loader" class="jtlsdk-loader jtlsdk-loader--%JTLSDK_PROGRESS_POSITION%">
+      <img id="jtlsdk-logo" src="TemplateData/%JTLSDK_LOGO_FILE%" alt="">
+      <div class="jtlsdk-progress"><div id="jtlsdk-progress-fill" class="jtlsdk-progress__fill"></div></div>
+      <div id="jtlsdk-loading-text" class="jtlsdk-loading-text">%JTLSDK_LOADING_TEXT%</div>
+    </div>
+    <div id="jtlsdk-input-block" class="jtlsdk-input-block"></div>
+    <div id="jtlsdk-dev-badge" class="jtlsdk-dev-badge">%JTLSDK_DEV_BADGE%</div>
+    <script src="TemplateData/jtlsdk-page.js"></script>
+  </body>
+</html>

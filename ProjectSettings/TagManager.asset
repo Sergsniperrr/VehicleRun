@@ -41,3 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 769821829
+    locked: 0
+  - name: Track
+    uniqueID: 1067497741
+    locked: 0
+  - name: Garage
+    uniqueID: 509987006
+    locked: 0
+  - name: Vehicles
+    uniqueID: 916940642
+    locked: 0
+  - name: Effects
+    uniqueID: 1380758663
+    locked: 0

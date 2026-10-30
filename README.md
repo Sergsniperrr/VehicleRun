@@ -38,12 +38,17 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 2D-проект на Built
 ```
 Assets/
 ├── _Project/                          весь код и данные игры
+│   ├── Art/Placeholders/              заглушки из референса, заменить до релиза (Docs/TechPlan.md, 3.3)
+│   ├── Audio/AudioMixers/             AudioMixer.mixer: Master, Music, SFX
 │   ├── Configs/Localization/          LocalizationConfig.asset, таблица переводов
+│   ├── Fonts/Nunito/                  Nunito ExtraBold (OFL) и его TMP Font Asset с кириллицей
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib
 │   ├── Prefabs/                       RootLifetimeScope.prefab, корневой контейнер
 │   ├── Scenes/                        Bootstrap.unity, Game.unity
+│   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView, спрайты Vehicle_NN_Garage и Vehicle_NN_Track
 │   └── Scripts/
 │       ├── Editor/                    сборка _Project.Editor, пока пустая
+│       ├── Tests/EditMode/            сборка _Project.Tests.EditMode
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
 │           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
@@ -71,6 +76,7 @@ Assets/
 | `_Project.UI` | Core, Features, VContainer, UniTask, Unity.TextMeshPro | экраны, окна, компоненты интерфейса |
 | `_Project.Composition` | Core, Infrastructure, Features, UI, VContainer, UniTask | регистрация в контейнере, состояния запуска |
 | `_Project.Editor` | все сборки выше, только Editor | редакторские скрипты и тулзы |
+| `_Project.Tests.EditMode` | Core, Features, Test Framework, только Editor | EditMode-тесты логики |
 
 Правила, которые держат структуру:
 
@@ -395,7 +401,7 @@ public class TimeService : ITimeService
 | SceneSwitcher Pro | кнопки сцен в тулбаре редактора, список настраивается в `Assets/SceneSwitcherPro/` |
 | Odin Inspector | атрибуты `[Button]`, `[ShowInInspector]`, `[Required]` в любых MonoBehaviour и ScriptableObject |
 | DOTween Pro | настройки в `Assets/Resources/DOTweenSettings.asset`; после обновления пакета откройте `Tools, Demigiant, DOTween Utility Panel` и нажмите Setup |
-| TextMeshPro | шрифт по умолчанию `LiberationSans SDF`; для кириллицы создайте свой Font Asset через `Window, TextMeshPro, Font Asset Creator` |
+| TextMeshPro | шрифт игры `Assets/_Project/Fonts/Nunito/Nunito-ExtraBold SDF.asset` с кириллицей, назначается в компоненте явно; шрифт по умолчанию в настройках TMP остался `LiberationSans SDF` без кириллицы (см. [Docs/Localization.md](Docs/Localization.md), раздел 1) |
 | MCP for Unity | пакет `com.coplaydev.unity-mcp` подключает открытый редактор к AI-агенту: сцены, объекты, консоль, тесты. Сервер запускается вместе с редактором и слушает `http://127.0.0.1:8080/mcp`. Claude Code подключается к нему локальной настройкой: откройте `Window, MCP for Unity, Toggle MCP Window` (Ctrl+Shift+M), выберите Claude Code и нажмите Configure. Окно выполнит `claude mcp add --scope local` для сервера `UnityMCP` и уберёт его из остальных областей, в том числе из `.mcp.json`, поэтому в репозитории этой настройки нет и каждый делает её у себя. Инструменты появляются в сессии, начатой при открытом редакторе |
 
 ---

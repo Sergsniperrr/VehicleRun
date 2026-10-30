@@ -4,7 +4,7 @@
 
 Звук работает на встроенных средствах Unity (`AudioSource` и `AudioMixer`), никаких внешних плагинов здесь нет.
 
-В шаблоне папка `Assets/_Project/Audio` и микшер ещё не созданы. Перед первым звуком создайте микшер через **Create → Audio Mixer** с группами `Music` и `SFX` внутри `Master` и папки под файлы, как в дереве ниже.
+Микшер `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` уже создан: группы `Music` и `SFX` внутри `Master`. Открытых (exposed) параметров пока нет. Папки `Music` и `Sounds` заводятся вместе с первыми файлами. Звуки и музыка референса лежат отдельно, в `Assets/_Project/Art/Placeholders/Audio/` (см. [TechPlan.md](TechPlan.md), раздел 3.3).
 
 ---
 

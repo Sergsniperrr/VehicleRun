@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: GOLTECH STUDIO
-  productName: UnityTemplate
+  productName: VehicleRun
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -141,7 +141,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.0.0.1
+  bundleVersion: 0.1.0
   preloadedAssets:
   - {fileID: 11400000, guid: a0504417737414ce88af99c6ec7041a7, type: 2}
   metroInputSource: 0
@@ -645,7 +645,7 @@ PlayerSettings:
   webGLDebugSymbols: 0
   webGLEmscriptenArgs: 
   webGLModulesDirectory: 
-  webGLTemplate: APPLICATION:Default
+  webGLTemplate: PROJECT:JTLSDK
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
   webGLCompressionFormat: 0
@@ -673,7 +673,7 @@ PlayerSettings:
     Stadia: DOTWEEN;DOTWEEN_TEXTMESHPRO
     Standalone: DOTWEEN;DOTWEEN_TEXTMESHPRO;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3
     VisionOS: DOTWEEN;DOTWEEN_TEXTMESHPRO
-    WebGL: DOTWEEN;DOTWEEN_TEXTMESHPRO;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3
+    WebGL: DOTWEEN;DOTWEEN_TEXTMESHPRO;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3;JTLSDK_YANDEX_GAMES
     Windows Store Apps: DOTWEEN;DOTWEEN_TEXTMESHPRO
     XboxOne: DOTWEEN;DOTWEEN_TEXTMESHPRO
     iPhone: DOTWEEN;DOTWEEN_TEXTMESHPRO
@@ -693,7 +693,7 @@ PlayerSettings:
     QNX: 1
     Stadia: 1
     VisionOS: 1
-    WebGL: 1
+    WebGL: 2
     Windows Store Apps: 1
     XboxOne: 1
     iPhone: 1

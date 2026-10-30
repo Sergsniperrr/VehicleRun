@@ -1,0 +1,114 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d25363e8620ac4c1ea2650739512eab7, type: 3}
+  m_Name: Yandex_Games
+  m_EditorClassIdentifier: 
+  _displayName: Yandex Games
+  _platform: 1
+  _defineSymbol: JTLSDK_YANDEX_GAMES
+  _pauseOnFocusLoss: 1
+  _yandexMetricaCounter: 
+  _languages: 0000000001000000
+  _playerSettings:
+    _applyTemplate: 1
+    _template: PROJECT:JTLSDK
+    _applyExceptions: 0
+    _exceptions: 1
+    _applyCompression: 1
+    _compression: 2
+    _applyDecompressionFallback: 1
+    _decompressionFallback: 0
+    _applyNameFilesAsHashes: 0
+    _nameFilesAsHashes: 0
+    _applyDataCaching: 1
+    _dataCaching: 1
+    _applyStripping: 1
+    _stripping: 3
+    _applyRunInBackground: 1
+    _runInBackground: 1
+    _applyDebugSymbols: 1
+    _debugSymbols: 0
+    _applyMemorySize: 0
+    _memorySizeMegabytes: 512
+  _platformProvider:
+    rid: 2713181189832704
+  _ads:
+    rid: 2713181189832705
+  _data:
+    rid: 2713181189832706
+  _payments:
+    rid: 2713181189832707
+  _languageProvider:
+    rid: 2713181189832708
+  _player:
+    rid: 2713181189832709
+  _leaderboards:
+    rid: 2713181189832710
+  _flags:
+    rid: 2713181189832711
+  _timeProvider:
+    rid: 2713181189832712
+  _gameEvents:
+    rid: 2713181189832713
+  _review:
+    rid: 2713181189832714
+  _gameLabel:
+    rid: 2713181189832715
+  _links:
+    rid: 2713181189832716
+  references:
+    version: 2
+    RefIds:
+    - rid: 2713181189832704
+      type: {class: YandexGamesPlatformProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data:
+        _appId: 
+    - rid: 2713181189832705
+      type: {class: YandexGamesAdsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data:
+        _minimumInterstitialIntervalSeconds: 60
+        _skipInterstitialAfterRewardedSeconds: 60
+        _stickyBanner: 0
+    - rid: 2713181189832706
+      type: {class: YandexGamesDataProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832707
+      type: {class: YandexGamesPaymentsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832708
+      type: {class: YandexGamesLanguageProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832709
+      type: {class: YandexGamesPlayerProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832710
+      type: {class: YandexGamesLeaderboardsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832711
+      type: {class: YandexGamesFlagsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832712
+      type: {class: YandexGamesTimeProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832713
+      type: {class: YandexGamesGameEventsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832714
+      type: {class: YandexGamesReviewProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832715
+      type: {class: YandexGamesGameLabelProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 2713181189832716
+      type: {class: YandexGamesLinksProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data:
+        _developerName: 

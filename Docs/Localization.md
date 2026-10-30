@@ -33,6 +33,19 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Ассет с переводами лежит в поле `_localizationConfig` на префабе `RootLifetimeScope` и попадает в сервис через конструктор.
 
+**Шрифт.** Используйте `Assets/_Project/Fonts/Nunito/Nunito-ExtraBold SDF.asset`. Стандартный `LiberationSans SDF` кириллицу не содержит, вместо русских букв в нём будут квадраты. Настройки TMP в `Assets/TextMesh Pro/` не меняли, поэтому шрифт назначайте в каждом `TextMeshProUGUI` явно, лучше один раз в префабе.
+
+Что лежит в папке шрифта:
+- `Nunito-ExtraBold.ttf` — статическое начертание 800. Получено из вариативного `Nunito[wght].ttf` из [google/fonts](https://github.com/google/fonts/tree/main/ofl/nunito) командой `fonttools varLib.instancer "Nunito[wght].ttf" wght=800 --update-name-table -o Nunito-ExtraBold.ttf`.
+- `Nunito - OFL.txt` — лицензия SIL OFL 1.1. Она разрешает использовать шрифт в игре и создавать такие производные.
+
+Как устроен Font Asset:
+- **Режим Dynamic.** Символ, которого нет в атласе, добавляется сам при первом показе, и ассет при этом меняется.
+- **Атлас** один, 1024 × 1024, выборка 72 pt, отступ 7.
+- **Набор символов заранее:** латиница, весь русский алфавит, украинские буквы и знаки `«»—–…№₽•×°·’“”„`, неразрывный пробел.
+
+Другая толщина делается той же командой с другим `wght`, от 200 до 1000.
+
 ---
 
 ## 2. Где заводить ключи

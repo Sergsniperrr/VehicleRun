@@ -28,6 +28,7 @@
 | `_Project.UI` | Core, Features, VContainer, UniTask, TextMeshPro | экраны, окна, компоненты интерфейса |
 | `_Project.Composition` | все сборки выше | регистрация в контейнере, состояния запуска |
 | `_Project.Editor` | все сборки выше, только Editor | редакторские тулзы |
+| `_Project.Tests.EditMode` | Core, Features, Test Framework, только Editor | EditMode-тесты логики, папка `Assets/_Project/Scripts/Tests/EditMode/` |
 
 - Интерфейс лежит в `Core`, реализация в `Infrastructure`, регистрация в `Composition`.
 - `Core` не ссылается на JTL SDK. Если интерфейсу нужен тип из SDK, заведи свой класс данных в `Core`.
