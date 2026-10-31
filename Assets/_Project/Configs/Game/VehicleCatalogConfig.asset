@@ -1,0 +1,135 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e8af1ec81678894586b83141a45758d, type: 3}
+  m_Name: VehicleCatalogConfig
+  m_EditorClassIdentifier: 
+  _vehicles:
+  - _id: scooter
+    _rank: 1
+    _nameKey: vehicle.scooter.name
+    _incomePerSecond: 1
+    _garageSprite: {fileID: -749692788, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 2091854564, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: motorcycle
+    _rank: 2
+    _nameKey: vehicle.motorcycle.name
+    _incomePerSecond: 2
+    _garageSprite: {fileID: 398276104, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -1807074531, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: car
+    _rank: 3
+    _nameKey: vehicle.car.name
+    _incomePerSecond: 5
+    _garageSprite: {fileID: -1258490958, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 809811616, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: taxi
+    _rank: 4
+    _nameKey: vehicle.taxi.name
+    _incomePerSecond: 11
+    _garageSprite: {fileID: -527805359, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -908089454, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: police_car
+    _rank: 5
+    _nameKey: vehicle.police_car.name
+    _incomePerSecond: 23
+    _garageSprite: {fileID: -2031340353, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -896926812, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: off_roader
+    _rank: 6
+    _nameKey: vehicle.off_roader.name
+    _incomePerSecond: 52
+    _garageSprite: {fileID: 475063169, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -1476264254, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: pickup
+    _rank: 7
+    _nameKey: vehicle.pickup.name
+    _incomePerSecond: 113
+    _garageSprite: {fileID: -768060521, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 201530925, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: van
+    _rank: 8
+    _nameKey: vehicle.van.name
+    _incomePerSecond: 249
+    _garageSprite: {fileID: -1281711103, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 1609601331, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: ambulance
+    _rank: 9
+    _nameKey: vehicle.ambulance.name
+    _incomePerSecond: 549
+    _garageSprite: {fileID: 600542862, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -1341691640, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: race_car
+    _rank: 10
+    _nameKey: vehicle.race_car.name
+    _incomePerSecond: 1207
+    _garageSprite: {fileID: 1394651023, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 253776870, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: school_bus
+    _rank: 11
+    _nameKey: vehicle.school_bus.name
+    _incomePerSecond: 2656
+    _garageSprite: {fileID: -1349923729, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -1580600608, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: city_bus
+    _rank: 12
+    _nameKey: vehicle.city_bus.name
+    _incomePerSecond: 5843
+    _garageSprite: {fileID: 93133834, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 385421987, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: fire_truck
+    _rank: 13
+    _nameKey: vehicle.fire_truck.name
+    _incomePerSecond: 12855
+    _garageSprite: {fileID: -604055847, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 1425058431, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: semi_truck
+    _rank: 14
+    _nameKey: vehicle.semi_truck.name
+    _incomePerSecond: 28281
+    _garageSprite: {fileID: -1351482955, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 212871308, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: dump_truck
+    _rank: 15
+    _nameKey: vehicle.dump_truck.name
+    _incomePerSecond: 62218
+    _garageSprite: {fileID: 166980316, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 273570105, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: tractor
+    _rank: 16
+    _nameKey: vehicle.tractor.name
+    _incomePerSecond: 136880
+    _garageSprite: {fileID: -1969731705, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -2141296699, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: bulldozer
+    _rank: 17
+    _nameKey: vehicle.bulldozer.name
+    _incomePerSecond: 301136
+    _garageSprite: {fileID: 916976774, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -115877651, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: excavator
+    _rank: 18
+    _nameKey: vehicle.excavator.name
+    _incomePerSecond: 662500
+    _garageSprite: {fileID: 36161328, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 1199609021, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: tank
+    _rank: 19
+    _nameKey: vehicle.tank.name
+    _incomePerSecond: 1457499
+    _garageSprite: {fileID: -769208317, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: -1709484768, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+  - _id: armored_rover
+    _rank: 20
+    _nameKey: vehicle.armored_rover.name
+    _incomePerSecond: 3206498
+    _garageSprite: {fileID: 1058512369, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 281877013, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}

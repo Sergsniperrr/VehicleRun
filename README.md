@@ -7,6 +7,7 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 2D-проект на Built
 Здесь описан каркас: структура, композиция, запуск, сцены и старт нового проекта. Отдельные документы по системам лежат в `Docs/`:
 
 - [Тех.план игры](Docs/TechPlan.md)
+- [Игровые конфиги](Docs/Configs.md)
 - [Локализация](Docs/Localization.md)
 - [Звук: AudioService](Docs/Audio.md)
 - [Аналитика, реклама и сохранения](Docs/Analytics-Ads-Saves.md)
@@ -40,6 +41,7 @@ Assets/
 ├── _Project/                          весь код и данные игры
 │   ├── Art/Placeholders/              заглушки из референса, заменить до релиза (Docs/TechPlan.md, 3.3)
 │   ├── Audio/AudioMixers/             AudioMixer.mixer: Master, Music, SFX
+│   ├── Configs/Game/                  GameConfig и конфиги машин, экономики, гаража и трассы (Docs/Configs.md)
 │   ├── Configs/Localization/          LocalizationConfig.asset, таблица переводов
 │   ├── Fonts/Nunito/                  Nunito ExtraBold (OFL) и его TMP Font Asset с кириллицей
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib
@@ -47,7 +49,7 @@ Assets/
 │   ├── Scenes/                        Bootstrap.unity, Game.unity
 │   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView, спрайты Vehicle_NN_Garage и Vehicle_NN_Track
 │   └── Scripts/
-│       ├── Editor/                    сборка _Project.Editor, пока пустая
+│       ├── Editor/                    сборка _Project.Editor: проверка конфигов
 │       ├── Tests/EditMode/            сборка _Project.Tests.EditMode
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
@@ -398,6 +400,7 @@ public class TimeService : ITimeService
 | Инструмент | Как пользоваться |
 |---|---|
 | JTL SDK Toolkit | меню `JTL SDK, Toolkit`: конфигурации площадок, сборка, симуляция ответов площадки в редакторе, шаблон страницы, товары, языки, просмотр и очистка сейва |
+| Проверка конфигов | меню `_Project, Validate Game Config`. Та же проверка запускается перед каждой сборкой и останавливает её при ошибке, см. [Docs/Configs.md](Docs/Configs.md) |
 | SceneSwitcher Pro | кнопки сцен в тулбаре редактора, список настраивается в `Assets/SceneSwitcherPro/` |
 | Odin Inspector | атрибуты `[Button]`, `[ShowInInspector]`, `[Required]` в любых MonoBehaviour и ScriptableObject |
 | DOTween Pro | настройки в `Assets/Resources/DOTweenSettings.asset`; после обновления пакета откройте `Tools, Demigiant, DOTween Utility Panel` и нажмите Setup |
@@ -413,7 +416,7 @@ public class TimeService : ITimeService
 | Запуск | Play со сцены `Bootstrap`: через секунду загружается `Game`, ошибок в консоли нет |
 | Контейнер | в иерархии в `DontDestroyOnLoad` есть объект `RootLifetimeScope` |
 | SDK | в консоли строки с префиксом `[JTL SDK]`: старт с версией и площадкой, состояние модулей. Ошибка `Settings were not found at Resources/JTLSDK/JTLSDKSettings` значит, что конфигурация ещё не создана, SDK работает без площадки |
-| Компиляция | предупреждения «Assembly for Assembly Definition File ... will not be compiled» для `_Project.Features` и `_Project.Editor` исчезнут после первого скрипта в этих папках |
+| Компиляция | предупреждение «Assembly for Assembly Definition File ... will not be compiled» для `_Project.Features` исчезнет после первого скрипта в этой папке |
 | WebGL | собранная страница показывает экран загрузки JTL SDK, затем игру |
 
 ---

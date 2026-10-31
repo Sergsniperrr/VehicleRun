@@ -10,31 +10,36 @@
 
 ## Где остановились
 
-Состояние на 30.10.2026.
+Состояние на 31.10.2026.
 
 **Этап 0 закрыт.** Условие перехода выполнено: Play со сцены `Bootstrap` загружает `Game` без ошибок.
 
-**Следующий шаг — этап 1 «Прототип»**, первая задача 1.1 (конфиги машин, экономики, гаража и трассы). Перед ней нужно утвердить порядок рангов машин: таблица в [TechPlan.md](TechPlan.md), раздел 5. Владелец её ещё не подтвердил.
+**Этап 1 «Прототип» идёт, задача 1.1 сделана.** В конфигах все 20 рангов, проверка конфигов работает. Подробности в [TechPlan.md](TechPlan.md), раздел 7, и в [Configs.md](Configs.md).
+
+**Следующий шаг — задача 1.2** `Garage`: слоты, открытие слотов по K, перемещение, слияние, открытие коробки. Вместе с ней `GameConfig` регистрируется в `GameLifetimeScope`.
 
 Git:
-- **Рабочая ветка `develop`.** На ней последний коммит `3f6613f`: WebGL-сборка перенесена на этап тестирования.
+- **Рабочая ветка `develop`.** Последний коммит на ней — задача 1.1, в `origin` он ещё не отправлен.
 - **`main` стоит на `40ec619`** (этап 0).
-- **`develop` и `main`** запушены в `origin` (github.com/Sergsniperrr/VehicleRun).
+- **В `origin`** (github.com/Sergsniperrr/VehicleRun) лежат `main` и `develop` до задачи 1.1: `origin/develop` стоит на `47750d6`.
 
-Что лежит в проекте после этапа 0:
+Что лежит в проекте:
 
 | Что | Где |
 |---|---|
+| Конфиги игры: `GameConfig`, 20 машин, экономика, гараж, трасса | `Assets/_Project/Configs/Game/`, описание в [Configs.md](Configs.md) |
+| Проверка конфигов: меню `_Project › Validate Game Config` и проверка перед сборкой | `Assets/_Project/Scripts/Editor/Configs/` |
+| Имена 20 машин RU и EN, ключи `vehicle.<id>.name` | `Assets/_Project/Configs/Localization/LocalizationConfig.asset` |
 | Конфигурация Яндекс Игр (активна, define `JTLSDK_YANDEX_GAMES`), языки RU/EN, товар `workshop_style` | `Assets/Settings/JTLSDK/Configurations/Yandex_Games.asset`, `Assets/Resources/JTLSDK/JTLSDKSettings.asset` |
 | Шаблон страницы WebGL | `Assets/WebGLTemplates/JTLSDK/` |
 | Sorting Layers `Background`, `Track`, `Garage`, `Vehicles`, `Effects`; сортировка Custom Axis (0, 1, 0) | Project Settings |
 | Шрифт Nunito ExtraBold и TMP Font Asset с кириллицей | `Assets/_Project/Fonts/Nunito/`, описание в [Localization.md](Localization.md), раздел 1 |
-| Сборка EditMode-тестов с одним пустым тестом | `Assets/_Project/Scripts/Tests/EditMode/` |
+| EditMode-тесты: пустой тест сборки и 14 тестов проверки конфигов | `Assets/_Project/Scripts/Tests/EditMode/` |
 | Микшер Master, Music, SFX | `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` |
 | Заглушки из референса (93 файла) | `Assets/_Project/Art/Placeholders/`, описание в [TechPlan.md](TechPlan.md), раздел 3.3 |
 | 40 спрайтов машин `Vehicle_NN_Garage` и `Vehicle_NN_Track` | `Assets/_Project/Sprites/` |
 
-Игрового кода ещё нет: сборка `_Project.Features` пустая, `GameLifetimeScope.Configure` пустой.
+Игровой логики ещё нет: сборка `_Project.Features` пустая, `GameLifetimeScope.Configure` пустой, конфиги в контейнере не зарегистрированы.
 
 ---
 
@@ -45,6 +50,8 @@ Git:
 | Вид игры | 2D, как у референса. Проект переведён на 2D 28.10.2026 |
 | ГДД | примерный, его можно менять. Изменения ведутся в [TechPlan.md](TechPlan.md), раздел 2 |
 | Спрайты машин | рисует владелец; два листа 5 × 4, вид сбоку и сверху |
+| Порядок рангов машин | утверждён 31.10.2026 по таблице [TechPlan.md](TechPlan.md), раздел 5: ранг 1 мотороллер, ранг 20 броневездеход 6 × 6 |
+| Ранги в прототипе | в конфиге сразу все 20 рангов, а не 6 (31.10.2026). Задача 3.1 сводится к проверке рангов 7–20 в игре |
 | Шрифт | Nunito ExtraBold (800), статическая копия из вариативного файла Google Fonts |
 | Проверка до этапа тестирования | только Play Mode со сцены `Bootstrap`, консоль и EditMode-тесты. WebGL-сборку не запускать до задачи 4.6 |
 | Git | новых веток не создавать, коммитить в текущую ветку (сейчас `develop`). Коммит и пуш только по просьбе владельца |
@@ -56,10 +63,10 @@ Git:
 
 | Вопрос | Решить до | Где описано |
 |---|---|---|
-| Порядок рангов машин | задачи 1.1 | [TechPlan.md](TechPlan.md), раздел 5 |
 | Рост цены коробки: предложен 1,175 за покупку без потолка, ранг 1 — 1,07 | задачи 1.9 | [TechPlan.md](TechPlan.md), разделы 2 и 2.1 |
 | Что делать с отсутствием короче 60 секунд (предложено ничего не начислять) | задачи 2.5 | [TechPlan.md](TechPlan.md), раздел 2 |
 | Название игры | задачи 5.5 | [TechPlan.md](TechPlan.md), раздел 8 |
+| Имя ранга 6: в игре «Внедорожник» (Off-Roader) вместо «Джип», потому что Jeep — торговая марка. Владелец ещё не подтвердил | вычитки, задача 5.3 | [TechPlan.md](TechPlan.md), раздел 5 |
 | Ставить ли Nunito шрифтом по умолчанию в настройках TMP (`Assets/TextMesh Pro/` по правилам не правим) | первого экрана с текстом | [Localization.md](Localization.md), раздел 1 |
 | Красный крест на скорой помощи заменить нейтральным символом | релиза | [TechPlan.md](TechPlan.md), раздел 8 |
 
@@ -81,6 +88,8 @@ Git:
 - **`AssetDatabase.DeleteAsset` заблокирован** проверкой безопасности. Удалять через `manage_asset` с `action: delete`.
 - **Изменения в `TagManager` могут пропасть.** После правки через `SerializedObject` их надо сохранить на диск: `EditorApplication.ExecuteMenuItem("File/Save Project")`. Иначе принудительный refresh перечитает `TagManager` с диска.
 - **Долгие операции** (сборка) блокируют редактор, и MCP не отвечает до их конца. Отменить можно только кнопкой Cancel в Unity.
+- **Кириллица в `execute_code`** передаётся без искажений. `LocalizationConfig.asset` хранит её в YAML как `\u`-последовательности, это нормально.
+- **Ассеты конфигов** удобно заполнять в `execute_code` через `SerializedObject` и `AssetDatabase.CreateAsset`, а спрайты листа брать по имени из `AssetDatabase.LoadAllAssetsAtPath`.
 
 **JTL SDK**
 - **Конфигурации и шаблон** создаются публичными классами пакета, которые вызывает окно Toolkit:
@@ -109,6 +118,20 @@ Git:
 ---
 
 ## Хроника
+
+### 31.10.2026
+
+- Изучены документы и инструкции проекта.
+- **Владелец утвердил порядок рангов машин** (TechPlan, раздел 5). Имена спрайтов `Vehicle_NN_Garage` и `Vehicle_NN_Track` сверены с таблицей: все 40 стоят в нужных ячейках листов, переименовывать ничего не нужно.
+- **Задача 1.1.**
+  - По плану в каталоге было 6 рангов, но тогда пороги 7, 8 и 12 не проходили правило проверки ГДД 20. Владелец решил завести сразу все 20.
+  - Конфиги `GameConfig`, `VehicleCatalogConfig`, `EconomyConfig`, `GarageConfig`, `TrackConfig` и 20 имён RU и EN.
+  - Доходы сверены с формулой `round_half_up(2,2^(r−1))`, совпадают с ГДД 11.
+  - `GameConfigValidator` в `Core`; меню проверки и проверка перед сборкой в `Editor`.
+  - 15 из 15 EditMode-тестов проходят.
+  - Сквозная проверка: порог гаража на ранге 21 и отрицательное отставание ранга коробки дают по ошибке на нужном конфиге.
+  - Play со сцены `Bootstrap` проходит без ошибок.
+- Новый документ [Configs.md](Configs.md). Обновлены тех.план, README, CLAUDE.md и Localization.md.
 
 ### 30.10.2026
 

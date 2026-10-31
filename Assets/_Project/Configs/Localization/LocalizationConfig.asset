@@ -12,4 +12,66 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12ae320121a840d3bcd32b62bc10601, type: 3}
   m_Name: LocalizationConfig
   m_EditorClassIdentifier: 
-  _entries: []
+  _entries:
+  - _key: vehicle.scooter.name
+    _russian: "\u041C\u043E\u0442\u043E\u0440\u043E\u043B\u043B\u0435\u0440"
+    _english: Scooter
+  - _key: vehicle.motorcycle.name
+    _russian: "\u041C\u043E\u0442\u043E\u0446\u0438\u043A\u043B"
+    _english: Motorcycle
+  - _key: vehicle.car.name
+    _russian: "\u041B\u0435\u0433\u043A\u043E\u0432\u0443\u0448\u043A\u0430"
+    _english: Car
+  - _key: vehicle.taxi.name
+    _russian: "\u0422\u0430\u043A\u0441\u0438"
+    _english: Taxi
+  - _key: vehicle.police_car.name
+    _russian: "\u041F\u043E\u043B\u0438\u0446\u0435\u0439\u0441\u043A\u0430\u044F
+      \u043C\u0430\u0448\u0438\u043D\u0430"
+    _english: Police Car
+  - _key: vehicle.off_roader.name
+    _russian: "\u0412\u043D\u0435\u0434\u043E\u0440\u043E\u0436\u043D\u0438\u043A"
+    _english: Off-Roader
+  - _key: vehicle.pickup.name
+    _russian: "\u041F\u0438\u043A\u0430\u043F"
+    _english: Pickup
+  - _key: vehicle.van.name
+    _russian: "\u0424\u0443\u0440\u0433\u043E\u043D"
+    _english: Van
+  - _key: vehicle.ambulance.name
+    _russian: "\u0421\u043A\u043E\u0440\u0430\u044F \u043F\u043E\u043C\u043E\u0449\u044C"
+    _english: Ambulance
+  - _key: vehicle.race_car.name
+    _russian: "\u0413\u043E\u043D\u043E\u0447\u043D\u044B\u0439 \u0431\u043E\u043B\u0438\u0434"
+    _english: Race Car
+  - _key: vehicle.school_bus.name
+    _russian: "\u0428\u043A\u043E\u043B\u044C\u043D\u044B\u0439 \u0430\u0432\u0442\u043E\u0431\u0443\u0441"
+    _english: School Bus
+  - _key: vehicle.city_bus.name
+    _russian: "\u0413\u043E\u0440\u043E\u0434\u0441\u043A\u043E\u0439 \u0430\u0432\u0442\u043E\u0431\u0443\u0441"
+    _english: City Bus
+  - _key: vehicle.fire_truck.name
+    _russian: "\u041F\u043E\u0436\u0430\u0440\u043D\u0430\u044F \u043C\u0430\u0448\u0438\u043D\u0430"
+    _english: Fire Truck
+  - _key: vehicle.semi_truck.name
+    _russian: "\u0421\u0435\u0434\u0435\u043B\u044C\u043D\u044B\u0439 \u0442\u044F\u0433\u0430\u0447"
+    _english: Semi Truck
+  - _key: vehicle.dump_truck.name
+    _russian: "\u0421\u0430\u043C\u043E\u0441\u0432\u0430\u043B"
+    _english: Dump Truck
+  - _key: vehicle.tractor.name
+    _russian: "\u0422\u0440\u0430\u043A\u0442\u043E\u0440"
+    _english: Tractor
+  - _key: vehicle.bulldozer.name
+    _russian: "\u0411\u0443\u043B\u044C\u0434\u043E\u0437\u0435\u0440"
+    _english: Bulldozer
+  - _key: vehicle.excavator.name
+    _russian: "\u042D\u043A\u0441\u043A\u0430\u0432\u0430\u0442\u043E\u0440"
+    _english: Excavator
+  - _key: vehicle.tank.name
+    _russian: "\u0422\u0430\u043D\u043A"
+    _english: Tank
+  - _key: vehicle.armored_rover.name
+    _russian: "\u0411\u0440\u043E\u043D\u0435\u0432\u0435\u0437\u0434\u0435\u0445\u043E\u0434
+      6 \xD7 6"
+    _english: "6\xD76 Armored Rover"
