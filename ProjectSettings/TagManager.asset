@@ -53,6 +53,9 @@ TagManager:
   - name: Vehicles
     uniqueID: 916940642
     locked: 0
+  - name: UI
+    uniqueID: 658621139
+    locked: 0
   - name: Effects
     uniqueID: 1380758663
     locked: 0

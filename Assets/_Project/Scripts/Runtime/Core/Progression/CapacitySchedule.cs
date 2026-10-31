@@ -16,5 +16,20 @@ namespace _Project.Core.Progression
         {
             return _steps[index];
         }
+
+        public int GetCapacity(int maxRank)
+        {
+            int capacity = _initial;
+
+            foreach (CapacityStep step in _steps)
+            {
+                if (step.Rank <= maxRank)
+                {
+                    capacity = Math.Max(capacity, step.Capacity);
+                }
+            }
+
+            return capacity;
+        }
     }
 }

@@ -9,6 +9,7 @@
 | [Docs/TechPlan.md](Docs/TechPlan.md) | тех.план игры: принятые решения, изменения ГДД, что берём из референса Merge Dinosaurs, архитектура, этапы и задачи |
 | [Docs/Journal.md](Docs/Journal.md) | журнал прогресса: где остановились, договорённости с владельцем, открытые вопросы, грабли, хроника |
 | [Docs/Configs.md](Docs/Configs.md) | игровые конфиги: `GameConfig`, машины, экономика, гараж, трасса, поля и значения, проверка конфигов |
+| [Docs/Gameplay.md](Docs/Gameplay.md) | игровая логика в `Features`: экземпляры, `GarageBoard`, команды, `FailureReason`, события |
 | [README.md](README.md) | стек, структура, сборки, композиция VContainer, запуск, сцены, новый проект из шаблона, типичные ошибки |
 | [Docs/Analytics-Ads-Saves.md](Docs/Analytics-Ads-Saves.md) | аналитика (JTL SDK + Яндекс.Метрика), реклама, покупки, сохранения `JTLSDK.Data` |
 | [Docs/Localization.md](Docs/Localization.md) | `LocalizationConfig`, ключи, `LocalizedText`, `ILocalizationService` |
@@ -79,5 +80,4 @@
 - Play со сцены `Bootstrap`: через секунду загружается `Game`, ошибок в консоли нет.
 - Это нормальные сообщения, не ошибки:
   - строки с префиксом `[JTL SDK]` о старте и состоянии модулей;
-  - ошибка `[JTL SDK] Settings were not found at Resources/JTLSDK/JTLSDKSettings`, пока в окне SDK не создана конфигурация площадки;
-  - предупреждение «Assembly for Assembly Definition File ... will not be compiled» для пустой сборки `_Project.Features`.
+  - ошибка `[JTL SDK] Settings were not found at Resources/JTLSDK/JTLSDKSettings`, пока в окне SDK не создана конфигурация площадки.

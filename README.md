@@ -8,6 +8,7 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 2D-проект на Built
 
 - [Тех.план игры](Docs/TechPlan.md)
 - [Игровые конфиги](Docs/Configs.md)
+- [Игровая логика](Docs/Gameplay.md)
 - [Локализация](Docs/Localization.md)
 - [Звук: AudioService](Docs/Audio.md)
 - [Аналитика, реклама и сохранения](Docs/Analytics-Ads-Saves.md)
@@ -39,22 +40,22 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 2D-проект на Built
 ```
 Assets/
 ├── _Project/                          весь код и данные игры
-│   ├── Art/Placeholders/              заглушки из референса, заменить до релиза (Docs/TechPlan.md, 3.3)
+│   ├── Art/Placeholders/              ассеты из выгрузки референса, большая часть остаётся в игре (Docs/TechPlan.md, 3.3)
 │   ├── Audio/AudioMixers/             AudioMixer.mixer: Master, Music, SFX
 │   ├── Configs/Game/                  GameConfig и конфиги машин, экономики, гаража и трассы (Docs/Configs.md)
 │   ├── Configs/Localization/          LocalizationConfig.asset, таблица переводов
-│   ├── Fonts/Nunito/                  Nunito ExtraBold (OFL) и его TMP Font Asset с кириллицей
+│   ├── Fonts/Nunito/                  Nunito ExtraBold (OFL), его TMP Font Asset с кириллицей и материал с обводкой
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib
-│   ├── Prefabs/                       RootLifetimeScope.prefab, корневой контейнер
+│   ├── Prefabs/                       RootLifetimeScope.prefab (корневой контейнер); Game/: GarageSlot, TrackVehicle
 │   ├── Scenes/                        Bootstrap.unity, Game.unity
-│   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView, спрайты Vehicle_NN_Garage и Vehicle_NN_Track
+│   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView (спрайты Vehicle_NN_Garage и Vehicle_NN_Track), временная монета Coin
 │   └── Scripts/
 │       ├── Editor/                    сборка _Project.Editor: проверка конфигов
 │       ├── Tests/EditMode/            сборка _Project.Tests.EditMode
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
 │           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
-│           ├── Features/              игровые механики, пока пустая
+│           ├── Features/              игровые механики: гараж, экземпляры, команды (Docs/Gameplay.md)
 │           ├── UI/                    интерфейс, сейчас LocalizedText
 │           └── Composition/           LifetimeScope и стартовые состояния
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают
@@ -416,7 +417,7 @@ public class TimeService : ITimeService
 | Запуск | Play со сцены `Bootstrap`: через секунду загружается `Game`, ошибок в консоли нет |
 | Контейнер | в иерархии в `DontDestroyOnLoad` есть объект `RootLifetimeScope` |
 | SDK | в консоли строки с префиксом `[JTL SDK]`: старт с версией и площадкой, состояние модулей. Ошибка `Settings were not found at Resources/JTLSDK/JTLSDKSettings` значит, что конфигурация ещё не создана, SDK работает без площадки |
-| Компиляция | предупреждение «Assembly for Assembly Definition File ... will not be compiled» для `_Project.Features` исчезнет после первого скрипта в этой папке |
+| Компиляция | после перекомпиляции в консоли нет ошибок и предупреждений. В пустой сборке без скриптов Unity предупреждает «Assembly for Assembly Definition File ... will not be compiled», это не ошибка |
 | WebGL | собранная страница показывает экран загрузки JTL SDK, затем игру |
 
 ---

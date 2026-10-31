@@ -14,14 +14,19 @@
 
 **Этап 0 закрыт.** Условие перехода выполнено: Play со сцены `Bootstrap` загружает `Game` без ошибок.
 
-**Этап 1 «Прототип» идёт, задача 1.1 сделана.** В конфигах все 20 рангов, проверка конфигов работает. Подробности в [TechPlan.md](TechPlan.md), раздел 7, и в [Configs.md](Configs.md).
+**Этап 1 «Прототип» идёт, сделаны задачи 1.1 и 1.2.**
+- 1.1: конфиги с 20 рангами и их проверка ([Configs.md](Configs.md)).
+- 1.2: гараж `GarageBoard` с командами открытия коробки, перемещения и слияния ([Gameplay.md](Gameplay.md)).
+- Вне очереди сверстана сцена `Game` по образцу референса: трасса, 15 слотов, машины, HUD и кнопки ([TechPlan.md](TechPlan.md), раздел 4.6). Это статичный пример, логика к нему не подключена.
 
-**Следующий шаг — задача 1.2** `Garage`: слоты, открытие слотов по K, перемещение, слияние, открытие коробки. Вместе с ней `GameConfig` регистрируется в `GameLifetimeScope`.
+Подробности в [TechPlan.md](TechPlan.md), раздел 7.
+
+**Следующий шаг — задача 1.3** `Progression`: K, открытые ранги, `b`, открытие слотов и мест трассы. Класс нельзя назвать `Progression`, как его папку (см. «Технические заметки»).
 
 Git:
-- **Рабочая ветка `develop`.** Последний коммит на ней — задача 1.1, в `origin` он ещё не отправлен.
+- **Рабочая ветка `develop`.** Последний коммит на ней: задача 1.2 и вёрстка сцены `Game` (после `70800b1` с задачей 1.1). В `origin` он пока не запушен.
 - **`main` стоит на `40ec619`** (этап 0).
-- **В `origin`** (github.com/Sergsniperrr/VehicleRun) лежат `main` и `develop` до задачи 1.1: `origin/develop` стоит на `47750d6`.
+- **`develop` и `main`** запушены в `origin` (github.com/Sergsniperrr/VehicleRun).
 
 Что лежит в проекте:
 
@@ -30,16 +35,19 @@ Git:
 | Конфиги игры: `GameConfig`, 20 машин, экономика, гараж, трасса | `Assets/_Project/Configs/Game/`, описание в [Configs.md](Configs.md) |
 | Проверка конфигов: меню `_Project › Validate Game Config` и проверка перед сборкой | `Assets/_Project/Scripts/Editor/Configs/` |
 | Имена 20 машин RU и EN, ключи `vehicle.<id>.name` | `Assets/_Project/Configs/Localization/LocalizationConfig.asset` |
+| Игровая логика: `GarageBoard`, `Vehicle`, `Box`, `CommandResult`, `FailureReason` | `Assets/_Project/Scripts/Runtime/Features/`, описание в [Gameplay.md](Gameplay.md) |
 | Конфигурация Яндекс Игр (активна, define `JTLSDK_YANDEX_GAMES`), языки RU/EN, товар `workshop_style` | `Assets/Settings/JTLSDK/Configurations/Yandex_Games.asset`, `Assets/Resources/JTLSDK/JTLSDKSettings.asset` |
 | Шаблон страницы WebGL | `Assets/WebGLTemplates/JTLSDK/` |
-| Sorting Layers `Background`, `Track`, `Garage`, `Vehicles`, `Effects`; сортировка Custom Axis (0, 1, 0) | Project Settings |
-| Шрифт Nunito ExtraBold и TMP Font Asset с кириллицей | `Assets/_Project/Fonts/Nunito/`, описание в [Localization.md](Localization.md), раздел 1 |
-| EditMode-тесты: пустой тест сборки и 14 тестов проверки конфигов | `Assets/_Project/Scripts/Tests/EditMode/` |
+| Sorting Layers `Background`, `Track`, `Garage`, `Vehicles`, `UI`, `Effects`; сортировка Custom Axis (0, 1, 0) | Project Settings |
+| Сцена `Game`: камера, песок, трасса, 15 слотов, машины, HUD с кнопками | `Assets/_Project/Scenes/Game.unity`, описание в [TechPlan.md](TechPlan.md), раздел 4.6 |
+| Префабы `GarageSlot` и `TrackVehicle` | `Assets/_Project/Prefabs/Game/` |
+| Шрифт Nunito ExtraBold, TMP Font Asset с кириллицей и материал с обводкой | `Assets/_Project/Fonts/Nunito/`, описание в [Localization.md](Localization.md), раздел 1 |
+| EditMode-тесты: пустой тест сборки, 14 тестов проверки конфигов, 12 тестов гаража | `Assets/_Project/Scripts/Tests/EditMode/` |
 | Микшер Master, Music, SFX | `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` |
-| Заглушки из референса (93 файла) | `Assets/_Project/Art/Placeholders/`, описание в [TechPlan.md](TechPlan.md), раздел 3.3 |
-| 40 спрайтов машин `Vehicle_NN_Garage` и `Vehicle_NN_Track` | `Assets/_Project/Sprites/` |
+| Ассеты из выгрузки референса (102 файла: 93 из задачи 0.7 и 9 спрайтов песка) | `Assets/_Project/Art/Placeholders/`, описание в [TechPlan.md](TechPlan.md), раздел 3.3 |
+| 40 спрайтов машин `Vehicle_NN_Garage` и `Vehicle_NN_Track`, временная монета `Coin` | `Assets/_Project/Sprites/` |
 
-Игровой логики ещё нет: сборка `_Project.Features` пустая, `GameLifetimeScope.Configure` пустой, конфиги в контейнере не зарегистрированы.
+Сцена игры пока статичная. Машины, числа в HUD и замки слотов проставлены вручную как пример: K = 5, открыто 12 слотов, 3 машины на трассе из 4 мест, 1 234 монеты. `GameLifetimeScope.Configure` пустой, конфиги и `GarageBoard` в контейнере не зарегистрированы, кода видов нет. Виды (1.7) и HUD (1.8) заменят пример данными логики.
 
 ---
 
@@ -52,6 +60,7 @@ Git:
 | Спрайты машин | рисует владелец; два листа 5 × 4, вид сбоку и сверху |
 | Порядок рангов машин | утверждён 31.10.2026 по таблице [TechPlan.md](TechPlan.md), раздел 5: ранг 1 мотороллер, ранг 20 броневездеход 6 × 6 |
 | Ранги в прототипе | в конфиге сразу все 20 рангов, а не 6 (31.10.2026). Задача 3.1 сводится к проверке рангов 7–20 в игре |
+| Ресурсы игры | все ресурсы (UI, иконки, частицы, звук, музыка) берём из выгрузки референса `E:\AndroidGames\Vehicle\Unpacked` (31.10.2026). В основном они остаются в игре насовсем, владелец заменит только часть. Машины — спрайты владельца. Монету с черепом и яйцо заменяем обязательно. Правовой риск записан в [TechPlan.md](TechPlan.md), раздел 8 |
 | Шрифт | Nunito ExtraBold (800), статическая копия из вариативного файла Google Fonts |
 | Проверка до этапа тестирования | только Play Mode со сцены `Bootstrap`, консоль и EditMode-тесты. WebGL-сборку не запускать до задачи 4.6 |
 | Git | новых веток не создавать, коммитить в текущую ветку (сейчас `develop`). Коммит и пуш только по просьбе владельца |
@@ -69,6 +78,7 @@ Git:
 | Имя ранга 6: в игре «Внедорожник» (Off-Roader) вместо «Джип», потому что Jeep — торговая марка. Владелец ещё не подтвердил | вычитки, задача 5.3 | [TechPlan.md](TechPlan.md), раздел 5 |
 | Ставить ли Nunito шрифтом по умолчанию в настройках TMP (`Assets/TextMesh Pro/` по правилам не правим) | первого экрана с текстом | [Localization.md](Localization.md), раздел 1 |
 | Красный крест на скорой помощи заменить нейтральным символом | релиза | [TechPlan.md](TechPlan.md), раздел 8 |
+| Права на ассеты референса Zepni Ltd., которые остаются в игре, и список тех, что владелец заменит | публикации, задача 5.5 | [TechPlan.md](TechPlan.md), разделы 3.3 и 8 |
 
 Мелочи, замеченные по пути:
 - **`JTLPurchaseService` из шаблона** всё ещё работает с товаром `no_ads`, которого больше нет в настройках SDK. Убирается задачей 4.3.
@@ -90,6 +100,12 @@ Git:
 - **Долгие операции** (сборка) блокируют редактор, и MCP не отвечает до их конца. Отменить можно только кнопкой Cancel в Unity.
 - **Кириллица в `execute_code`** передаётся без искажений. `LocalizationConfig.asset` хранит её в YAML как `\u`-последовательности, это нормально.
 - **Ассеты конфигов** удобно заполнять в `execute_code` через `SerializedObject` и `AssetDatabase.CreateAsset`, а спрайты листа брать по имени из `AssetDatabase.LoadAllAssetsAtPath`.
+- **Снимок кадра.** `manage_camera` с `screenshot` пишет только внутрь проекта: `output_folder` = `Temp/Screenshots`. Кадр нужного размера без Play даёт `execute_code`: камера рендерит в `RenderTexture` 540 × 960, `ReadPixels`, `EncodeToPNG`, `File.WriteAllBytes` в scratchpad. Canvas в режиме Screen Space - Camera попадает в такой кадр.
+- **Сцену удобно собирать в `execute_code`:** `PrefabUtility.SaveAsPrefabAsset` для префабов, `PrefabUtility.InstantiatePrefab` для экземпляров, в конце `EditorSceneManager.SaveScene`.
+
+**Код**
+- **Класс не называем так же, как его папку.** Пример: класс `Garage` в `_Project.Features.Garage`. Тогда в соседнем `_Project.Features.Session` имя `Garage` находится как namespace раньше, чем срабатывает `using`, и код не компилируется. Поэтому гараж назван `GarageBoard`, а для 1.3 нужно имя вместо `Progression`.
+- **Тестовые конфиги** собирает `GameConfigFixture` (`Tests/EditMode/Configs`) через `SerializedObject`: 8 рангов, гараж 3 × 5 с порогами 3, 5, 7, трасса с порогами 4 и 8. Им пользуются тесты конфигов и гаража.
 
 **JTL SDK**
 - **Конфигурации и шаблон** создаются публичными классами пакета, которые вызывает окно Toolkit:
@@ -132,6 +148,20 @@ Git:
   - Сквозная проверка: порог гаража на ранге 21 и отрицательное отставание ранга коробки дают по ошибке на нужном конфиге.
   - Play со сцены `Bootstrap` проходит без ошибок.
 - Новый документ [Configs.md](Configs.md). Обновлены тех.план, README, CLAUDE.md и Localization.md.
+- Задача 1.1 закоммичена (`70800b1`) и запушена в `origin/develop`.
+- **Задача 1.2.**
+  - `GarageBoard`: слоты, `UnlockSlots(K)`, `PlaceVehicle`/`PlaceBox`, команды `OpenBox`, `Move`, `Merge` с `CommandResult` и событиями.
+  - Экземпляры `Vehicle` и `Box`, `InstanceIdGenerator`. В конфиги добавлены `GetByRank`, `MaxRank` и `CapacitySchedule.GetCapacity`.
+  - 27 из 27 EditMode-тестов проходят, Play без ошибок.
+  - Новый документ [Gameplay.md](Gameplay.md).
+- **Владелец велел брать все ресурсы игры из `E:\AndroidGames\Vehicle\Unpacked`.** В основном они останутся насовсем, а не заглушками. Записано в договорённости, тех.план (разделы 3.3, 5, 7, 8) обновлён. Я предупредил о правовом риске, он оставлен в разделе 8 и в открытых вопросах.
+- **Вёрстка сцены `Game` по снимку референса.** Владелец хотел увидеть игру, поэтому сцену сверстали раньше задач 1.7 и 1.8.
+  - Раскладка, цвет фона и песок взяты из сцены референса `Stage1`, цвета значков рангов из `LevelColorTable.json`.
+  - Динозавров, яиц, черепа и окаменелостей нет. Иконки турбо и каталога собраны из `Popup`, `UI_2x05` и спрайта машины, монета со звездой нарисована кодом.
+  - Добавлен Sorting Layer `UI` для Canvas. Префабы `GarageSlot` и `TrackVehicle`, материал шрифта с обводкой.
+  - Play со сцены `Bootstrap` проходит без ошибок и предупреждений, `Game` показывает вёрстку.
+  - Зоны переработки (`Sell` у референса — окаменелость динозавра) и таймера бесплатной поставки на экране пока нет.
+- Задача 1.2 и вёрстка сцены закоммичены в `develop` одним коммитом.
 
 ### 30.10.2026
 
