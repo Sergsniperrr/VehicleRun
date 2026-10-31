@@ -48,7 +48,7 @@ Assets/
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib
 │   ├── Prefabs/                       RootLifetimeScope.prefab (корневой контейнер); Game/: GarageSlot, TrackVehicle
 │   ├── Scenes/                        Bootstrap.unity, Game.unity
-│   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView (спрайты Vehicle_NN_Garage и Vehicle_NN_Track)
+│   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView (спрайты Vehicle_NN_Garage и Vehicle_NN_Track), коробка Box_Closed и Box_Open
 │   └── Scripts/
 │       ├── Editor/                    сборка _Project.Editor: проверка конфигов
 │       ├── Tests/EditMode/            сборка _Project.Tests.EditMode
