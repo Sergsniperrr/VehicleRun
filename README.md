@@ -55,7 +55,7 @@ Assets/
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
 │           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
-│           ├── Features/              игровые механики: гараж, экземпляры, команды (Docs/Gameplay.md)
+│           ├── Features/              игровые механики: гараж, прогрессия, экземпляры, команды (Docs/Gameplay.md)
 │           ├── UI/                    интерфейс, сейчас LocalizedText
 │           └── Composition/           LifetimeScope и стартовые состояния
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают

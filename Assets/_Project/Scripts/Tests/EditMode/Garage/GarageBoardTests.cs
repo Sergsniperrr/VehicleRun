@@ -12,7 +12,6 @@ namespace _Project.Tests.EditMode.Garage
     public class GarageBoardTests
     {
         private const int InitialOpenSlots = 6;
-        private const int LastRank = 8;
 
         private GameConfigFixture _fixture;
         private InstanceIdGenerator _instanceIds;
@@ -99,8 +98,9 @@ namespace _Project.Tests.EditMode.Garage
         [Test]
         public void LastRankVehiclesDoNotMerge()
         {
-            PlaceVehicle(0, LastRank);
-            PlaceVehicle(1, LastRank);
+            int lastRank = _fixture.Vehicles.MaxRank;
+            PlaceVehicle(0, lastRank);
+            PlaceVehicle(1, lastRank);
 
             CommandResult result = _garage.Merge(0, 1);
 

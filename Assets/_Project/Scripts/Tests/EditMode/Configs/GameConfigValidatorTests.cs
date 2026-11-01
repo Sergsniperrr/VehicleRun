@@ -105,7 +105,7 @@ namespace _Project.Tests.EditMode.Configs
         [Test]
         public void GarageExpansionAboveLastRankIsReported()
         {
-            _fixture.Change(_fixture.Garage, "_openSlots._steps.Array.data[2]._rank", property => property.intValue = 9);
+            _fixture.Change(_fixture.Garage, "_openSlots._steps.Array.data[2]._rank", property => property.intValue = _fixture.Vehicles.MaxRank + 1);
 
             AssertReportedBy(_fixture.Garage);
         }

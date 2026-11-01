@@ -14,9 +14,9 @@ namespace _Project.Tests.EditMode.Configs
 {
     public class GameConfigFixture : IDisposable
     {
-        private static readonly long[] Incomes = { 1, 2, 5, 11, 23, 52, 113, 249 };
+        private static readonly long[] Incomes = { 1, 2, 5, 11, 23, 52, 113, 249, 549, 1207, 2656, 5843 };
         private static readonly (int Rank, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
-        private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6) };
+        private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
 
         private const int Version = 1;
         private const long StartCoins = 60;
