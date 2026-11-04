@@ -14,7 +14,8 @@ namespace _Project.Tests.EditMode.Configs
 {
     public class GameConfigFixture : IDisposable
     {
-        private static readonly long[] Incomes = { 1, 2, 5, 11, 23, 52, 113, 249, 549, 1207, 2656, 5843 };
+        private static readonly long[] CoinsPerLap = { 10, 19, 45, 95, 190, 412, 862, 1828, 3887, 8250, 17550, 37363 };
+        private static readonly float[] TrackSpeeds = { 3.964f, 4.173f, 4.405f, 4.59f, 4.799f, 5.003f, 5.197f, 5.4f, 5.599f, 5.8f, 5.999f, 6.2f };
         private static readonly (int Rank, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
         private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
 
@@ -33,9 +34,9 @@ namespace _Project.Tests.EditMode.Configs
         private const int GarageColumns = 3;
         private const int GarageRows = 5;
         private const int GarageInitialOpenSlots = 6;
-        private const float LapDurationSeconds = 12f;
         private const float StraightHalfLength = 3f;
         private const float TurnRadius = 4.4f;
+        private const float StartDistance = 5.59f;
         private const int TrackInitialCapacity = 2;
         private const float SpritePixelsPerUnit = 100f;
 
@@ -116,9 +117,9 @@ namespace _Project.Tests.EditMode.Configs
         {
             SerializedObject localization = new SerializedObject(Localization);
             SerializedProperty entries = localization.FindProperty("_entries");
-            entries.arraySize = Incomes.Length;
+            entries.arraySize = CoinsPerLap.Length;
 
-            for (int i = 0; i < Incomes.Length; i++)
+            for (int i = 0; i < CoinsPerLap.Length; i++)
             {
                 SerializedProperty entry = entries.GetArrayElementAtIndex(i);
                 entry.FindPropertyRelative("_key").stringValue = GetNameKey(i);
@@ -133,15 +134,16 @@ namespace _Project.Tests.EditMode.Configs
         {
             SerializedObject catalog = new SerializedObject(Vehicles);
             SerializedProperty vehicles = catalog.FindProperty("_vehicles");
-            vehicles.arraySize = Incomes.Length;
+            vehicles.arraySize = CoinsPerLap.Length;
 
-            for (int i = 0; i < Incomes.Length; i++)
+            for (int i = 0; i < CoinsPerLap.Length; i++)
             {
                 SerializedProperty vehicle = vehicles.GetArrayElementAtIndex(i);
                 vehicle.FindPropertyRelative("_id").stringValue = $"test_{i}";
                 vehicle.FindPropertyRelative("_rank").intValue = i + 1;
                 vehicle.FindPropertyRelative("_nameKey").stringValue = GetNameKey(i);
-                vehicle.FindPropertyRelative("_incomePerSecond").longValue = Incomes[i];
+                vehicle.FindPropertyRelative("_coinsPerLap").longValue = CoinsPerLap[i];
+                vehicle.FindPropertyRelative("_trackSpeed").floatValue = TrackSpeeds[i];
                 vehicle.FindPropertyRelative("_garageSprite").objectReferenceValue = CreateSprite();
                 vehicle.FindPropertyRelative("_trackSprite").objectReferenceValue = CreateSprite();
             }
@@ -178,9 +180,9 @@ namespace _Project.Tests.EditMode.Configs
         private void FillTrack()
         {
             SerializedObject track = new SerializedObject(Track);
-            track.FindProperty("_lapDurationSeconds").floatValue = LapDurationSeconds;
             track.FindProperty("_straightHalfLength").floatValue = StraightHalfLength;
             track.FindProperty("_turnRadius").floatValue = TurnRadius;
+            track.FindProperty("_startDistance").floatValue = StartDistance;
             FillSchedule(track.FindProperty("_capacity"), TrackInitialCapacity, TrackSteps);
             track.ApplyModifiedPropertiesWithoutUndo();
         }

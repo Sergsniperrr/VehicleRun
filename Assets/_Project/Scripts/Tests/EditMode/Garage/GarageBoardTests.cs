@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using _Project.Features.Boxes;
 using _Project.Features.Commands;
@@ -174,6 +175,48 @@ namespace _Project.Tests.EditMode.Garage
             CommandResult result = _garage.OpenBox(0);
 
             Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NoBox));
+        }
+
+        [Test]
+        public void VehicleOnTrackDoesNotMergeOrMove()
+        {
+            PlaceVehicle(0, 2);
+            PlaceVehicle(1, 2);
+            _garage.MarkOnTrack(1);
+
+            Assert.That(_garage.Merge(0, 1).FailureReason, Is.EqualTo(FailureReason.VehicleOnTrack));
+            Assert.That(_garage.Merge(1, 0).FailureReason, Is.EqualTo(FailureReason.VehicleOnTrack));
+            Assert.That(_garage.Move(1, 3).FailureReason, Is.EqualTo(FailureReason.VehicleOnTrack));
+            Assert.That(_garage.TryGetVehicle(0, out _) && _garage.TryGetVehicle(1, out _), Is.True);
+        }
+
+        [Test]
+        public void VehicleOnTrackKeepsItsSlotInFullGarage()
+        {
+            for (int slot = 0; slot < InitialOpenSlots; slot++)
+            {
+                PlaceVehicle(slot, 1);
+            }
+
+            _garage.MarkOnTrack(0);
+
+            Assert.That(_garage.TryFindFreeSlot(out _), Is.False);
+
+            _garage.MarkInGarage(0);
+
+            Assert.That(_garage.IsOnTrack(0), Is.False);
+            Assert.That(_garage.TryGetVehicle(0, out _), Is.True);
+        }
+
+        [Test]
+        public void MarkingSlotTwiceIsInvalid()
+        {
+            PlaceVehicle(0, 2);
+            _garage.MarkOnTrack(0);
+
+            Assert.Throws<InvalidOperationException>(() => _garage.MarkOnTrack(0));
+            Assert.Throws<InvalidOperationException>(() => _garage.MarkOnTrack(1));
+            Assert.Throws<InvalidOperationException>(() => _garage.MarkInGarage(1));
         }
 
         [Test]

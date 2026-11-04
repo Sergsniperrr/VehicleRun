@@ -55,9 +55,9 @@ Assets/
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
 │           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
-│           ├── Features/              игровые механики: гараж, прогрессия, экземпляры, команды (Docs/Gameplay.md)
-│           ├── UI/                    интерфейс, сейчас LocalizedText
-│           └── Composition/           LifetimeScope и стартовые состояния
+│           ├── Features/              игровые механики: гараж, прогрессия, монеты, поставка коробок, трасса и доход, экземпляры, команды; виды трассы (Docs/Gameplay.md)
+│           ├── UI/                    интерфейс: LocalizedText, монеты и доход в HUD
+│           └── Composition/           LifetimeScope, стартовые состояния, временное стартовое состояние игры
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают
 ├── Plugins/                           DOTween Pro, Odin Inspector, UniTask
 ├── Resources/                         DOTweenSettings.asset; JTLSDK/JTLSDKSettings.asset после создания конфигурации
@@ -75,7 +75,7 @@ Assets/
 |---|---|---|
 | `_Project.Core` | UniTask | интерфейсы сервисов, события аналитики, модели данных, ScriptableObject-конфиги |
 | `_Project.Infrastructure` | Core, VContainer, UniTask, JTLStudio.SDK | реализации интерфейсов Core, обёртки над SDK и Unity API |
-| `_Project.Features` | Core, VContainer, UniTask | игровые механики: уровни, персонажи, экономика |
+| `_Project.Features` | Core, VContainer, UniTask, Unity.TextMeshPro | игровые механики и виды мира рядом с ними: гараж, трасса, экономика |
 | `_Project.UI` | Core, Features, VContainer, UniTask, Unity.TextMeshPro | экраны, окна, компоненты интерфейса |
 | `_Project.Composition` | Core, Infrastructure, Features, UI, VContainer, UniTask | регистрация в контейнере, состояния запуска |
 | `_Project.Editor` | все сборки выше, только Editor | редакторские скрипты и тулзы |
@@ -98,7 +98,7 @@ Assets/
 |---|---|---|
 | `RootLifetimeScope` | префаб `Assets/_Project/Prefabs/RootLifetimeScope.prefab` | все сервисы, автомат состояний и состояния |
 | `BootstrapLifetimeScope` | сцена `Bootstrap` | точку входа `Bootstrapper` |
-| `GameLifetimeScope` | сцена `Game` | пока ничего, сюда идут регистрации игровой сцены |
+| `GameLifetimeScope` | сцена `Game` | части `GameConfig`, логику гаража, прогрессии, экономики и трассы, тик экономики, форматирование монет и временное стартовое состояние ([Docs/Gameplay.md](Docs/Gameplay.md), раздел 12) |
 
 Корневой контейнер указан в `Assets/Settings/VContainerSettings.asset`. VContainer создаёт его один раз при старте, помечает `DontDestroyOnLoad` и делает родителем каждого `LifetimeScope` на сценах. Поле `Parent` у сценовых контейнеров оставляйте пустым: родитель приходит из настроек.
 
@@ -311,7 +311,7 @@ public class LoadLevelState : IPayloadState<int>
 | Сцена | Индекс в Build Settings | Что на ней |
 |---|---|---|
 | `Bootstrap` | 0 | `BootstrapLifetimeScope` |
-| `Game` | 1 | `Main Camera` (ортографическая, size 5, позиция (0, 0, -10), фон Solid Color), `GameLifetimeScope` |
+| `Game` | 1 | `Main Camera` (ортографическая, size 9,6, позиция (0, 0, -10), фон Solid Color цветом песка), `GameLifetimeScope`, мир `World` (трасса, гараж, зона переработки) и `Canvas` с HUD. Устройство в [Docs/TechPlan.md](Docs/TechPlan.md), раздел 4.6 |
 
 Проект настроен под 2D. В Project Settings, Editor стоят Default Behavior Mode 2D (картинки импортируются как спрайты, новые сцены создаются с ортографической камерой и без света) и Sprite Packer Mode Sprite Atlas V2. На сцене `Game` нет `Directional Light` и скайбокса, Environment Lighting задан цветом. 2D-света (`Light 2D`) в Built-in RP нет, он работает только в URP с 2D Renderer, поэтому спрайты рисуются материалом `Sprites-Default` без освещения.
 
@@ -365,7 +365,7 @@ public class TimeService : ITimeService
 
 *Это фактический код проекта, а не пример.*
 
-В шаблоне нет папки `Assets/_Project/Audio` и микшера, о которых говорит [документ по звуку](Docs/Audio.md). Перед первым `AudioAsset` создайте микшер через Create, Audio Mixer с группами `Music` и `SFX` внутри `Master`.
+Микшер `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` с группами `Music` и `SFX` внутри `Master` уже создан (задача 0.6), его описывает [документ по звуку](Docs/Audio.md). В свежем шаблоне папки `Assets/_Project/Audio` нет: там микшер создаётся через Create, Audio Mixer.
 
 ---
 

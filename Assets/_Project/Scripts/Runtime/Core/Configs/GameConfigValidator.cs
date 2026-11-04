@@ -40,7 +40,7 @@ namespace _Project.Core.Configs
                 return errors;
             }
 
-            ValidateVehicles(config.Vehicles, localization, errors);
+            ValidateVehicles(config.Vehicles, config.Track.LapLength, localization, errors);
 
             int maxRank = config.Vehicles.Count;
 
@@ -78,7 +78,7 @@ namespace _Project.Core.Configs
             return errors.Count == errorCount;
         }
 
-        private void ValidateVehicles(VehicleCatalogConfig catalog, LocalizationConfig localization, List<ConfigError> errors)
+        private void ValidateVehicles(VehicleCatalogConfig catalog, float lapLength, LocalizationConfig localization, List<ConfigError> errors)
         {
             if (catalog.Count == 0)
             {
@@ -89,7 +89,7 @@ namespace _Project.Core.Configs
 
             HashSet<string> localizedKeys = CollectLocalizedKeys(localization);
             HashSet<string> vehicleIds = new HashSet<string>();
-            long previousIncome = 0;
+            double previousIncome = 0;
 
             for (int i = 0; i < catalog.Count; i++)
             {
@@ -120,13 +120,26 @@ namespace _Project.Core.Configs
                     errors.Add(new ConfigError(catalog, $"{label}: ключа {vehicle.NameKey} нет в LocalizationConfig или у него пустой перевод"));
                 }
 
-                if (vehicle.IncomePerSecond <= 0)
+                if (vehicle.CoinsPerLap <= 0)
                 {
-                    errors.Add(new ConfigError(catalog, $"{label}: доход {vehicle.IncomePerSecond}, должен быть больше 0"));
+                    errors.Add(new ConfigError(catalog, $"{label}: выплата за круг {vehicle.CoinsPerLap}, должна быть больше 0"));
                 }
-                else if (vehicle.IncomePerSecond < previousIncome)
+
+                if (vehicle.TrackSpeed <= 0)
                 {
-                    errors.Add(new ConfigError(catalog, $"{label}: доход {vehicle.IncomePerSecond} меньше дохода предыдущего ранга {previousIncome}"));
+                    errors.Add(new ConfigError(catalog, $"{label}: скорость на трассе {vehicle.TrackSpeed}, должна быть больше 0"));
+                }
+
+                if (vehicle.CoinsPerLap > 0 && vehicle.TrackSpeed > 0 && lapLength > 0)
+                {
+                    double income = vehicle.CalculateAverageIncome(lapLength);
+
+                    if (income < previousIncome)
+                    {
+                        errors.Add(new ConfigError(catalog, $"{label}: средний доход {income:0.###} меньше дохода предыдущего ранга {previousIncome:0.###}"));
+                    }
+
+                    previousIncome = Math.Max(previousIncome, income);
                 }
 
                 if (vehicle.GarageSprite == null)
@@ -138,8 +151,6 @@ namespace _Project.Core.Configs
                 {
                     errors.Add(new ConfigError(catalog, $"{label}: нет спрайта для трассы"));
                 }
-
-                previousIncome = Math.Max(previousIncome, vehicle.IncomePerSecond);
             }
         }
 
@@ -218,11 +229,6 @@ namespace _Project.Core.Configs
 
         private void ValidateTrack(TrackConfig track, int maxRank, List<ConfigError> errors)
         {
-            if (track.LapDurationSeconds <= 0)
-            {
-                errors.Add(new ConfigError(track, $"Круг {track.LapDurationSeconds} секунд, должен быть больше 0"));
-            }
-
             if (track.StraightHalfLength < 0)
             {
                 errors.Add(new ConfigError(track, $"Полудлина прямой {track.StraightHalfLength}, не может быть отрицательной"));
@@ -231,6 +237,10 @@ namespace _Project.Core.Configs
             if (track.TurnRadius <= 0)
             {
                 errors.Add(new ConfigError(track, $"Радиус поворота {track.TurnRadius}, должен быть больше 0"));
+            }
+            else if (track.StartDistance < 0 || track.StartDistance >= track.LapLength)
+            {
+                errors.Add(new ConfigError(track, $"Точка старта {track.StartDistance} должна быть на круге: от 0 до длины круга {track.LapLength:0.###}"));
             }
 
             ValidateSchedule(track, track.Capacity, TrackScheduleName, maxRank, errors);

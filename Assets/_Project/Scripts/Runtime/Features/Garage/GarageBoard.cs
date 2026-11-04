@@ -17,6 +17,7 @@ namespace _Project.Features.Garage
         private readonly InstanceIdGenerator _instanceIds;
         private readonly Vehicle[] _vehicles;
         private readonly Box[] _boxes;
+        private readonly bool[] _onTrack;
 
         public GarageBoard(GarageConfig config, VehicleCatalogConfig catalog, InstanceIdGenerator instanceIds)
         {
@@ -25,6 +26,7 @@ namespace _Project.Features.Garage
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
             _vehicles = new Vehicle[config.SlotCount];
             _boxes = new Box[config.SlotCount];
+            _onTrack = new bool[config.SlotCount];
             OpenSlotCount = Math.Min(config.OpenSlots.Initial, config.SlotCount);
         }
 
@@ -68,6 +70,13 @@ namespace _Project.Features.Garage
             return box != null;
         }
 
+        public bool IsOnTrack(int slot)
+        {
+            CheckSlotIndex(slot);
+
+            return _onTrack[slot];
+        }
+
         public bool TryFindFreeSlot(out int slot)
         {
             for (int i = 0; i < OpenSlotCount; i++)
@@ -107,6 +116,26 @@ namespace _Project.Features.Garage
             CheckSlotAvailable(slot);
             _boxes[slot] = box;
             BoxPlaced?.Invoke(slot, box);
+        }
+
+        public void MarkOnTrack(int slot)
+        {
+            if (TryGetVehicle(slot, out Vehicle _) == false || _onTrack[slot])
+            {
+                throw new InvalidOperationException(nameof(slot));
+            }
+
+            _onTrack[slot] = true;
+        }
+
+        public void MarkInGarage(int slot)
+        {
+            if (IsOnTrack(slot) == false)
+            {
+                throw new InvalidOperationException(nameof(slot));
+            }
+
+            _onTrack[slot] = false;
         }
 
         public void UnlockSlots(int maxRank)
@@ -163,6 +192,11 @@ namespace _Project.Features.Garage
                 return Fail(FailureReason.NoVehicle);
             }
 
+            if (_onTrack[fromSlot])
+            {
+                return Fail(FailureReason.VehicleOnTrack);
+            }
+
             if (IsSlotEmpty(toSlot) == false)
             {
                 return Fail(FailureReason.SlotOccupied);
@@ -204,6 +238,11 @@ namespace _Project.Features.Garage
             if (target == null)
             {
                 return Fail(FailureReason.NoVehicle);
+            }
+
+            if (_onTrack[fromSlot] || _onTrack[toSlot])
+            {
+                return Fail(FailureReason.VehicleOnTrack);
             }
 
             if (source.Rank != target.Rank)

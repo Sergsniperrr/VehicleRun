@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dc162f218d655f4d8ab2a23634c9a87, type: 3}
   m_Name: TrackConfig
   m_EditorClassIdentifier: 
-  _lapDurationSeconds: 12
   _straightHalfLength: 3
   _turnRadius: 4.4
+  _startDistance: 5.59
   _capacity:
     _initial: 2
     _steps:

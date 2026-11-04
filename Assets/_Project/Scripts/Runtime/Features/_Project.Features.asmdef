@@ -4,7 +4,8 @@
     "references": [
         "_Project.Core",
         "VContainer",
-        "UniTask"
+        "UniTask",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

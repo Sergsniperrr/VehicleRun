@@ -57,7 +57,15 @@ namespace _Project.Tests.EditMode.Configs
         [Test]
         public void DecreasingIncomeIsReported()
         {
-            _fixture.Change(_fixture.Vehicles, "_vehicles.Array.data[4]._incomePerSecond", property => property.longValue = 3);
+            _fixture.Change(_fixture.Vehicles, "_vehicles.Array.data[4]._coinsPerLap", property => property.longValue = 3);
+
+            AssertReportedBy(_fixture.Vehicles);
+        }
+
+        [Test]
+        public void NonPositiveTrackSpeedIsReported()
+        {
+            _fixture.Change(_fixture.Vehicles, "_vehicles.Array.data[2]._trackSpeed", property => property.floatValue = 0);
 
             AssertReportedBy(_fixture.Vehicles);
         }
@@ -130,6 +138,14 @@ namespace _Project.Tests.EditMode.Configs
         public void NonGrowingTrackCapacityIsReported()
         {
             _fixture.Change(_fixture.Track, "_capacity._steps.Array.data[0]._capacity", property => property.intValue = 2);
+
+            AssertReportedBy(_fixture.Track);
+        }
+
+        [Test]
+        public void StartPointOutsideLapIsReported()
+        {
+            _fixture.Change(_fixture.Track, "_startDistance", property => property.floatValue = _fixture.Track.LapLength);
 
             AssertReportedBy(_fixture.Track);
         }

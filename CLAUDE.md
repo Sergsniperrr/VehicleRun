@@ -27,7 +27,7 @@
 |---|---|---|
 | `_Project.Core` | UniTask | интерфейсы сервисов, события аналитики, модели данных, ScriptableObject-конфиги |
 | `_Project.Infrastructure` | Core, VContainer, UniTask, JTLStudio.SDK | реализации интерфейсов Core, обёртки над SDK и Unity API |
-| `_Project.Features` | Core, VContainer, UniTask | игровые механики |
+| `_Project.Features` | Core, VContainer, UniTask, TextMeshPro | игровые механики и виды мира рядом с ними |
 | `_Project.UI` | Core, Features, VContainer, UniTask, TextMeshPro | экраны, окна, компоненты интерфейса |
 | `_Project.Composition` | все сборки выше | регистрация в контейнере, состояния запуска |
 | `_Project.Editor` | все сборки выше, только Editor | редакторские тулзы |

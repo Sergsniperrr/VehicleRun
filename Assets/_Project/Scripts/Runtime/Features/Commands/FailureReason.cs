@@ -11,5 +11,11 @@ namespace _Project.Features.Commands
         TargetIsBox,
         RankMismatch,
         MaxRank,
+        NoFreeSlot,
+        NotEnoughCoins,
+        VehicleOnTrack,
+        AlreadyOnTrack,
+        NotOnTrack,
+        TrackFull,
     }
 }
