@@ -11,6 +11,7 @@ namespace _Project.Features.Garage
     public class GarageBoard
     {
         private const int NoSlot = -1;
+        private const int EmergencyBoxRank = 1;
 
         private readonly GarageConfig _config;
         private readonly VehicleCatalogConfig _catalog;
@@ -35,6 +36,8 @@ namespace _Project.Features.Garage
         public event Action<int, Vehicle> BoxOpened;
         public event Action<int, int> VehicleMoved;
         public event Action<int, int, Vehicle> VehicleMerged;
+        public event Action<int, Vehicle> VehicleRecycled;
+        public event Action<int, Box> BoxRecycled;
         public event Action<int> SlotsUnlocked;
 
         public int SlotCount => _vehicles.Length;
@@ -261,6 +264,65 @@ namespace _Project.Features.Garage
             VehicleMerged?.Invoke(fromSlot, toSlot, result);
 
             return Succeed();
+        }
+
+        public CommandResult Recycle(int slot)
+        {
+            if (IsSlotOpen(slot) == false)
+            {
+                return Fail(FailureReason.SlotLocked);
+            }
+
+            if (IsSlotEmpty(slot))
+            {
+                return Fail(FailureReason.SlotEmpty);
+            }
+
+            if (_onTrack[slot])
+            {
+                return Fail(FailureReason.VehicleOnTrack);
+            }
+
+            Vehicle vehicle = _vehicles[slot];
+            Box box = _boxes[slot];
+            _vehicles[slot] = null;
+            _boxes[slot] = null;
+            Box emergencyBox = null;
+
+            if (HasAnyItem() == false)
+            {
+                emergencyBox = new Box(_instanceIds.Create(), BoxSource.Emergency, _catalog.GetByRank(EmergencyBoxRank));
+                _boxes[slot] = emergencyBox;
+            }
+
+            if (vehicle != null)
+            {
+                VehicleRecycled?.Invoke(slot, vehicle);
+            }
+            else
+            {
+                BoxRecycled?.Invoke(slot, box);
+            }
+
+            if (emergencyBox != null)
+            {
+                BoxPlaced?.Invoke(slot, emergencyBox);
+            }
+
+            return Succeed();
+        }
+
+        private bool HasAnyItem()
+        {
+            for (int slot = 0; slot < SlotCount; slot++)
+            {
+                if (IsSlotEmpty(slot) == false)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void CheckSlotIndex(int slot)

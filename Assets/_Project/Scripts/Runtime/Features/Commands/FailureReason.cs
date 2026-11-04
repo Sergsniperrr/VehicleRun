@@ -17,5 +17,6 @@ namespace _Project.Features.Commands
         AlreadyOnTrack,
         NotOnTrack,
         TrackFull,
+        SlotEmpty,
     }
 }
