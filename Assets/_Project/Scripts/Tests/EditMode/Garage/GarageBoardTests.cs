@@ -239,6 +239,27 @@ namespace _Project.Tests.EditMode.Garage
             Assert.That(unlocked, Is.EqualTo(new[] { 9, 15 }));
         }
 
+        [Test]
+        public void MergePairCountsVehicleOnTrack()
+        {
+            PlaceVehicle(0, 3);
+            PlaceVehicle(1, 3);
+            PlaceVehicle(2, 4);
+            PlaceVehicle(3, 3);
+            _garage.PlaceBox(4, CreateBox(3));
+            _garage.MarkOnTrack(3);
+
+            Assert.That(_garage.IsMergePair(0, 1), Is.True);
+            Assert.That(_garage.IsMergePair(0, 3), Is.True);
+            Assert.That(_garage.IsMergePair(3, 0), Is.True);
+            Assert.That(_garage.IsMergePair(0, 0), Is.False);
+            Assert.That(_garage.IsMergePair(0, 2), Is.False);
+            Assert.That(_garage.IsMergePair(0, 4), Is.False);
+            Assert.That(_garage.IsMergePair(0, 5), Is.False);
+            Assert.That(_garage.Merge(0, 3).FailureReason, Is.EqualTo(FailureReason.VehicleOnTrack));
+            Assert.That(_garage.TryGetVehicle(0, out Vehicle _) && _garage.TryGetVehicle(3, out Vehicle _), Is.True);
+        }
+
         private Vehicle PlaceVehicle(int slot, int rank)
         {
             Vehicle vehicle = new Vehicle(_instanceIds.Create(), _fixture.Vehicles.GetByRank(rank));

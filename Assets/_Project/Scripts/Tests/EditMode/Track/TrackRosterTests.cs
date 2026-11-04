@@ -204,6 +204,27 @@ namespace _Project.Tests.EditMode.Track
             Assert.That(_garage.IsOnTrack(0) || _garage.IsOnTrack(5), Is.False);
         }
 
+        [Test]
+        public void CanSendToTrackMatchesSendResult()
+        {
+            for (int slot = 0; slot <= _roster.Capacity; slot++)
+            {
+                PlaceVehicle(slot, 1);
+            }
+
+            Assert.That(_roster.CanSendToTrack(0), Is.True);
+            Assert.That(_roster.CanSendToTrack(_roster.Capacity + 1), Is.False);
+
+            for (int slot = 0; slot < _roster.Capacity; slot++)
+            {
+                _roster.SendToTrack(slot);
+            }
+
+            Assert.That(_roster.CanSendToTrack(0), Is.False);
+            Assert.That(_roster.CanSendToTrack(_roster.Capacity), Is.False);
+            Assert.That(_roster.Count, Is.EqualTo(_roster.Capacity));
+        }
+
         private Vehicle PlaceVehicle(int slot, int rank)
         {
             Vehicle vehicle = new Vehicle(_instanceIds.Create(), _fixture.Vehicles.GetByRank(rank));

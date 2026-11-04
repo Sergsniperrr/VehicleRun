@@ -33,6 +33,24 @@ namespace _Project.Features.Track
             return direction;
         }
 
+        public float MeasureDistanceToCenterline(Vector2 point)
+        {
+            float halfStraight = _config.StraightHalfLength;
+            float radius = _config.TurnRadius;
+
+            if (point.y > halfStraight)
+            {
+                return Mathf.Abs(Vector2.Distance(point, new Vector2(0f, halfStraight)) - radius);
+            }
+
+            if (point.y < -halfStraight)
+            {
+                return Mathf.Abs(Vector2.Distance(point, new Vector2(0f, -halfStraight)) - radius);
+            }
+
+            return Mathf.Abs(Mathf.Abs(point.x) - radius);
+        }
+
         private void Locate(float distanceFromStart, out Vector2 point, out Vector2 direction)
         {
             float halfStraight = _config.StraightHalfLength;

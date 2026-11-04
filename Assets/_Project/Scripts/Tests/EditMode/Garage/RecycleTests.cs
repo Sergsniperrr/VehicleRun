@@ -92,6 +92,20 @@ namespace _Project.Tests.EditMode.Garage
         }
 
         [Test]
+        public void CanRecycleMatchesRecycleResult()
+        {
+            PlaceVehicle(0, 2);
+            PlaceVehicle(1, 2);
+            _roster.SendToTrack(0);
+
+            Assert.That(_garage.CanRecycle(LockedSlot), Is.False);
+            Assert.That(_garage.CanRecycle(2), Is.False);
+            Assert.That(_garage.CanRecycle(0), Is.False);
+            Assert.That(_garage.CanRecycle(1), Is.True);
+            Assert.That(_garage.TryGetVehicle(1, out _), Is.True);
+        }
+
+        [Test]
         public void RecycleKeepsMaxRankAndUnlockedRank()
         {
             PlaceVehicle(0, 5);

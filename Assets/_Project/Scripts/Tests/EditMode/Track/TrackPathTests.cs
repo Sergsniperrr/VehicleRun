@@ -67,6 +67,27 @@ namespace _Project.Tests.EditMode.Track
             AssertSamePoint(_path.GetPoint(-1f), _path.GetPoint(_path.Length - 1f));
         }
 
+        [Test]
+        public void DistanceToCenterlineIsZeroOnPath()
+        {
+            for (float distance = 0f; distance < _path.Length; distance += 1f)
+            {
+                Assert.That(_path.MeasureDistanceToCenterline(_path.GetPoint(distance)), Is.EqualTo(0f).Within(Tolerance));
+            }
+        }
+
+        [Test]
+        public void DistanceToCenterlineGrowsAwayFromPath()
+        {
+            const float offset = 0.5f;
+
+            Assert.That(_path.MeasureDistanceToCenterline(Vector2.zero), Is.EqualTo(Radius).Within(Tolerance));
+            Assert.That(_path.MeasureDistanceToCenterline(new Vector2(Radius + offset, 0f)), Is.EqualTo(offset).Within(Tolerance));
+            Assert.That(_path.MeasureDistanceToCenterline(new Vector2(offset - Radius, 1f)), Is.EqualTo(offset).Within(Tolerance));
+            Assert.That(_path.MeasureDistanceToCenterline(new Vector2(0f, HalfStraight + Radius + offset)), Is.EqualTo(offset).Within(Tolerance));
+            Assert.That(_path.MeasureDistanceToCenterline(new Vector2(0f, -HalfStraight - Radius + offset)), Is.EqualTo(offset).Within(Tolerance));
+        }
+
         private void AssertPoint(float distance, Vector2 expectedPoint, Vector2 expectedDirection)
         {
             AssertSamePoint(_path.GetPoint(distance), expectedPoint);

@@ -7,7 +7,7 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Track;
-using _Project.UI.Hud;
+using _Project.UI.Windows;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -17,6 +17,7 @@ namespace _Project.Composition
     public class GameLifetimeScope : LifetimeScope
     {
         [SerializeField] private GameConfig _gameConfig;
+        [SerializeField] private RecycleConfirmWindow _recycleConfirmWindow;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -49,13 +50,20 @@ namespace _Project.Composition
             builder.Register<BoxDelivery>(Lifetime.Singleton);
             builder.Register<TrackPath>(Lifetime.Singleton);
             builder.Register<TrackRoster>(Lifetime.Singleton);
+            builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();
         }
 
         private void RegisterUI(IContainerBuilder builder)
         {
+            if (_recycleConfirmWindow == null)
+            {
+                throw new InvalidOperationException(nameof(_recycleConfirmWindow));
+            }
+
             builder.Register<CoinsFormatter>(Lifetime.Singleton);
+            builder.RegisterInstance(_recycleConfirmWindow).As<IRecycleConfirmation>();
         }
     }
 }

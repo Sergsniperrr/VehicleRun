@@ -75,3 +75,24 @@ MonoBehaviour:
     _russian: "\u0411\u0440\u043E\u043D\u0435\u0432\u0435\u0437\u0434\u0435\u0445\u043E\u0434
       6 \xD7 6"
     _english: "6\xD76 Armored Rover"
+  - _key: popup.recycle.title
+    _russian: "\u041F\u0435\u0440\u0435\u0440\u0430\u0431\u043E\u0442\u043A\u0430"
+    _english: Recycling
+  - _key: popup.recycle.vehicle_question
+    _russian: "\u041F\u0435\u0440\u0435\u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C
+      \xAB{0}\xBB?"
+    _english: Recycle the {0}?
+  - _key: popup.recycle.box_question
+    _russian: "\u041F\u0435\u0440\u0435\u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C
+      \u043A\u043E\u0440\u043E\u0431\u043A\u0443 \u0440\u0430\u043D\u0433\u0430 {0}?"
+    _english: Recycle the rank {0} box?
+  - _key: popup.recycle.no_reward
+    _russian: "\u041C\u043E\u043D\u0435\u0442 \u0437\u0430 \u044D\u0442\u043E \u043D\u0435
+      \u0431\u0443\u0434\u0435\u0442"
+    _english: You won't get any coins for it
+  - _key: ui.common.yes
+    _russian: "\u0414\u0430"
+    _english: Yes
+  - _key: ui.common.no
+    _russian: "\u041D\u0435\u0442"
+    _english: No

@@ -212,52 +212,21 @@ namespace _Project.Features.Garage
             return Succeed();
         }
 
+        public bool IsMergePair(int fromSlot, int toSlot)
+        {
+            return CheckPair(fromSlot, toSlot) == FailureReason.None;
+        }
+
         public CommandResult Merge(int fromSlot, int toSlot)
         {
-            if (fromSlot == toSlot)
-            {
-                return Fail(FailureReason.SameSlot);
-            }
+            FailureReason failureReason = CheckMerge(fromSlot, toSlot);
 
-            if (IsSlotOpen(fromSlot) == false || IsSlotOpen(toSlot) == false)
+            if (failureReason != FailureReason.None)
             {
-                return Fail(FailureReason.SlotLocked);
+                return Fail(failureReason);
             }
 
             Vehicle source = _vehicles[fromSlot];
-
-            if (source == null)
-            {
-                return Fail(FailureReason.NoVehicle);
-            }
-
-            if (_boxes[toSlot] != null)
-            {
-                return Fail(FailureReason.TargetIsBox);
-            }
-
-            Vehicle target = _vehicles[toSlot];
-
-            if (target == null)
-            {
-                return Fail(FailureReason.NoVehicle);
-            }
-
-            if (_onTrack[fromSlot] || _onTrack[toSlot])
-            {
-                return Fail(FailureReason.VehicleOnTrack);
-            }
-
-            if (source.Rank != target.Rank)
-            {
-                return Fail(FailureReason.RankMismatch);
-            }
-
-            if (source.Rank >= _catalog.MaxRank)
-            {
-                return Fail(FailureReason.MaxRank);
-            }
-
             Vehicle result = new Vehicle(_instanceIds.Create(), _catalog.GetByRank(source.Rank + 1));
             _vehicles[fromSlot] = null;
             _vehicles[toSlot] = result;
@@ -266,21 +235,18 @@ namespace _Project.Features.Garage
             return Succeed();
         }
 
+        public bool CanRecycle(int slot)
+        {
+            return CheckRecycle(slot) == FailureReason.None;
+        }
+
         public CommandResult Recycle(int slot)
         {
-            if (IsSlotOpen(slot) == false)
-            {
-                return Fail(FailureReason.SlotLocked);
-            }
+            FailureReason failureReason = CheckRecycle(slot);
 
-            if (IsSlotEmpty(slot))
+            if (failureReason != FailureReason.None)
             {
-                return Fail(FailureReason.SlotEmpty);
-            }
-
-            if (_onTrack[slot])
-            {
-                return Fail(FailureReason.VehicleOnTrack);
+                return Fail(failureReason);
             }
 
             Vehicle vehicle = _vehicles[slot];
@@ -310,6 +276,87 @@ namespace _Project.Features.Garage
             }
 
             return Succeed();
+        }
+
+        private FailureReason CheckMerge(int fromSlot, int toSlot)
+        {
+            FailureReason pairFailure = CheckPair(fromSlot, toSlot);
+
+            if (pairFailure != FailureReason.None)
+            {
+                return pairFailure;
+            }
+
+            if (_onTrack[fromSlot] || _onTrack[toSlot])
+            {
+                return FailureReason.VehicleOnTrack;
+            }
+
+            return FailureReason.None;
+        }
+
+        private FailureReason CheckPair(int fromSlot, int toSlot)
+        {
+            if (fromSlot == toSlot)
+            {
+                return FailureReason.SameSlot;
+            }
+
+            if (IsSlotOpen(fromSlot) == false || IsSlotOpen(toSlot) == false)
+            {
+                return FailureReason.SlotLocked;
+            }
+
+            Vehicle source = _vehicles[fromSlot];
+
+            if (source == null)
+            {
+                return FailureReason.NoVehicle;
+            }
+
+            if (_boxes[toSlot] != null)
+            {
+                return FailureReason.TargetIsBox;
+            }
+
+            Vehicle target = _vehicles[toSlot];
+
+            if (target == null)
+            {
+                return FailureReason.NoVehicle;
+            }
+
+            if (source.Rank != target.Rank)
+            {
+                return FailureReason.RankMismatch;
+            }
+
+            if (source.Rank >= _catalog.MaxRank)
+            {
+                return FailureReason.MaxRank;
+            }
+
+            return FailureReason.None;
+        }
+
+        private FailureReason CheckRecycle(int slot)
+        {
+            if (IsSlotOpen(slot) == false)
+            {
+                return FailureReason.SlotLocked;
+            }
+
+            if (IsSlotEmpty(slot))
+            {
+                return FailureReason.SlotEmpty;
+            }
+
+            if (_onTrack[slot])
+            {
+                return FailureReason.VehicleOnTrack;
+            }
+
+            return FailureReason.None;
         }
 
         private bool HasAnyItem()

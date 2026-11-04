@@ -13,6 +13,7 @@ namespace _Project.Core.Vehicles
         [SerializeField] private float _trackSpeed;
         [SerializeField] private Sprite _garageSprite;
         [SerializeField] private Sprite _trackSprite;
+        [SerializeField] private Color _badgeColor = Color.white;
 
         public string Id => _id;
         public int Rank => _rank;
@@ -21,6 +22,7 @@ namespace _Project.Core.Vehicles
         public float TrackSpeed => _trackSpeed;
         public Sprite GarageSprite => _garageSprite;
         public Sprite TrackSprite => _trackSprite;
+        public Color BadgeColor => _badgeColor;
 
         public double CalculateAverageIncome(float lapLength)
         {

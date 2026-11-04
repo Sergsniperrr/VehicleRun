@@ -33,28 +33,21 @@ namespace _Project.Features.Track
         public int Count => _runners.Count;
         public int Capacity => _progress.TrackCapacity;
 
+        public bool CanSendToTrack(int slot)
+        {
+            return CheckSend(slot) == FailureReason.None;
+        }
+
         public CommandResult SendToTrack(int slot)
         {
-            if (_garage.IsSlotOpen(slot) == false)
+            FailureReason failureReason = CheckSend(slot);
+
+            if (failureReason != FailureReason.None)
             {
-                return Fail(FailureReason.SlotLocked);
+                return Fail(failureReason);
             }
 
-            if (_garage.TryGetVehicle(slot, out Vehicle vehicle) == false)
-            {
-                return Fail(FailureReason.NoVehicle);
-            }
-
-            if (_garage.IsOnTrack(slot))
-            {
-                return Fail(FailureReason.AlreadyOnTrack);
-            }
-
-            if (Count >= Capacity)
-            {
-                return Fail(FailureReason.TrackFull);
-            }
-
+            _garage.TryGetVehicle(slot, out Vehicle vehicle);
             Send(slot, vehicle);
 
             return Succeed();
@@ -116,6 +109,31 @@ namespace _Project.Features.Track
                     PayForLaps(runner, crossings);
                 }
             }
+        }
+
+        private FailureReason CheckSend(int slot)
+        {
+            if (_garage.IsSlotOpen(slot) == false)
+            {
+                return FailureReason.SlotLocked;
+            }
+
+            if (_garage.TryGetVehicle(slot, out Vehicle _) == false)
+            {
+                return FailureReason.NoVehicle;
+            }
+
+            if (_garage.IsOnTrack(slot))
+            {
+                return FailureReason.AlreadyOnTrack;
+            }
+
+            if (Count >= Capacity)
+            {
+                return FailureReason.TrackFull;
+            }
+
+            return FailureReason.None;
         }
 
         private void Send(int slot, Vehicle vehicle)

@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace _Project.UI.Hud
+namespace _Project.Features.Economy
 {
     public class CoinsFormatter
     {

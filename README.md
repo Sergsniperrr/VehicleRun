@@ -75,8 +75,8 @@ Assets/
 |---|---|---|
 | `_Project.Core` | UniTask | интерфейсы сервисов, события аналитики, модели данных, ScriptableObject-конфиги |
 | `_Project.Infrastructure` | Core, VContainer, UniTask, JTLStudio.SDK | реализации интерфейсов Core, обёртки над SDK и Unity API |
-| `_Project.Features` | Core, VContainer, UniTask, Unity.TextMeshPro | игровые механики и виды мира рядом с ними: гараж, трасса, экономика |
-| `_Project.UI` | Core, Features, VContainer, UniTask, Unity.TextMeshPro | экраны, окна, компоненты интерфейса |
+| `_Project.Features` | Core, VContainer, UniTask, Unity.TextMeshPro, UnityEngine.UI | игровые механики и виды мира рядом с ними: гараж, трасса, экономика. `UnityEngine.UI` нужен ради `EventSystem`: через него идёт ввод гаража |
+| `_Project.UI` | Core, Features, VContainer, UniTask, Unity.TextMeshPro, UnityEngine.UI | экраны, окна, компоненты интерфейса |
 | `_Project.Composition` | Core, Infrastructure, Features, UI, VContainer, UniTask | регистрация в контейнере, состояния запуска |
 | `_Project.Editor` | все сборки выше, только Editor | редакторские скрипты и тулзы |
 | `_Project.Tests.EditMode` | Core, Features, Test Framework, только Editor | EditMode-тесты логики |
@@ -98,7 +98,7 @@ Assets/
 |---|---|---|
 | `RootLifetimeScope` | префаб `Assets/_Project/Prefabs/RootLifetimeScope.prefab` | все сервисы, автомат состояний и состояния |
 | `BootstrapLifetimeScope` | сцена `Bootstrap` | точку входа `Bootstrapper` |
-| `GameLifetimeScope` | сцена `Game` | части `GameConfig`, логику гаража, прогрессии, экономики и трассы, тик экономики, форматирование монет и временное стартовое состояние ([Docs/Gameplay.md](Docs/Gameplay.md), раздел 12) |
+| `GameLifetimeScope` | сцена `Game` | части `GameConfig`, логику гаража, прогрессии, экономики и трассы, правила жестов гаража, тик экономики, форматирование монет, окно подтверждения переработки и временное стартовое состояние ([Docs/Gameplay.md](Docs/Gameplay.md), раздел 13) |
 
 Корневой контейнер указан в `Assets/Settings/VContainerSettings.asset`. VContainer создаёт его один раз при старте, помечает `DontDestroyOnLoad` и делает родителем каждого `LifetimeScope` на сценах. Поле `Parent` у сценовых контейнеров оставляйте пустым: родитель приходит из настроек.
 
