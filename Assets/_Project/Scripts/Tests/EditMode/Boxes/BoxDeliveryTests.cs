@@ -156,6 +156,33 @@ namespace _Project.Tests.EditMode.Boxes
         }
 
         [Test]
+        public void MissingCoinsIsPriceMinusCoins()
+        {
+            Assert.That(_delivery.MissingCoins, Is.EqualTo(0));
+
+            _wallet.TrySpend(_wallet.Coins - 5);
+
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(12));
+            Assert.That(_delivery.MissingCoins, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void FreeBoxProgressFollowsTimerAndIsFullForReadyDelivery()
+        {
+            Assert.That(_delivery.FreeBoxProgress, Is.EqualTo(0f));
+
+            _delivery.Advance(FreeBoxInterval / 4);
+
+            Assert.That(_delivery.FreeBoxProgress, Is.EqualTo(0.25f).Within(0.0001f));
+
+            FillGarage(1);
+            _delivery.Advance(FreeBoxInterval);
+
+            Assert.That(_delivery.HasReadyDelivery, Is.True);
+            Assert.That(_delivery.FreeBoxProgress, Is.EqualTo(1f));
+        }
+
+        [Test]
         public void ReadyDeliveryTakesLastSlotBeforePurchase()
         {
             long startCoins = _wallet.Coins;

@@ -60,14 +60,17 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 26 записей:
+Сейчас в ассете 28 записей:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
   - `popup.recycle.vehicle_question` — «Переработать «{0}»?», где `{0}` — имя машины;
   - `popup.recycle.box_question` — «Переработать коробку ранга {0}?», где `{0}` — ранг;
   - `popup.recycle.no_reward` — «Монет за это не будет»;
-- общие кнопки `ui.common.yes` и `ui.common.no` — «Да» и «Нет».
+- общие кнопки `ui.common.yes` и `ui.common.no` — «Да» и «Нет»;
+- отказы покупки коробки в HUD ([Gameplay.md](Gameplay.md), раздел 13):
+  - `ui.hud.no_free_slot` — «Освободите место»;
+  - `ui.hud.not_enough_coins` — «Не хватает {0}», где `{0}` — недостающая сумма с разделителем разрядов.
 
 Остальные тексты добавляются по мере их появления в игре.
 

@@ -39,8 +39,10 @@ namespace _Project.Features.Boxes
         }
 
         public float FreeBoxRemainingSeconds { get; private set; }
+        public float FreeBoxProgress => 1f - FreeBoxRemainingSeconds / _economy.FreeBoxIntervalSeconds;
         public bool HasReadyDelivery { get; private set; }
         public long BoxPrice => _pricing.GetPrice(_progress.BoxRank);
+        public long MissingCoins => Math.Max(0, BoxPrice - _wallet.Coins);
 
         public void Advance(float deltaTime)
         {

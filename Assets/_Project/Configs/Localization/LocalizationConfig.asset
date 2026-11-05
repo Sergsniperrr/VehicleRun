@@ -96,3 +96,9 @@ MonoBehaviour:
   - _key: ui.common.no
     _russian: "\u041D\u0435\u0442"
     _english: No
+  - _key: ui.hud.no_free_slot
+    _russian: "\u041E\u0441\u0432\u043E\u0431\u043E\u0434\u0438\u0442\u0435 \u043C\u0435\u0441\u0442\u043E"
+    _english: Free up a slot
+  - _key: ui.hud.not_enough_coins
+    _russian: "\u041D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442 {0}"
+    _english: Need {0} more

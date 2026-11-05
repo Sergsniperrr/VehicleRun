@@ -2,10 +2,10 @@ using System;
 using TMPro;
 using UnityEngine;
 
-namespace _Project.Features.Track
+namespace _Project.Features.Effects
 {
     [RequireComponent(typeof(TMP_Text))]
-    public class PayoutPopupView : MonoBehaviour
+    public class FloatingTextView : MonoBehaviour
     {
         private const float OpaqueAlpha = 1f;
 
@@ -17,7 +17,7 @@ namespace _Project.Features.Track
         private Vector3 _startPosition;
         private float _age;
 
-        public event Action<PayoutPopupView> Finished;
+        public event Action<FloatingTextView> Finished;
 
         private void Awake()
         {
@@ -40,12 +40,12 @@ namespace _Project.Features.Track
 
         public void Show(string text, Vector3 localPosition)
         {
+            gameObject.SetActive(true);
             _label.text = text;
             _label.alpha = OpaqueAlpha;
             _startPosition = localPosition;
             _age = 0f;
             transform.localPosition = localPosition;
-            gameObject.SetActive(true);
         }
     }
 }

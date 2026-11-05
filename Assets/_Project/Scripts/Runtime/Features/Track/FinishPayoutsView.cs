@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using _Project.Features.Economy;
+using _Project.Features.Effects;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -12,11 +13,11 @@ namespace _Project.Features.Track
         private const string PayoutPrefix = "+";
         private const float FinishDistance = 0f;
 
-        [SerializeField] private PayoutPopupView _popupPrefab;
+        [SerializeField] private FloatingTextView _popupPrefab;
         [SerializeField] private Vector2 _offset;
 
-        private readonly List<PayoutPopupView> _popups = new List<PayoutPopupView>();
-        private readonly Stack<PayoutPopupView> _freePopups = new Stack<PayoutPopupView>();
+        private readonly List<FloatingTextView> _popups = new List<FloatingTextView>();
+        private readonly Stack<FloatingTextView> _freePopups = new Stack<FloatingTextView>();
 
         private TrackRoster _roster;
         private TrackPath _path;
@@ -32,7 +33,7 @@ namespace _Project.Features.Track
         {
             _roster.FinishCrossed -= OnFinishCrossed;
 
-            foreach (PayoutPopupView popup in _popups)
+            foreach (FloatingTextView popup in _popups)
             {
                 popup.Finished -= OnPopupFinished;
             }
@@ -47,14 +48,14 @@ namespace _Project.Features.Track
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
         }
 
-        private PayoutPopupView TakePopup()
+        private FloatingTextView TakePopup()
         {
             if (_freePopups.Count > 0)
             {
                 return _freePopups.Pop();
             }
 
-            PayoutPopupView popup = _resolver.Instantiate(_popupPrefab, transform);
+            FloatingTextView popup = _resolver.Instantiate(_popupPrefab, transform);
             popup.Finished += OnPopupFinished;
             _popups.Add(popup);
 
@@ -68,7 +69,7 @@ namespace _Project.Features.Track
             TakePopup().Show(text, position);
         }
 
-        private void OnPopupFinished(PayoutPopupView popup)
+        private void OnPopupFinished(FloatingTextView popup)
         {
             _freePopups.Push(popup);
         }
