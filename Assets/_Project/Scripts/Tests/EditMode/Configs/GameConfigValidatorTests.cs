@@ -103,6 +103,14 @@ namespace _Project.Tests.EditMode.Configs
         }
 
         [Test]
+        public void FirstRankPriceGrowthBelowOneIsReported()
+        {
+            _fixture.Change(_fixture.Economy, "_firstRankBoxPriceGrowth", property => property.doubleValue = 0.9);
+
+            AssertReportedBy(_fixture.Economy);
+        }
+
+        [Test]
         public void StartVehiclesBeyondOpenSlotsAreReported()
         {
             _fixture.Change(_fixture.Economy, "_startVehicleCount", property => property.intValue = 7);

@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 197d95b7f8f1b8b4cb02d2d949ddb765, type: 3}
+  m_Name: BalanceSimulationSettings
+  m_EditorClassIdentifier: 
+  _gameConfig: {fileID: 11400000, guid: 0c8bfb98663ac5d4ebe23d5c7344e8d4, type: 2}
+  _reportPath: Docs/Balance/SimulationReport.md
+  _stepSeconds: 0.1
+  _activeTimeLimitSeconds: 21600
+  _turboSpeedMultiplier: 2
+  _turboDurationSeconds: 30
+  _turboCooldownSeconds: 180
+  _turboUnlockRank: 3
+  _decorRankStep: 4
+  _decorIncomeBonus: 0.1
+  _firstMergeTargetSeconds: 45
+  _firstIncomeTargetSeconds: 60
+  _paceTargets:
+  - _rank: 4
+    _minSeconds: 120
+    _maxSeconds: 300
+  - _rank: 8
+    _minSeconds: 900
+    _maxSeconds: 2100
+  - _rank: 12
+    _minSeconds: 2100
+    _maxSeconds: 4800
+  - _rank: 20
+    _minSeconds: 7200
+    _maxSeconds: 18000
+  _economyVariants:
+  - _name: "\u0420\u043E\u0441\u0442 \u043A\u0430\u043A \u0432 \u0440\u0435\u0444\u0435\u0440\u0435\u043D\u0441\u0435"
+    _boxRankLag: 5
+    _freeBoxIntervalSeconds: 20
+    _boxBasePriceIncomeSeconds: 48
+    _boxPriceGrowth: 1.175
+    _firstRankBoxPriceGrowth: 1.07
+    _isBoxPriceGrowthLimited: 0
+    _boxPriceGrowthPurchaseLimit: 20
+  - _name: "\u041E\u0442\u0441\u0442\u0430\u0432\u0430\u043D\u0438\u0435 \u0440\u0430\u043D\u0433\u0430
+      \u043A\u043E\u0440\u043E\u0431\u043A\u0438 4"
+    _boxRankLag: 4
+    _freeBoxIntervalSeconds: 20
+    _boxBasePriceIncomeSeconds: 48
+    _boxPriceGrowth: 1.3
+    _firstRankBoxPriceGrowth: 1.07
+    _isBoxPriceGrowthLimited: 0
+    _boxPriceGrowthPurchaseLimit: 20
+  _scenarios:
+  - _name: "\u0411\u0435\u0437 \u0440\u0435\u043A\u043B\u0430\u043C\u044B \u0438
+      \u043F\u043E\u043A\u0443\u043F\u043E\u043A"
+    _secondsPerAction: 2
+    _buysBoxes: 0
+    _usesBestLineup: 0
+    _usesTurbo: 0
+    _sessionActiveSeconds: 0
+    _sessionOfflineSeconds: 0
+  - _name: "\u0410\u043A\u0442\u0438\u0432\u043D\u0430\u044F \u043E\u043F\u0442\u0438\u043C\u0438\u0437\u0430\u0446\u0438\u044F"
+    _secondsPerAction: 1
+    _buysBoxes: 1
+    _usesBestLineup: 1
+    _usesTurbo: 1
+    _sessionActiveSeconds: 0
+    _sessionOfflineSeconds: 0
+  - _name: "\u0410\u043A\u0442\u0438\u0432\u043D\u0430\u044F \u043E\u043F\u0442\u0438\u043C\u0438\u0437\u0430\u0446\u0438\u044F"
+    _secondsPerAction: 2
+    _buysBoxes: 1
+    _usesBestLineup: 1
+    _usesTurbo: 1
+    _sessionActiveSeconds: 0
+    _sessionOfflineSeconds: 0
+  - _name: "\u0410\u043A\u0442\u0438\u0432\u043D\u0430\u044F \u043E\u043F\u0442\u0438\u043C\u0438\u0437\u0430\u0446\u0438\u044F"
+    _secondsPerAction: 3
+    _buysBoxes: 1
+    _usesBestLineup: 1
+    _usesTurbo: 1
+    _sessionActiveSeconds: 0
+    _sessionOfflineSeconds: 0
+  - _name: "\u041A\u043E\u0440\u043E\u0442\u043A\u0438\u0435 \u0432\u043E\u0437\u0432\u0440\u0430\u0442\u044B"
+    _secondsPerAction: 2
+    _buysBoxes: 1
+    _usesBestLineup: 1
+    _usesTurbo: 1
+    _sessionActiveSeconds: 300
+    _sessionOfflineSeconds: 14400

@@ -31,7 +31,7 @@ namespace _Project.Tests.EditMode.Boxes
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
             _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
             _wallet = new Wallet(_fixture.Economy);
-            _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles, _fixture.Track);
+            _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles, _fixture.Track, _progress);
             _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds);
         }
 
@@ -101,7 +101,7 @@ namespace _Project.Tests.EditMode.Boxes
             int firstUnlockedSlot = _fixture.Garage.OpenSlots.Initial;
             FillGarage(1);
             _delivery.Advance(FreeBoxInterval);
-            UnlockRanksUpTo(6);
+            UnlockRanksUpTo(7);
 
             _delivery.Advance(0);
 
@@ -119,12 +119,12 @@ namespace _Project.Tests.EditMode.Boxes
             CommandResult result = _delivery.BuyBox();
 
             Assert.That(result.IsSuccess, Is.True);
-            Assert.That(_wallet.Coins, Is.EqualTo(startCoins - 12));
+            Assert.That(_wallet.Coins, Is.EqualTo(startCoins - 20));
             Assert.That(_garage.TryGetBox(2, out Box box), Is.True);
             Assert.That(box.Source, Is.EqualTo(BoxSource.Purchased));
             Assert.That(box.Rank, Is.EqualTo(1));
             Assert.That(_pricing.GetPurchaseCount(1), Is.EqualTo(1));
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(13));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(21));
         }
 
         [Test]
@@ -162,8 +162,8 @@ namespace _Project.Tests.EditMode.Boxes
 
             _wallet.TrySpend(_wallet.Coins - 5);
 
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(12));
-            Assert.That(_delivery.MissingCoins, Is.EqualTo(7));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(20));
+            Assert.That(_delivery.MissingCoins, Is.EqualTo(15));
         }
 
         [Test]
@@ -206,22 +206,22 @@ namespace _Project.Tests.EditMode.Boxes
 
             Assert.That(CountBoxes(), Is.EqualTo(1));
             Assert.That(_pricing.GetPurchaseCount(1), Is.EqualTo(0));
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(12));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(20));
         }
 
         [Test]
-        public void BoxAtMaxRankTenIsRankSixForSixHundredTwentyFourCoins()
+        public void BoxAtMaxRankTenIsRankFiveForTwentyThreeThousandCoins()
         {
             UnlockRanksUpTo(10);
-            _wallet.Add(1000);
+            _wallet.Add(30000);
             long coins = _wallet.Coins;
 
             CommandResult result = _delivery.BuyBox();
 
             Assert.That(result.IsSuccess, Is.True);
-            Assert.That(_wallet.Coins, Is.EqualTo(coins - 624));
+            Assert.That(_wallet.Coins, Is.EqualTo(coins - 23181));
             Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
-            Assert.That(box.Rank, Is.EqualTo(6));
+            Assert.That(box.Rank, Is.EqualTo(5));
         }
 
         [Test]

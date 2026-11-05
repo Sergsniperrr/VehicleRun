@@ -50,7 +50,7 @@ Assets/
 │   ├── Scenes/                        Bootstrap.unity, Game.unity
 │   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView (спрайты Vehicle_NN_Garage и Vehicle_NN_Track), коробка Box_Closed и Box_Open
 │   └── Scripts/
-│       ├── Editor/                    сборка _Project.Editor: проверка конфигов
+│       ├── Editor/                    сборка _Project.Editor: проверка конфигов, симулятор баланса
 │       ├── Tests/EditMode/            сборка _Project.Tests.EditMode
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
@@ -402,6 +402,7 @@ public class TimeService : ITimeService
 |---|---|
 | JTL SDK Toolkit | меню `JTL SDK, Toolkit`: конфигурации площадок, сборка, симуляция ответов площадки в редакторе, шаблон страницы, товары, языки, просмотр и очистка сейва |
 | Проверка конфигов | меню `_Project, Validate Game Config`. Та же проверка запускается перед каждой сборкой и останавливает её при ошибке, см. [Docs/Configs.md](Docs/Configs.md) |
+| Симулятор баланса | меню `_Project, Balance, Run Simulation`: проигрывает сценарии ГДД 10 ботом на логике игры и пишет отчёт `Docs/Balance/SimulationReport.md`, см. [Docs/Configs.md](Docs/Configs.md), раздел 4 |
 | SceneSwitcher Pro | кнопки сцен в тулбаре редактора, список настраивается в `Assets/SceneSwitcherPro/` |
 | Odin Inspector | атрибуты `[Button]`, `[ShowInInspector]`, `[Required]` в любых MonoBehaviour и ScriptableObject |
 | DOTween Pro | настройки в `Assets/Resources/DOTweenSettings.asset`; после обновления пакета откройте `Tools, Demigiant, DOTween Utility Panel` и нажмите Setup |

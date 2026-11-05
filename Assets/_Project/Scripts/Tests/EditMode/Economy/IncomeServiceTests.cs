@@ -47,14 +47,14 @@ namespace _Project.Tests.EditMode.Economy
         }
 
         [Test]
-        public void TwoRankFourVehiclesEarnAboutTwentyTwo()
+        public void TwoRankFourVehiclesEarnAboutEightAndHalf()
         {
             PlaceVehicle(0, 4);
             PlaceVehicle(1, 4);
             _roster.SendToTrack(0);
             _roster.SendToTrack(1);
 
-            Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(22).Within(Tolerance));
+            Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(8.52).Within(Tolerance));
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace _Project.Tests.EditMode.Economy
 
             _roster.ReturnFromTrack(1);
 
-            Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(11).Within(Tolerance));
+            Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(4.26).Within(Tolerance));
         }
 
         private void PlaceVehicle(int slot, int rank)

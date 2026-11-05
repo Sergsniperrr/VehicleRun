@@ -16,55 +16,55 @@ MonoBehaviour:
   - _id: scooter
     _rank: 1
     _nameKey: vehicle.scooter.name
-    _coinsPerLap: 10
-    _trackSpeed: 3.964
+    _coinsPerLap: 4
+    _trackSpeed: 3.965
     _garageSprite: {fileID: -749692788, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 2091854564, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.9490196, g: 0, b: 0.015686275, a: 1}
   - _id: motorcycle
     _rank: 2
     _nameKey: vehicle.motorcycle.name
-    _coinsPerLap: 19
-    _trackSpeed: 4.173
+    _coinsPerLap: 8
+    _trackSpeed: 4.361
     _garageSprite: {fileID: 398276104, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1807074531, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 1, g: 1, b: 1, a: 1}
   - _id: car
     _rank: 3
     _nameKey: vehicle.car.name
-    _coinsPerLap: 45
-    _trackSpeed: 4.405
+    _coinsPerLap: 17
+    _trackSpeed: 4.515
     _garageSprite: {fileID: -1258490958, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 809811616, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.08235294, g: 0.5019608, b: 0.9607843, a: 1}
   - _id: taxi
     _rank: 4
     _nameKey: vehicle.taxi.name
-    _coinsPerLap: 95
-    _trackSpeed: 4.59
+    _coinsPerLap: 37
+    _trackSpeed: 4.564
     _garageSprite: {fileID: -527805359, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -908089454, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.99215686, g: 0.9490196, b: 0.019607844, a: 1}
   - _id: police_car
     _rank: 5
     _nameKey: vehicle.police_car.name
-    _coinsPerLap: 190
-    _trackSpeed: 4.799
+    _coinsPerLap: 77
+    _trackSpeed: 4.825
     _garageSprite: {fileID: -2031340353, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -896926812, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.2, g: 0.63529414, b: 0.03137255, a: 1}
   - _id: off_roader
     _rank: 6
     _nameKey: vehicle.off_roader.name
-    _coinsPerLap: 412
-    _trackSpeed: 5.003
+    _coinsPerLap: 163
+    _trackSpeed: 5.014
     _garageSprite: {fileID: 475063169, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1476264254, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.24705882, g: 0.24705882, b: 0.24705882, a: 1}
   - _id: pickup
     _rank: 7
     _nameKey: vehicle.pickup.name
-    _coinsPerLap: 862
+    _coinsPerLap: 346
     _trackSpeed: 5.197
     _garageSprite: {fileID: -768060521, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 201530925, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -72,23 +72,23 @@ MonoBehaviour:
   - _id: van
     _rank: 8
     _nameKey: vehicle.van.name
-    _coinsPerLap: 1828
-    _trackSpeed: 5.4
+    _coinsPerLap: 733
+    _trackSpeed: 5.397
     _garageSprite: {fileID: -1281711103, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1609601331, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 1, g: 0.6509804, b: 0.75686276, a: 1}
   - _id: ambulance
     _rank: 9
     _nameKey: vehicle.ambulance.name
-    _coinsPerLap: 3887
-    _trackSpeed: 5.599
+    _coinsPerLap: 1554
+    _trackSpeed: 5.6
     _garageSprite: {fileID: 600542862, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1341691640, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.011764706, g: 0.7490196, b: 0.74509805, a: 1}
   - _id: race_car
     _rank: 10
     _nameKey: vehicle.race_car.name
-    _coinsPerLap: 8250
+    _coinsPerLap: 3301
     _trackSpeed: 5.8
     _garageSprite: {fileID: 1394651023, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 253776870, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -96,15 +96,15 @@ MonoBehaviour:
   - _id: school_bus
     _rank: 11
     _nameKey: vehicle.school_bus.name
-    _coinsPerLap: 17550
-    _trackSpeed: 5.999
+    _coinsPerLap: 7020
+    _trackSpeed: 6
     _garageSprite: {fileID: -1349923729, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1580600608, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.68235296, g: 0.68235296, b: 0.68235296, a: 1}
   - _id: city_bus
     _rank: 12
     _nameKey: vehicle.city_bus.name
-    _coinsPerLap: 37363
+    _coinsPerLap: 14946
     _trackSpeed: 6.2
     _garageSprite: {fileID: 93133834, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 385421987, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -112,15 +112,15 @@ MonoBehaviour:
   - _id: fire_truck
     _rank: 13
     _nameKey: vehicle.fire_truck.name
-    _coinsPerLap: 79633
-    _trackSpeed: 6.399
+    _coinsPerLap: 31853
+    _trackSpeed: 6.4
     _garageSprite: {fileID: -604055847, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1425058431, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.49411765, g: 0.23529412, b: 0.25490198, a: 1}
   - _id: semi_truck
     _rank: 14
     _nameKey: vehicle.semi_truck.name
-    _coinsPerLap: 169883
+    _coinsPerLap: 67953
     _trackSpeed: 6.6
     _garageSprite: {fileID: -1351482955, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 212871308, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -128,7 +128,7 @@ MonoBehaviour:
   - _id: dump_truck
     _rank: 15
     _nameKey: vehicle.dump_truck.name
-    _coinsPerLap: 362749
+    _coinsPerLap: 145100
     _trackSpeed: 6.8
     _garageSprite: {fileID: 166980316, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 273570105, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -136,23 +136,23 @@ MonoBehaviour:
   - _id: tractor
     _rank: 16
     _nameKey: vehicle.tractor.name
-    _coinsPerLap: 775250
-    _trackSpeed: 6.999
+    _coinsPerLap: 310100
+    _trackSpeed: 7
     _garageSprite: {fileID: -1969731705, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -2141296699, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.6784314, g: 0.9254902, b: 1, a: 1}
   - _id: bulldozer
     _rank: 17
     _nameKey: vehicle.bulldozer.name
-    _coinsPerLap: 1658173
-    _trackSpeed: 7.199
+    _coinsPerLap: 663269
+    _trackSpeed: 7.2
     _garageSprite: {fileID: 916976774, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -115877651, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.19607843, g: 0.28235295, b: 0.50980395, a: 1}
   - _id: excavator
     _rank: 18
     _nameKey: vehicle.excavator.name
-    _coinsPerLap: 3549390
+    _coinsPerLap: 1419755
     _trackSpeed: 7.4
     _garageSprite: {fileID: 36161328, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1199609021, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -160,7 +160,7 @@ MonoBehaviour:
   - _id: tank
     _rank: 19
     _nameKey: vehicle.tank.name
-    _coinsPerLap: 7603162
+    _coinsPerLap: 3041265
     _trackSpeed: 7.6
     _garageSprite: {fileID: -769208317, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1709484768, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -168,8 +168,8 @@ MonoBehaviour:
   - _id: armored_rover
     _rank: 20
     _nameKey: vehicle.armored_rover.name
-    _coinsPerLap: 16298062
-    _trackSpeed: 7.799
+    _coinsPerLap: 6519223
+    _trackSpeed: 7.8
     _garageSprite: {fileID: 1058512369, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 281877013, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 1, g: 0.11764706, b: 0.7019608, a: 1}

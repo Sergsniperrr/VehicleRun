@@ -45,8 +45,8 @@ namespace _Project.UI.Hud
 
         private void ShowIncome()
         {
-            long incomePerSecond = (long)Math.Round(_income.CalculateIncomePerSecond(), MidpointRounding.AwayFromZero);
-            _label.text = IncomePrefix + _formatter.Format(incomePerSecond);
+            double incomePerSecond = _income.CalculateIncomePerSecond();
+            _label.text = IncomePrefix + _formatter.FormatIncome(incomePerSecond);
         }
 
         private void OnVehicleSent(TrackRunner runner)

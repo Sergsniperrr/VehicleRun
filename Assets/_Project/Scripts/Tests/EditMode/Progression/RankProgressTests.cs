@@ -60,9 +60,9 @@ namespace _Project.Tests.EditMode.Progression
         }
 
         [TestCase(1, 1)]
-        [TestCase(5, 1)]
-        [TestCase(6, 2)]
-        [TestCase(12, 8)]
+        [TestCase(6, 1)]
+        [TestCase(7, 2)]
+        [TestCase(12, 7)]
         public void BoxRankLagsBehindMaxRank(int maxRank, int boxRank)
         {
             UnlockRanksUpTo(maxRank);

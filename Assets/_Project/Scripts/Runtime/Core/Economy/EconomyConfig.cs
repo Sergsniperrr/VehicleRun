@@ -11,6 +11,8 @@ namespace _Project.Core.Economy
         [SerializeField] private int _boxRankLag;
         [SerializeField] private double _boxBasePriceIncomeSeconds;
         [SerializeField] private double _boxPriceGrowth;
+        [SerializeField] private double _firstRankBoxPriceGrowth;
+        [SerializeField] private bool _isBoxPriceGrowthLimited;
         [SerializeField] private int _boxPriceGrowthPurchaseLimit;
         [SerializeField] private float _freeBoxIntervalSeconds;
         [SerializeField] private float _offlineMinAwaySeconds;
@@ -23,6 +25,8 @@ namespace _Project.Core.Economy
         public int BoxRankLag => _boxRankLag;
         public double BoxBasePriceIncomeSeconds => _boxBasePriceIncomeSeconds;
         public double BoxPriceGrowth => _boxPriceGrowth;
+        public double FirstRankBoxPriceGrowth => _firstRankBoxPriceGrowth;
+        public bool IsBoxPriceGrowthLimited => _isBoxPriceGrowthLimited;
         public int BoxPriceGrowthPurchaseLimit => _boxPriceGrowthPurchaseLimit;
         public float FreeBoxIntervalSeconds => _freeBoxIntervalSeconds;
         public float OfflineMinAwaySeconds => _offlineMinAwaySeconds;

@@ -14,8 +14,8 @@ namespace _Project.Tests.EditMode.Configs
 {
     public class GameConfigFixture : IDisposable
     {
-        private static readonly long[] CoinsPerLap = { 10, 19, 45, 95, 190, 412, 862, 1828, 3887, 8250, 17550, 37363 };
-        private static readonly float[] TrackSpeeds = { 3.964f, 4.173f, 4.405f, 4.59f, 4.799f, 5.003f, 5.197f, 5.4f, 5.599f, 5.8f, 5.999f, 6.2f };
+        private static readonly long[] CoinsPerLap = { 4, 8, 17, 37, 77, 163, 346, 733, 1554, 3301, 7020, 14946 };
+        private static readonly float[] TrackSpeeds = { 3.965f, 4.361f, 4.515f, 4.564f, 4.825f, 5.014f, 5.197f, 5.397f, 5.6f, 5.8f, 6f, 6.2f };
         private static readonly (int Rank, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
         private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
 
@@ -23,9 +23,11 @@ namespace _Project.Tests.EditMode.Configs
         private const long StartCoins = 60;
         private const int StartVehicleRank = 1;
         private const int StartVehicleCount = 2;
-        private const int BoxRankLag = 4;
-        private const double BoxBasePriceIncomeSeconds = 12;
-        private const double BoxPriceGrowth = 1.04;
+        private const int BoxRankLag = 5;
+        private const double BoxBasePriceIncomeSeconds = 48;
+        private const double BoxPriceGrowth = 1.3;
+        private const double FirstRankBoxPriceGrowth = 1.07;
+        private const bool IsBoxPriceGrowthLimited = false;
         private const int BoxPriceGrowthPurchaseLimit = 20;
         private const float FreeBoxIntervalSeconds = 20f;
         private const float OfflineMinAwaySeconds = 60f;
@@ -160,6 +162,8 @@ namespace _Project.Tests.EditMode.Configs
             economy.FindProperty("_boxRankLag").intValue = BoxRankLag;
             economy.FindProperty("_boxBasePriceIncomeSeconds").doubleValue = BoxBasePriceIncomeSeconds;
             economy.FindProperty("_boxPriceGrowth").doubleValue = BoxPriceGrowth;
+            economy.FindProperty("_firstRankBoxPriceGrowth").doubleValue = FirstRankBoxPriceGrowth;
+            economy.FindProperty("_isBoxPriceGrowthLimited").boolValue = IsBoxPriceGrowthLimited;
             economy.FindProperty("_boxPriceGrowthPurchaseLimit").intValue = BoxPriceGrowthPurchaseLimit;
             economy.FindProperty("_freeBoxIntervalSeconds").floatValue = FreeBoxIntervalSeconds;
             economy.FindProperty("_offlineMinAwaySeconds").floatValue = OfflineMinAwaySeconds;

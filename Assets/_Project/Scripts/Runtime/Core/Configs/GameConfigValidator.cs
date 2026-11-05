@@ -186,6 +186,11 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(economy, $"Рост цены коробки {economy.BoxPriceGrowth}, должен быть не меньше 1"));
             }
 
+            if (economy.FirstRankBoxPriceGrowth < 1)
+            {
+                errors.Add(new ConfigError(economy, $"Рост цены коробки ранга 1 {economy.FirstRankBoxPriceGrowth}, должен быть не меньше 1"));
+            }
+
             if (economy.BoxPriceGrowthPurchaseLimit < 0)
             {
                 errors.Add(new ConfigError(economy, $"Предел покупок для роста цены {economy.BoxPriceGrowthPurchaseLimit}, не может быть отрицательным"));
