@@ -12,43 +12,32 @@ using VContainer;
 
 namespace _Project.UI.Windows
 {
-    public class RecycleConfirmWindow : MonoBehaviour, IRecycleConfirmation
+    public class RecycleConfirmWindow : Window, IRecycleConfirmation
     {
         private const string VehicleQuestionKey = "popup.recycle.vehicle_question";
         private const string BoxQuestionKey = "popup.recycle.box_question";
 
-        [SerializeField] private GameObject _panel;
         [SerializeField] private TMP_Text _question;
         [SerializeField] private Button _yesButton;
         [SerializeField] private Button _noButton;
-        [SerializeField] private Button _closeButton;
 
         private ILocalizationService _localization;
         private UniTaskCompletionSource<bool> _answer;
 
-        private bool IsOpen => _answer != null;
+        private bool IsAsking => _answer != null;
 
-        private void Awake()
+        protected override void Awake()
         {
-            _panel.SetActive(false);
+            base.Awake();
             _yesButton.onClick.AddListener(OnYesClicked);
             _noButton.onClick.AddListener(OnNoClicked);
-            _closeButton.onClick.AddListener(OnNoClicked);
         }
 
-        private void Update()
+        protected override void OnDestroy()
         {
-            if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
-            {
-                Answer(false);
-            }
-        }
-
-        private void OnDestroy()
-        {
+            base.OnDestroy();
             _yesButton.onClick.RemoveListener(OnYesClicked);
             _noButton.onClick.RemoveListener(OnNoClicked);
-            _closeButton.onClick.RemoveListener(OnNoClicked);
         }
 
         [Inject]
@@ -82,16 +71,21 @@ namespace _Project.UI.Windows
             return AskAsync(question, cancellationToken);
         }
 
+        public override void Dismiss()
+        {
+            Answer(false);
+        }
+
         private async UniTask<bool> AskAsync(string question, CancellationToken cancellationToken)
         {
-            if (IsOpen)
+            if (IsAsking)
             {
                 throw new InvalidOperationException(nameof(_answer));
             }
 
             _answer = new UniTaskCompletionSource<bool>();
             _question.text = question;
-            _panel.SetActive(true);
+            Open();
 
             try
             {
@@ -101,9 +95,9 @@ namespace _Project.UI.Windows
             {
                 _answer = null;
 
-                if (_panel != null)
+                if (this != null)
                 {
-                    _panel.SetActive(false);
+                    Close();
                 }
             }
         }

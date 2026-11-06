@@ -38,7 +38,7 @@ namespace _Project.UI.Hud
 
         private void ShowCoins(long coins)
         {
-            _label.text = _formatter.Format(coins);
+            _label.text = _formatter.FormatShort(coins);
         }
 
         private void OnCoinsChanged(long coins)

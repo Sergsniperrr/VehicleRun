@@ -5,6 +5,7 @@ using _Project.Core.Garage;
 using _Project.Core.Localization;
 using _Project.Core.Progression;
 using _Project.Core.Track;
+using _Project.Core.Turbo;
 using _Project.Core.Vehicles;
 using Object = UnityEngine.Object;
 
@@ -47,6 +48,7 @@ namespace _Project.Core.Configs
             ValidateEconomy(config.Economy, maxRank, config.Garage.OpenSlots.Initial, errors);
             ValidateGarage(config.Garage, maxRank, errors);
             ValidateTrack(config.Track, maxRank, errors);
+            ValidateTurbo(config.Turbo, maxRank, errors);
 
             return errors;
         }
@@ -73,6 +75,11 @@ namespace _Project.Core.Configs
             if (config.Track == null)
             {
                 errors.Add(new ConfigError(config, "Не назначен конфиг трассы"));
+            }
+
+            if (config.Turbo == null)
+            {
+                errors.Add(new ConfigError(config, "Не назначен конфиг турбо"));
             }
 
             return errors.Count == errorCount;
@@ -249,6 +256,14 @@ namespace _Project.Core.Configs
             }
 
             ValidateSchedule(track, track.Capacity, TrackScheduleName, maxRank, errors);
+        }
+
+        private void ValidateTurbo(TurboConfig turbo, int maxRank, List<ConfigError> errors)
+        {
+            if (turbo.UnlockRank < FirstRank || turbo.UnlockRank > maxRank)
+            {
+                errors.Add(new ConfigError(turbo, $"Ранг открытия турбо {turbo.UnlockRank} вне каталога 1..{maxRank}"));
+            }
         }
 
         private int ValidateSchedule(Object source, CapacitySchedule schedule, string scheduleName, int maxRank, List<ConfigError> errors)

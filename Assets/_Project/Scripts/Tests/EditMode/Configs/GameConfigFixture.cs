@@ -5,6 +5,7 @@ using _Project.Core.Economy;
 using _Project.Core.Garage;
 using _Project.Core.Localization;
 using _Project.Core.Track;
+using _Project.Core.Turbo;
 using _Project.Core.Vehicles;
 using UnityEditor;
 using UnityEngine;
@@ -40,6 +41,7 @@ namespace _Project.Tests.EditMode.Configs
         private const float TurnRadius = 4.4f;
         private const float StartDistance = 5.59f;
         private const int TrackInitialCapacity = 2;
+        private const int TurboUnlockRank = 3;
         private const float SpritePixelsPerUnit = 100f;
 
         private readonly List<Object> _createdObjects = new List<Object>();
@@ -51,6 +53,7 @@ namespace _Project.Tests.EditMode.Configs
             Economy = Create<EconomyConfig>();
             Garage = Create<GarageConfig>();
             Track = Create<TrackConfig>();
+            Turbo = Create<TurboConfig>();
             Config = Create<GameConfig>();
 
             FillLocalization();
@@ -58,6 +61,7 @@ namespace _Project.Tests.EditMode.Configs
             FillEconomy();
             FillGarage();
             FillTrack();
+            FillTurbo();
             FillConfig();
         }
 
@@ -66,6 +70,7 @@ namespace _Project.Tests.EditMode.Configs
         public EconomyConfig Economy { get; }
         public GarageConfig Garage { get; }
         public TrackConfig Track { get; }
+        public TurboConfig Turbo { get; }
         public GameConfig Config { get; }
 
         public void Change(Object target, string propertyPath, Action<SerializedProperty> change)
@@ -191,6 +196,13 @@ namespace _Project.Tests.EditMode.Configs
             track.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        private void FillTurbo()
+        {
+            SerializedObject turbo = new SerializedObject(Turbo);
+            turbo.FindProperty("_unlockRank").intValue = TurboUnlockRank;
+            turbo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private void FillSchedule(SerializedProperty schedule, int initial, (int Rank, int Capacity)[] steps)
         {
             schedule.FindPropertyRelative("_initial").intValue = initial;
@@ -214,6 +226,7 @@ namespace _Project.Tests.EditMode.Configs
             config.FindProperty("_economy").objectReferenceValue = Economy;
             config.FindProperty("_garage").objectReferenceValue = Garage;
             config.FindProperty("_track").objectReferenceValue = Track;
+            config.FindProperty("_turbo").objectReferenceValue = Turbo;
             config.ApplyModifiedPropertiesWithoutUndo();
         }
     }

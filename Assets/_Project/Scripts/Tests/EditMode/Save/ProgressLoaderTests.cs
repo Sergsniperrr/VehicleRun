@@ -41,7 +41,7 @@ namespace _Project.Tests.EditMode.Save
             _storage.State = state;
             _storage.Backup = CreateSave(2);
 
-            Assert.That(_loader.TryLoad(), Is.True);
+            Assert.That(_loader.Load(), Is.EqualTo(LoadOutcome.Loaded));
             Assert.That(_target.Progress.MaxRank, Is.EqualTo(3));
             Assert.That(_storage.Backup, Is.SameAs(state));
         }
@@ -54,7 +54,7 @@ namespace _Project.Tests.EditMode.Save
             _storage.State.SchemaVersion = BrokenSchemaVersion;
             _storage.Backup = backup;
 
-            Assert.That(_loader.TryLoad(), Is.True);
+            Assert.That(_loader.Load(), Is.EqualTo(LoadOutcome.RestoredFromBackup));
             Assert.That(_target.Progress.MaxRank, Is.EqualTo(2));
             Assert.That(_storage.Backup, Is.SameAs(backup));
         }
@@ -64,7 +64,7 @@ namespace _Project.Tests.EditMode.Save
         {
             _storage.Backup = CreateSave(2);
 
-            Assert.That(_loader.TryLoad(), Is.True);
+            Assert.That(_loader.Load(), Is.EqualTo(LoadOutcome.RestoredFromBackup));
             Assert.That(_target.Progress.MaxRank, Is.EqualTo(2));
         }
 
@@ -76,16 +76,26 @@ namespace _Project.Tests.EditMode.Save
             _storage.Backup = CreateSave(2);
             _storage.Backup.Vehicles = null;
 
-            Assert.That(_loader.TryLoad(), Is.False);
+            Assert.That(_loader.Load(), Is.EqualTo(LoadOutcome.Broken));
             Assert.That(_target.Progress.MaxRank, Is.EqualTo(0));
             Assert.That(_target.Garage.IsSlotEmpty(0), Is.True);
             Assert.That(_storage.BackupWriteCount, Is.EqualTo(0));
         }
 
         [Test]
+        public void InvalidStateWithoutBackupIsBroken()
+        {
+            _storage.State = CreateSave(3);
+            _storage.State.SchemaVersion = BrokenSchemaVersion;
+
+            Assert.That(_loader.Load(), Is.EqualTo(LoadOutcome.Broken));
+            Assert.That(_target.Progress.MaxRank, Is.EqualTo(0));
+        }
+
+        [Test]
         public void NothingIsLoadedFromEmptyStorage()
         {
-            Assert.That(_loader.TryLoad(), Is.False);
+            Assert.That(_loader.Load(), Is.EqualTo(LoadOutcome.NotFound));
             Assert.That(_storage.BackupWriteCount, Is.EqualTo(0));
             Assert.That(_storage.StateWriteCount, Is.EqualTo(0));
         }

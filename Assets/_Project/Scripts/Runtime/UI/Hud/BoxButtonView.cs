@@ -79,7 +79,7 @@ namespace _Project.UI.Hud
             _icon.sprite = content.GarageSprite;
             _rankBadge.color = content.BadgeColor;
             _rankValue.text = boxRank.ToString();
-            _price.text = _formatter.Format(_delivery.BoxPrice);
+            _price.text = _formatter.FormatShort(_delivery.BoxPrice);
         }
 
         private void ShowFailure(FailureReason reason)
@@ -95,7 +95,7 @@ namespace _Project.UI.Hud
                 case FailureReason.NoFreeSlot:
                     return _localization.Get(NoFreeSlotKey);
                 case FailureReason.NotEnoughCoins:
-                    string missingCoins = _formatter.Format(_delivery.MissingCoins);
+                    string missingCoins = _formatter.FormatExact(_delivery.MissingCoins);
                     return string.Format(_localization.Get(NotEnoughCoinsKey), missingCoins);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(reason));

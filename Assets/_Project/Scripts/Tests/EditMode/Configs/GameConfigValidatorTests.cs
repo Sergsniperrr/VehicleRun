@@ -39,6 +39,23 @@ namespace _Project.Tests.EditMode.Configs
         }
 
         [Test]
+        public void MissingTurboConfigIsReported()
+        {
+            _fixture.Change(_fixture.Config, "_turbo", property => property.objectReferenceValue = null);
+
+            AssertReportedBy(_fixture.Config);
+        }
+
+        [TestCase(0)]
+        [TestCase(13)]
+        public void TurboUnlockRankOutsideCatalogIsReported(int unlockRank)
+        {
+            _fixture.Change(_fixture.Turbo, "_unlockRank", property => property.intValue = unlockRank);
+
+            AssertReportedBy(_fixture.Turbo);
+        }
+
+        [Test]
         public void RankGapIsReported()
         {
             _fixture.Change(_fixture.Vehicles, "_vehicles.Array.data[3]._rank", property => property.intValue = 6);

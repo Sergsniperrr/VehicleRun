@@ -20,6 +20,7 @@ namespace _Project.Composition
     {
         [SerializeField] private GameConfig _gameConfig;
         [SerializeField] private RecycleConfirmWindow _recycleConfirmWindow;
+        [SerializeField] private VehicleCardWindow _vehicleCardWindow;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -42,6 +43,7 @@ namespace _Project.Composition
             builder.RegisterInstance(_gameConfig.Economy);
             builder.RegisterInstance(_gameConfig.Garage);
             builder.RegisterInstance(_gameConfig.Track);
+            builder.RegisterInstance(_gameConfig.Turbo);
         }
 
         private void RegisterGameplay(IContainerBuilder builder)
@@ -82,8 +84,16 @@ namespace _Project.Composition
                 throw new InvalidOperationException(nameof(_recycleConfirmWindow));
             }
 
+            if (_vehicleCardWindow == null)
+            {
+                throw new InvalidOperationException(nameof(_vehicleCardWindow));
+            }
+
             builder.Register<CoinsFormatter>(Lifetime.Singleton);
+            builder.Register<WindowQueue>(Lifetime.Singleton).AsSelf().As<IFieldInputBlocker>();
+            builder.RegisterEntryPoint<WindowGameplayReporter>();
             builder.RegisterInstance(_recycleConfirmWindow).As<IRecycleConfirmation>();
+            builder.RegisterInstance(_vehicleCardWindow).As<IVehicleCard>();
         }
     }
 }

@@ -37,6 +37,18 @@ namespace _Project.Features.Garage
             return _garage.CanRecycle(slot);
         }
 
+        public bool TryGetCardVehicle(int slot, out Vehicle vehicle)
+        {
+            if (_garage.TryGetVehicle(slot, out vehicle) && _garage.IsOnTrack(slot) == false)
+            {
+                return true;
+            }
+
+            vehicle = null;
+
+            return false;
+        }
+
         public CommandResult Tap(int slot)
         {
             if (_garage.TryGetBox(slot, out Box _))

@@ -17,6 +17,8 @@ namespace _Project.Features.Session
         }
 
         public bool IsOpen { get; private set; }
+        public LoadOutcome LoadOutcome { get; private set; }
+        public bool IsNewGame => LoadOutcome == LoadOutcome.NotFound || LoadOutcome == LoadOutcome.Broken;
 
         public void Open()
         {
@@ -26,10 +28,10 @@ namespace _Project.Features.Session
             }
 
             IsOpen = true;
-            bool isLoaded = _loader.TryLoad();
+            LoadOutcome = _loader.Load();
             _saveScheduler.StartWriting();
 
-            if (isLoaded == false)
+            if (IsNewGame)
             {
                 _newGameSetup.Apply();
             }

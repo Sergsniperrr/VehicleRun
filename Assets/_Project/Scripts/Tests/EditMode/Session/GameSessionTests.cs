@@ -53,6 +53,7 @@ namespace _Project.Tests.EditMode.Session
             _scheduler.LateTick();
 
             Assert.That(_session.IsOpen, Is.True);
+            Assert.That(_session.LoadOutcome, Is.EqualTo(LoadOutcome.NotFound));
             Assert.That(_game.Garage.TryGetVehicle(0, out Vehicle vehicle), Is.True);
             Assert.That(vehicle.Rank, Is.EqualTo(_fixture.Economy.StartVehicleRank));
             Assert.That(_storage.StateWriteCount, Is.EqualTo(1));
@@ -69,6 +70,7 @@ namespace _Project.Tests.EditMode.Session
             _session.Open();
             _scheduler.LateTick();
 
+            Assert.That(_session.LoadOutcome, Is.EqualTo(LoadOutcome.Loaded));
             Assert.That(_game.Progress.MaxRank, Is.EqualTo(SavedRank));
             Assert.That(_game.Garage.TryGetVehicle(SavedSlot, out Vehicle loaded) && loaded.InstanceId == saved.InstanceId, Is.True);
             Assert.That(_game.Garage.IsSlotEmpty(0), Is.True);
@@ -85,8 +87,22 @@ namespace _Project.Tests.EditMode.Session
 
             _session.Open();
 
+            Assert.That(_session.LoadOutcome, Is.EqualTo(LoadOutcome.Broken));
             Assert.That(_game.Progress.MaxRank, Is.EqualTo(_fixture.Economy.StartVehicleRank));
             Assert.That(_game.Garage.TryGetVehicle(0, out Vehicle vehicle), Is.True);
+        }
+
+        [Test]
+        public void BackupIsLoadedWithoutStartVehicles()
+        {
+            _source.PlaceVehicle(SavedSlot, SavedRank);
+            _storage.Backup = _source.Factory.Create();
+
+            _session.Open();
+
+            Assert.That(_session.LoadOutcome, Is.EqualTo(LoadOutcome.RestoredFromBackup));
+            Assert.That(_session.IsNewGame, Is.False);
+            Assert.That(_game.Garage.IsSlotEmpty(0), Is.True);
         }
 
         [Test]

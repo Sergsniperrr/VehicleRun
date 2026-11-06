@@ -16,23 +16,32 @@ namespace _Project.Features.Save
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
         }
 
-        public bool TryLoad()
+        public LoadOutcome Load()
         {
-            if (_storage.TryReadState(out GameSave state) && _validator.IsValid(state))
+            bool hasState = _storage.TryReadState(out GameSave state);
+
+            if (hasState && _validator.IsValid(state))
             {
                 Apply(state);
 
-                return true;
+                return LoadOutcome.Loaded;
             }
 
-            if (_storage.TryReadBackup(out GameSave backup) && _validator.IsValid(backup))
+            bool hasBackup = _storage.TryReadBackup(out GameSave backup);
+
+            if (hasBackup && _validator.IsValid(backup))
             {
                 Apply(backup);
 
-                return true;
+                return LoadOutcome.RestoredFromBackup;
             }
 
-            return false;
+            if (hasState || hasBackup)
+            {
+                return LoadOutcome.Broken;
+            }
+
+            return LoadOutcome.NotFound;
         }
 
         private void Apply(GameSave save)

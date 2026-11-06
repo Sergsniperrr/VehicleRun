@@ -30,6 +30,8 @@ namespace _Project.Features.Garage
         private GarageGestures _gestures;
         private TrackPath _path;
         private IRecycleConfirmation _recycleConfirmation;
+        private IVehicleCard _vehicleCard;
+        private IFieldInputBlocker _inputBlocker;
         private int _dragSlot = NoSlot;
         private int _dragPointerId;
         private Vector3 _grabOffset;
@@ -38,7 +40,7 @@ namespace _Project.Features.Garage
         private int _screenHeight;
 
         private bool IsDragging => _dragSlot != NoSlot;
-        private bool IsBusy => IsDragging || _isConfirming;
+        private bool IsBusy => IsDragging || _isConfirming || _inputBlocker.IsBlocking;
 
         private void Start()
         {
@@ -51,6 +53,7 @@ namespace _Project.Features.Garage
                 view.DragEnded += OnSlotDragEnded;
             }
 
+            _inputBlocker.BlockingStarted += OnBlockingStarted;
             HideTargets();
             UpdateDragThreshold();
         }
@@ -81,15 +84,25 @@ namespace _Project.Features.Garage
                 view.Dragged -= OnSlotDragged;
                 view.DragEnded -= OnSlotDragEnded;
             }
+
+            _inputBlocker.BlockingStarted -= OnBlockingStarted;
         }
 
         [Inject]
-        public void Construct(GarageBoard garage, GarageGestures gestures, TrackPath path, IRecycleConfirmation recycleConfirmation)
+        public void Construct(
+            GarageBoard garage,
+            GarageGestures gestures,
+            TrackPath path,
+            IRecycleConfirmation recycleConfirmation,
+            IVehicleCard vehicleCard,
+            IFieldInputBlocker inputBlocker)
         {
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _gestures = gestures ?? throw new ArgumentNullException(nameof(gestures));
             _path = path ?? throw new ArgumentNullException(nameof(path));
             _recycleConfirmation = recycleConfirmation ?? throw new ArgumentNullException(nameof(recycleConfirmation));
+            _vehicleCard = vehicleCard ?? throw new ArgumentNullException(nameof(vehicleCard));
+            _inputBlocker = inputBlocker ?? throw new ArgumentNullException(nameof(inputBlocker));
         }
 
         private void UpdateDragThreshold()
@@ -238,6 +251,13 @@ namespace _Project.Features.Garage
                 return;
             }
 
+            if (_gestures.TryGetCardVehicle(slot, out Vehicle vehicle))
+            {
+                _vehicleCard.Show(vehicle);
+
+                return;
+            }
+
             _gestures.Tap(slot);
         }
 
@@ -269,6 +289,14 @@ namespace _Project.Features.Garage
             }
 
             FinishDrag(eventData);
+        }
+
+        private void OnBlockingStarted()
+        {
+            if (IsDragging)
+            {
+                CancelDrag();
+            }
         }
     }
 }

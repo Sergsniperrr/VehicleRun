@@ -60,17 +60,26 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 28 записей:
+Сейчас в ассете 44 записи:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
   - `popup.recycle.vehicle_question` — «Переработать «{0}»?», где `{0}` — имя машины;
   - `popup.recycle.box_question` — «Переработать коробку ранга {0}?», где `{0}` — ранг;
   - `popup.recycle.no_reward` — «Монет за это не будет»;
-- общие кнопки `ui.common.yes` и `ui.common.no` — «Да» и «Нет»;
-- отказы покупки коробки в HUD ([Gameplay.md](Gameplay.md), раздел 13):
+- общие тексты:
+  - `ui.common.yes`, `ui.common.no`, `ui.common.ok` — «Да», «Нет», «Хорошо» / «Yes», «No», «OK»;
+  - `ui.common.rank` — «Ранг {0}» / «Rank {0}»: строка ранга в карточке машины и порог на замке турбо;
+- HUD ([Gameplay.md](Gameplay.md), раздел 13):
   - `ui.hud.no_free_slot` — «Освободите место»;
-  - `ui.hud.not_enough_coins` — «Не хватает {0}», где `{0}` — недостающая сумма с разделителем разрядов.
+  - `ui.hud.not_enough_coins` — «Не хватает {0}», где `{0}` — недостающая сумма точным числом с разделителем разрядов;
+  - `ui.hud.best_lineup` — «Лучший состав» / «Best lineup»;
+- запись чисел (`CoinsFormatter`, [Gameplay.md](Gameplay.md), раздел 13):
+  - `ui.number.decimal_separator` — «,» / «.»;
+  - `ui.number.thousand`, `ui.number.million`, `ui.number.billion` — «{0} тыс.», «{0} млн», «{0} млрд» / «{0}K», «{0}M», «{0}B». Между числом и сокращением в русском тексте стоит неразрывный пробел, `{0}` — число с одним знаком после запятой или целое;
+- карточка машины: `popup.vehicle.income` — «Доход: {0} в секунду» / «Income: {0} per second»;
+- сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;
+- заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки».
 
 Остальные тексты добавляются по мере их появления в игре.
 

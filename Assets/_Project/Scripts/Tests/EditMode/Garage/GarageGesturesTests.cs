@@ -78,6 +78,39 @@ namespace _Project.Tests.EditMode.Garage
         }
 
         [Test]
+        public void GarageVehicleOpensCard()
+        {
+            Vehicle vehicle = PlaceVehicle(0, 2);
+
+            Assert.That(_gestures.TryGetCardVehicle(0, out Vehicle cardVehicle), Is.True);
+            Assert.That(cardVehicle, Is.SameAs(vehicle));
+        }
+
+        [Test]
+        public void TrackVehicleDoesNotOpenCard()
+        {
+            PlaceVehicle(0, 2);
+            _roster.SendToTrack(0);
+
+            Assert.That(_gestures.TryGetCardVehicle(0, out Vehicle cardVehicle), Is.False);
+            Assert.That(cardVehicle, Is.Null);
+        }
+
+        [Test]
+        public void BoxDoesNotOpenCard()
+        {
+            PlaceBox(0, 2);
+
+            Assert.That(_gestures.TryGetCardVehicle(0, out Vehicle _), Is.False);
+        }
+
+        [Test]
+        public void EmptySlotDoesNotOpenCard()
+        {
+            Assert.That(_gestures.TryGetCardVehicle(0, out Vehicle _), Is.False);
+        }
+
+        [Test]
         public void DropOnEmptySlotMovesVehicle()
         {
             Vehicle vehicle = PlaceVehicle(0, 3);

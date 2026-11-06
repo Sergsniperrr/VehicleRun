@@ -64,7 +64,7 @@ namespace _Project.Features.Track
 
         private void OnFinishCrossed(TrackRunner runner, long payout)
         {
-            string text = PayoutPrefix + _formatter.Format(payout);
+            string text = PayoutPrefix + _formatter.FormatShort(payout);
             Vector2 position = _path.GetPoint(FinishDistance) + _offset;
             TakePopup().Show(text, position);
         }
