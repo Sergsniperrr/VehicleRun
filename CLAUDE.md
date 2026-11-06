@@ -49,7 +49,7 @@
 
 ## Запуск, сцены, JTL SDK
 
-- Порядок: сцена `Bootstrap` → `Bootstrapper` → `BootstrapState` (`IPlatformInitializer.InitializeAsync`: `JTLSDK.Create()` и `JTLSDK.WhenReady`) → `LoadRunState` (загрузка `Game`) → `RunState` (`GameReadyEvent`).
+- Порядок: сцена `Bootstrap` → `Bootstrapper` → `BootstrapState` (`IPlatformInitializer.InitializeAsync`: `JTLSDK.Create()` и `JTLSDK.WhenReady`) → `LoadRunState` (загрузка `Game`, сцена открывает `GameSession`: сейв или новая игра) → `RunState` (`GameReadyEvent`, `GameplayStartedEvent`).
 - До `JTLSDK.Create()` любое обращение к модулям SDK бросает `InvalidOperationException`. Сервис, которому SDK нужен раньше сцены `Game`, сначала делает `await IPlatformInitializer.InitializeAsync()`: метод идемпотентный, SDK создаётся один раз.
 - Колбэки SDK превращай в `UniTask` через `UniTaskCompletionSource`.
 - `Time.timeScale`, `AudioListener.volume`/`pause`, `Cursor` и `PlayerPrefs` принадлежат JTL SDK. Не пиши в них напрямую: используй `JTLSDK.Time.Scale`, `JTLSDK.Audio`, `JTLSDK.Device`, `JTLSDK.Data`, обёрнутые сервисом из `Core`.

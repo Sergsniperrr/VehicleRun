@@ -57,7 +57,7 @@ Assets/
 │           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
 │           ├── Features/              игровые механики: гараж, прогрессия, монеты, поставка коробок, трасса и доход, экземпляры, команды, сохранение прогресса; виды гаража и трассы, всплывающая надпись (Docs/Gameplay.md)
 │           ├── UI/                    интерфейс: LocalizedText; HUD: монеты, доход, K/20, кнопка коробки, таймер поставки; окно переработки
-│           └── Composition/           LifetimeScope, стартовые состояния, старт сцены Game: загрузка сейва или временное стартовое состояние
+│           └── Composition/           LifetimeScope, стартовые состояния, старт сцены Game
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают
 ├── Plugins/                           DOTween Pro, Odin Inspector, UniTask
 ├── Resources/                         DOTweenSettings.asset; JTLSDK/JTLSDKSettings.asset после создания конфигурации
@@ -98,7 +98,7 @@ Assets/
 |---|---|---|
 | `RootLifetimeScope` | префаб `Assets/_Project/Prefabs/RootLifetimeScope.prefab` | все сервисы, автомат состояний и состояния |
 | `BootstrapLifetimeScope` | сцена `Bootstrap` | точку входа `Bootstrapper` |
-| `GameLifetimeScope` | сцена `Game` | `GameConfig` и его части, логику гаража, прогрессии, экономики и трассы, правила жестов гаража, тик экономики, загрузку и запись сейва, форматирование монет, окно подтверждения переработки, старт сцены `GameStartup` и временное стартовое состояние ([Docs/Gameplay.md](Docs/Gameplay.md), разделы 13 и 14) |
+| `GameLifetimeScope` | сцена `Game` | `GameConfig` и его части, логику гаража, прогрессии, экономики и трассы, правила жестов гаража, тик экономики, загрузку и запись сейва, новую игру, форматирование монет, окно подтверждения переработки и старт сцены `GameStartup` → `GameSession` ([Docs/Gameplay.md](Docs/Gameplay.md), разделы 13 и 14) |
 
 Корневой контейнер указан в `Assets/Settings/VContainerSettings.asset`. VContainer создаёт его один раз при старте, помечает `DontDestroyOnLoad` и делает родителем каждого `LifetimeScope` на сценах. Поле `Parent` у сценовых контейнеров оставляйте пустым: родитель приходит из настроек.
 
@@ -192,7 +192,7 @@ VContainer внедряет зависимости только в объект�
 | 2 | `Bootstrapper.Start()` | вход в `BootstrapState` |
 | 3 | `BootstrapState` | `await IPlatformInitializer.InitializeAsync()`, внутри `JTLSDK.Create()` и ожидание `JTLSDK.WhenReady` |
 | 4 | `LoadRunState` | `await ISceneLoader.LoadAsync(SceneId.Game)` |
-| 5 | `RunState` | `IAnalyticsService.ReportEvent(new GameReadyEvent())`, площадка получает `GameReady` |
+| 5 | `RunState` | `IAnalyticsService.ReportEvent(new GameReadyEvent())` и `GameplayStartedEvent`, площадка получает `GameReady` и старт геймплея. Сейв сцена `Game` загрузила раньше, при сборке своего контейнера |
 
 До `JTLSDK.Create()` любое обращение к модулям SDK бросает `InvalidOperationException`. Весь код, который живёт на сцене `Game`, запускается уже после шага 3. `InitializeAsync` можно вызывать сколько угодно раз: SDK создаётся один раз, все вызовы ждут одну и ту же готовность. Этим пользуются сервисы рекламы и покупок в своём `Start()`.
 
@@ -335,7 +335,7 @@ public interface ISceneLoader
 3. Добавьте сцену в File, Build Settings.
 4. Положите на сцену объект с `LifetimeScope` (свой класс в `Composition`), иначе внедрение на этой сцене работать не будет.
 
-Play Mode запускайте со сцены `Bootstrap`, переключаться удобно через тулбар SceneSwitcher Pro. Если стартовать сразу с `Game`, корневой контейнер создастся, но `Bootstrapper` не запустится: автомат не стартует и `GameReady` площадке не уйдёт.
+Play Mode запускайте со сцены `Bootstrap`, переключаться удобно через тулбар SceneSwitcher Pro. Если стартовать сразу с `Game`, корневой контейнер создастся, но `Bootstrapper` не запустится: SDK не создан, загрузка сейва в `GameSession` бросит `InvalidOperationException`, автомат не стартует и `GameReady` площадке не уйдёт.
 
 ---
 

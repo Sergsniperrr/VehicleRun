@@ -43,7 +43,7 @@ Assets/_Project/Scripts/Runtime/
 | 2 | `Bootstrapper.Start()` | Вход в состояние `BootstrapState` |
 | 3 | `BootstrapState` | `await IPlatformInitializer.InitializeAsync()`, внутри `JTLSDK.Create()` и `JTLSDK.WhenReady(...)` |
 | 4 | `LoadRunState` | Загрузка сцены `Game` |
-| 5 | `RunState` | `analytics.ReportEvent(new GameReadyEvent())` |
+| 5 | `RunState` | `analytics.ReportEvent(new GameReadyEvent())`, затем `GameplayStartedEvent`: игрок на поле |
 
 Главное правило JTL SDK: **до `JTLSDK.Create()` любое обращение к модулям бросает `InvalidOperationException`**. Без исключений читаются только `JTLSDK.IsCreated`, `IsReady`, `Version` и `LogLevel`. Создание SDK спрятано в `JTLSDKInitializer`, а ожидание стоит в `BootstrapState`, поэтому весь код, который запускается со сцены `Game`, уже в безопасности.
 
@@ -126,7 +126,7 @@ public class ResultScreen : MonoBehaviour
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-`GameplayStarted` и `GameplayStopped` вызываются при старте и завершении уровня, а также при открытии и закрытии своего меню паузы. Удобное место для этого: класс в `Features`, который запускает и завершает уровень. Яндекс получает их как `GameplayAPI.start()` и `stop()`, на YouTube меняется только внутреннее состояние SDK. На время рекламы и паузы площадки SDK сам останавливает геймплей и возобновляет его после, вручную это делать не нужно. Повторный вызов с тем же состоянием ничего не отправляет.
+`GameplayStarted` и `GameplayStopped` вызываются при старте и завершении уровня, а также при открытии и закрытии своего меню паузы. В нашей игре уровней нет: `GameplayStarted` отправляет `RunState` сразу после `GameReady`, когда игрок попал на поле, а `GameplayStopped` — выход из `RunState`. Остановку на время полноэкранного окна добавит `WindowQueue` (задача 2.2, решение 19 тех.плана). Яндекс получает их как `GameplayAPI.start()` и `stop()`, на YouTube меняется только внутреннее состояние SDK. На время рекламы и паузы площадки SDK сам останавливает геймплей и возобновляет его после, вручную это делать не нужно. Повторный вызов с тем же состоянием ничего не отправляет.
 
 ### 2.4 Как добавить своё событие
 

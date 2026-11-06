@@ -7,8 +7,8 @@ using _Project.Features.Economy;
 using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
+using _Project.Features.Session;
 using _Project.Features.Track;
-using _Project.Features.Vehicles;
 
 namespace _Project.Editor.Balance
 {
@@ -42,7 +42,7 @@ namespace _Project.Editor.Balance
             Income = new IncomeService(Roster, config.Track);
 
             Roster.FinishCrossed += OnFinishCrossed;
-            PlaceStartVehicles(instanceIds);
+            new NewGameSetup(economy, config.Vehicles, Garage, Progress, instanceIds).Apply();
         }
 
         public VehicleCatalogConfig Catalog { get; }
@@ -107,16 +107,6 @@ namespace _Project.Editor.Balance
         {
             Roster.FinishCrossed -= OnFinishCrossed;
             Progress.Dispose();
-        }
-
-        private void PlaceStartVehicles(InstanceIdGenerator instanceIds)
-        {
-            VehicleDefinition definition = Catalog.GetByRank(_economy.StartVehicleRank);
-
-            for (int slot = 0; slot < _economy.StartVehicleCount; slot++)
-            {
-                Garage.PlaceVehicle(slot, new Vehicle(instanceIds.Create(), definition));
-            }
         }
 
         private void AdvanceTurbo(float deltaTime)

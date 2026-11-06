@@ -7,6 +7,7 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Save;
+using _Project.Features.Session;
 using _Project.Features.Track;
 using _Project.UI.Windows;
 using UnityEngine;
@@ -69,7 +70,8 @@ namespace _Project.Composition
 
         private void RegisterStartup(IContainerBuilder builder)
         {
-            builder.Register<SampleStateSeeder>(Lifetime.Singleton);
+            builder.Register<NewGameSetup>(Lifetime.Singleton);
+            builder.Register<GameSession>(Lifetime.Singleton);
             builder.RegisterEntryPoint<GameStartup>();
         }
 

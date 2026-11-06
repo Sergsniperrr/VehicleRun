@@ -18,12 +18,15 @@ namespace _Project.Composition.Startup
         public UniTask Enter()
         {
             _analytics.ReportEvent(new GameReadyEvent());
+            _analytics.ReportEvent(new GameplayStartedEvent());
 
             return UniTask.CompletedTask;
         }
 
         public UniTask Exit()
         {
+            _analytics.ReportEvent(new GameplayStoppedEvent());
+
             return UniTask.CompletedTask;
         }
     }

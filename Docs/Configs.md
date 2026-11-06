@@ -99,7 +99,7 @@ Assets/_Project/
 | Поле | Значение | Что задаёт | ГДД |
 |---|---|---|---|
 | `Start Coins` | 60 | монеты новой игры | 9 |
-| `Start Vehicle Rank`, `Start Vehicle Count` | 1, 2 | стартовые машины в гараже | 9, 14 |
+| `Start Vehicle Rank`, `Start Vehicle Count` | 1, 2 | стартовые машины новой игры, их кладёт `NewGameSetup` в первые слоты | 9, 14 |
 | `Box Rank Lag` | 5 | отставание ранга коробки: `b = max(1, K − Box Rank Lag)` | 5 |
 | `Box Base Price Income Seconds` | 48 | базовая цена коробки в секундах дохода машины старшего открытого ранга K: `48 × I_K` | 9 |
 | `Box Price Growth` | 1,3 | рост цены за каждую купленную коробку того же ранга | 9 |
@@ -172,7 +172,7 @@ Assets/_Project/
 
 Меню **_Project → Balance → Run Simulation** проигрывает игру жадным ботом на настоящих классах `Features` и записывает отчёт [Docs/Balance/SimulationReport.md](Balance/SimulationReport.md). Перед запуском меню проверяет конфиги, при ошибках симуляция не идёт. Прогон всех вариантов занимает меньше секунды.
 
-Бот собирает `GarageBoard`, `RankProgress`, `Wallet`, `BoxPricing`, `BoxDelivery`, `TrackRoster` и `GarageGestures` по `GameConfig` из настроек и кладёт стартовые машины из `EconomyConfig`. Раз в «секунд на действие» он делает одно действие, первое подходящее по списку:
+Бот собирает `GarageBoard`, `RankProgress`, `Wallet`, `BoxPricing`, `BoxDelivery`, `TrackRoster` и `GarageGestures` по `GameConfig` из настроек и кладёт стартовые машины из `EconomyConfig` тем же `NewGameSetup`, что и игра. Раз в «секунд на действие» он делает одно действие, первое подходящее по списку:
 1. открыть коробку;
 2. слить пару старшего ранга, в том числе с машиной на трассе (ГДД 1.7);
 3. включить турбо, если сценарий его использует;
