@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using _Project.Core.Economy;
 using _Project.Core.Track;
 using _Project.Core.Vehicles;
@@ -50,6 +51,29 @@ namespace _Project.Features.Economy
         {
             CheckRank(rank);
             _purchasesByRank[rank - 1]++;
+        }
+
+        public void RestorePurchaseCounts(IReadOnlyList<int> purchaseCounts)
+        {
+            if (purchaseCounts == null)
+            {
+                throw new ArgumentNullException(nameof(purchaseCounts));
+            }
+
+            if (purchaseCounts.Count > _purchasesByRank.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(purchaseCounts));
+            }
+
+            for (int i = 0; i < purchaseCounts.Count; i++)
+            {
+                if (purchaseCounts[i] < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(purchaseCounts));
+                }
+
+                _purchasesByRank[i] = purchaseCounts[i];
+            }
         }
 
         private double CalculateTopRankIncome()

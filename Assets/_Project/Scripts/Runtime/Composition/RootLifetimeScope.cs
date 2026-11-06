@@ -4,8 +4,8 @@ using _Project.Core.Audio;
 using _Project.Core.Localization;
 using _Project.Core.Platform;
 using _Project.Core.Purchasing;
-using _Project.Core.Storage;
 using _Project.Composition.Startup;
+using _Project.Core.Save;
 using _Project.Core.SceneManagement;
 using _Project.Core.StateMachine;
 using _Project.Core.Time;
@@ -44,7 +44,7 @@ namespace _Project.Composition
 
         private void RegisterStorage(IContainerBuilder builder)
         {
-            builder.Register<ExampleStorage>(Lifetime.Singleton).As<IExampleStorage>();
+            builder.Register<JTLProgressStorage>(Lifetime.Singleton).As<IProgressStorage>();
         }
 
         private void RegisterAnalytics(IContainerBuilder builder)

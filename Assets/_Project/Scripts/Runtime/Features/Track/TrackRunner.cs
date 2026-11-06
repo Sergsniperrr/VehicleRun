@@ -5,10 +5,16 @@ namespace _Project.Features.Track
 {
     public class TrackRunner
     {
-        public TrackRunner(int slot, Vehicle vehicle)
+        public TrackRunner(int slot, Vehicle vehicle, float distance)
         {
+            if (float.IsNaN(distance) || float.IsInfinity(distance) || distance < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(distance));
+            }
+
             Slot = slot;
             Vehicle = vehicle ?? throw new ArgumentNullException(nameof(vehicle));
+            Distance = distance;
         }
 
         public int Slot { get; }

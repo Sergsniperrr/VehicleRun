@@ -19,13 +19,13 @@ Assets/_Project/Scripts/Runtime/
 │   ├── Analytics/IAnalyticsService.cs, IAnalyticsReporter.cs, IAnalyticsEvent.cs
 │   ├── Analytics/Events/GameReadyEvent.cs, GameplayStartedEvent.cs, GameplayStoppedEvent.cs
 │   ├── Purchasing/IPurchaseService.cs
-│   ├── Storage/IExampleStorage.cs
+│   ├── Save/IProgressStorage.cs, GameSave.cs и вложенные DTO
 │   └── Platform/IPlatformInitializer.cs
 ├── Infrastructure/                сборка _Project.Infrastructure, ссылается на JTLStudio.SDK
 │   ├── JTL/JTLAdvertisingService.cs
 │   ├── JTL/JTLAnalyticsService.cs
 │   ├── JTL/JTLPurchaseService.cs
-│   ├── JTL/ExampleStorage.cs
+│   ├── JTL/JTLProgressStorage.cs
 │   ├── JTL/JTLSDKInitializer.cs
 │   └── Analytics/YandexMetrica.cs
 └── Composition/
@@ -333,37 +333,59 @@ private const string NoAdsOwnedKey = "no_ads.owned";
 
 ### 4.1 Интерфейс
 
-`Core/Storage/IExampleStorage.cs`:
+Прогресс игры хранит одно хранилище. `Core/Save/IProgressStorage.cs`:
 
 ```csharp
-public interface IExampleStorage
+public interface IProgressStorage
 {
-    int Coins { get; set; }
+    bool TryReadState(out GameSave save);
 
-    void Save();
+    bool TryReadBackup(out GameSave save);
+
+    void WriteState(GameSave save, bool isImportant);
+
+    void WriteBackup(GameSave save);
 }
 ```
 
 *Это фактический код проекта, а не пример.*
 
-Реализация `Infrastructure/JTL/ExampleStorage.cs`, тонкая обёртка над `JTLSDK.Data`:
+Реализация `Infrastructure/JTL/JTLProgressStorage.cs` пишет весь сейв `GameSave` одним объектом под ключ `progress.state`, а последнюю загруженную копию под `progress.backup`:
 
 ```csharp
-public int Coins
+public void WriteState(GameSave save, bool isImportant)
 {
-    get => JTLSDK.Data.GetInt(CoinsKey);
-    set => JTLSDK.Data.SetInt(CoinsKey, value);
+    Write(StateKey, save, isImportant);
 }
 
-public void Save()
+private bool TryRead(string key, out GameSave save)
 {
-    JTLSDK.Data.Save();
+    save = JTLSDK.Data.GetObject<GameSave>(key);
+
+    return save != null;
+}
+
+private void Write(string key, GameSave save, bool isImportant)
+{
+    if (save == null)
+    {
+        throw new ArgumentNullException(nameof(save));
+    }
+
+    if (_isStateReadFromFailedLoad)
+    {
+        return;
+    }
+
+    JTLSDK.Data.SetObject(key, save, isImportant);
 }
 ```
 
 *Это фактический код проекта, а не пример.*
 
-Имя `ExampleStorage` говорит само за себя: это образец из заготовки проекта. Настоящие сохранения (прогресс уровней, звёзды, настройки) пишутся по его примеру, см. 4.3.
+`_isStateReadFromFailedLoad` ставит `TryReadState`, если `JTLSDK.Data.LoadState` в этот момент `Failed`. Тогда игра начинается заново, а запись выключена до конца сцены: SDK повторяет загрузку каждые 30 секунд, и без этой защиты после удачной повторной загрузки новая игра перетёрла бы облако.
+
+Что лежит в `GameSave`, когда его пишут и как проверяют при загрузке, описано в [Gameplay.md](Gameplay.md), раздел 14. Хранилище зарегистрировано в `RootLifetimeScope.RegisterStorage`, а игровая сцена получает его из родительского контейнера.
 
 ### 4.2 Как работает `JTLSDK.Data`
 
@@ -392,83 +414,52 @@ public void Save()
 
 ### 4.3 Как добавить своё сохраняемое значение
 
-Быстро: добавить поле в существующий класс. В интерфейс `Core/Storage/IExampleStorage.cs`:
+Прогресс игры: добавить поле в `GameSave` (или вложенный DTO), заполнить его в `GameSaveFactory`, проверить в `GameSaveValidator` и восстановить в `GameStateRestorer`. Если старый сейв без поля нельзя прочитать как есть, поднимите `GameSave.CurrentSchemaVersion` и добавьте миграцию (задача 4.5). Порядок описан в [Gameplay.md](Gameplay.md), раздел 14.
+
+Другая область (настройки, отладка): завести отдельный класс хранилища по образцу `JTLProgressStorage`, а не раздувать сейв прогресса. Интерфейс `Core/Settings/ISettingsStorage.cs`:
 
 ```csharp
-int BestScore { get; set; }
-```
-
-*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
-
-И в реализацию `Infrastructure/JTL/ExampleStorage.cs`:
-
-```csharp
-private const string BestScoreKey = "best_score";
-
-public int BestScore
+namespace _Project.Core.Settings
 {
-    get => JTLSDK.Data.GetInt(BestScoreKey);
-    set => JTLSDK.Data.SetInt(BestScoreKey, value);
-}
-```
-
-*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
-
-Правильно: завести отдельный класс под свою область. Так и делайте, вместо того чтобы раздувать `ExampleStorage`. Интерфейс `Core/Storage/ILevelProgressStorage.cs`:
-
-```csharp
-namespace _Project.Core.Storage
-{
-    public interface ILevelProgressStorage
+    public interface ISettingsStorage
     {
-        int LastUnlockedLevel { get; set; }
+        bool IsMusicOn { get; set; }
 
-        int GetStars(int levelIndex);
-        void SetStars(int levelIndex, int stars);
-        void Save();
+        bool IsSoundOn { get; set; }
     }
 }
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Реализация `Infrastructure/JTL/LevelProgressStorage.cs`:
+Реализация `Infrastructure/JTL/JTLSettingsStorage.cs`:
 
 ```csharp
-public class LevelProgressStorage : ILevelProgressStorage
+public class JTLSettingsStorage : ISettingsStorage
 {
-    private const string LastUnlockedKey = "progress.last_unlocked";
-    private const string StarsKeyPrefix = "progress.stars.";
+    private const string MusicKey = "settings.music";
+    private const string SoundKey = "settings.sfx";
 
-    public int LastUnlockedLevel
+    public bool IsMusicOn
     {
-        get => JTLSDK.Data.GetInt(LastUnlockedKey);
-        set => JTLSDK.Data.SetInt(LastUnlockedKey, value);
+        get => JTLSDK.Data.GetBool(MusicKey, true);
+        set => JTLSDK.Data.SetBool(MusicKey, value);
     }
 
-    public int GetStars(int levelIndex)
+    public bool IsSoundOn
     {
-        return JTLSDK.Data.GetInt(StarsKeyPrefix + levelIndex);
-    }
-
-    public void SetStars(int levelIndex, int stars)
-    {
-        JTLSDK.Data.SetInt(StarsKeyPrefix + levelIndex, stars);
-    }
-
-    public void Save()
-    {
-        JTLSDK.Data.Save();
+        get => JTLSDK.Data.GetBool(SoundKey, true);
+        set => JTLSDK.Data.SetBool(SoundKey, value);
     }
 }
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-И зарегистрируйте его в `RootLifetimeScope.RegisterStorage`:
+И зарегистрируйте его в `RootLifetimeScope.RegisterStorage`, рядом с `JTLProgressStorage`:
 
 ```csharp
-builder.Register<LevelProgressStorage>(Lifetime.Singleton).As<ILevelProgressStorage>();
+builder.Register<JTLSettingsStorage>(Lifetime.Singleton).As<ISettingsStorage>();
 ```
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
@@ -478,6 +469,8 @@ builder.Register<LevelProgressStorage>(Lifetime.Singleton).As<ILevelProgressStor
 ### 4.4 Сохранение сложных данных
 
 Для целых структур есть `GetObject<T>` и `SetObject<T>`. Внутри обычный `JsonUtility`, со всеми его ограничениями: класс должен быть помечен `[Serializable]`, сохраняются только поля, которые сериализует `JsonUtility` (открытые и `[SerializeField]`, не свойства), `Dictionary` не поддерживается.
+
+`JsonUtility` пишет `double` 16 значащими цифрами, этого не хватает для точного возврата: 0,99999999999999989 возвращается как 1, а в 17-й цифре бывают расхождения. `long` и `float` возвращаются точно. Поэтому проверка дробного поля после загрузки не должна требовать строгого неравенства: так `Wallet.Restore` принимает остаток 1 и превращает его в монету ([Gameplay.md](Gameplay.md), раздел 6).
 
 Такой класс это чистая модель данных, поэтому открытые поля в нём допустимы:
 
@@ -522,12 +515,15 @@ public ProfileData LoadProfile()
 
 Пункт **Edit → Clear All PlayerPrefs** тоже работает, но стирает вообще всё: сейв, симуляцию покупок редактора (`JTLSDK.Prototype.Purchases`) и настройки. Игру после очистки нужно перезапустить: SDK читает сейв один раз при старте и дальше держит его в памяти.
 
-Если нужно стереть не всё, а только часть, сделайте кнопку в отладочном меню. `DeleteKey` стирает одно значение, `DeleteAll` все данные; после них вызывайте `Save()`. Методы живут в классе хранилища в `Infrastructure`, а кнопка вызывает их через интерфейс из `Core`:
+Чтобы начать игру заново, но сохранить покупки и настройки, достаточно стереть ключи `progress.state` и `progress.backup` в окне SDK, раздел Saves, и перезапустить Play. Без них `ProgressLoader` не найдёт сейв, и сцена начнётся с новой игры.
+
+Если нужно стереть не всё, а только часть, сделайте кнопку в отладочном меню. `DeleteKey` стирает одно значение, `DeleteAll` все данные; после них вызывайте `Save()`. Методы живут в классе хранилища в `Infrastructure`, а кнопка вызывает их через интерфейс из `Core`. Сцена после сброса держит старое состояние в памяти и запишет его снова, поэтому после сброса её нужно перезагрузить:
 
 ```csharp
 public void ResetProgress()
 {
-    JTLSDK.Data.DeleteKey(LastUnlockedKey);
+    JTLSDK.Data.DeleteKey(StateKey);
+    JTLSDK.Data.DeleteKey(BackupKey);
     JTLSDK.Data.Save();
 }
 
@@ -551,7 +547,7 @@ public void ResetAll()
 | Реклама | В Play Mode SDK показывает во вкладке Game окно с вариантами ответа площадки, обработчики вызываются по-настоящему. Ответы настраиваются в окне JTL SDK, раздел Simulation |
 | Игровые события | В консоли строки `[JTL SDK]` о `GameReady` и смене геймплея (при уровне логов «Всё») |
 | Яндекс.Метрика | В редакторе: строка `[YandexMetrica] (sim) ym(...)` в консоли. В WebGL-сборке: вкладка Network в браузере, запросы на `mc.yandex.ru`, и отчёт «Конверсии» в кабинете Метрики |
-| Сохранения | Окно JTL SDK, раздел Saves. Как сбросить, см. 4.5 |
+| Сохранения | Окно JTL SDK, раздел Saves: ключи `progress.state` и `progress.backup`. Перезапуск Play восстанавливает гараж, трассу и монеты ([Gameplay.md](Gameplay.md), раздел 16). Как сбросить, см. 4.5 |
 | Покупки | Без настоящей оплаты: Simulation, Purchases, `Ask every time` или `Use selected result`. Вариант `paid, restored on next launch` проверяет восстановление: товар придёт через `RestorePurchases` при следующем запуске Play Mode |
 
 Сообщения SDK в консоли начинаются с `[JTL SDK]`. Уровень логов задаётся в окне SDK (Configurations, General settings, Logging level) или из кода через `JTLSDK.LogLevel`.

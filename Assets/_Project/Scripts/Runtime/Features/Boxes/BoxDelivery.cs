@@ -94,6 +94,17 @@ namespace _Project.Features.Boxes
             return new CommandResult(FailureReason.None);
         }
 
+        public void Restore(float freeBoxRemainingSeconds, bool hasReadyDelivery)
+        {
+            if (float.IsNaN(freeBoxRemainingSeconds) || freeBoxRemainingSeconds < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(freeBoxRemainingSeconds));
+            }
+
+            FreeBoxRemainingSeconds = Math.Min(freeBoxRemainingSeconds, _economy.FreeBoxIntervalSeconds);
+            HasReadyDelivery = hasReadyDelivery;
+        }
+
         private void DeliverReadyBox()
         {
             if (_garage.TryFindFreeSlot(out int slot) == false)

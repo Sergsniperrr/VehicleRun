@@ -58,7 +58,7 @@
 - Play Mode запускай только со сцены `Bootstrap`.
 - Новое состояние: класс с `IState` или `IPayloadState<T>` и `builder.Register<T>(Lifetime.Transient)` в `RootLifetimeScope.RegisterStates`. `Enter<T>()` вызывается через `Forget()`, поэтому исключения из состояния попадают в лог UniTask, а не к вызывающему.
 - Новая сцена: файл в `Assets/_Project/Scenes/`, значение в `SceneId` с тем же именем, что у файла, сцена в Build Settings, свой `LifetimeScope` на сцене.
-- Сохраняемые данные каждой области держи в отдельном классе хранилища (по образцу `ExampleStorage`), ключи пиши с префиксом области (`progress.`, `settings.`). Префикс `jtlsdk.` занят SDK.
+- Сохраняемые данные каждой области держи в отдельном классе хранилища (по образцу `JTLProgressStorage`), ключи пиши с префиксом области (`progress.`, `settings.`). Префикс `jtlsdk.` занят SDK. Прогресс игры — один объект `GameSave`, новые поля добавляй в него ([Docs/Gameplay.md](Docs/Gameplay.md), раздел 14).
 - Тексты, которые видит игрок, заводи ключами в `LocalizationConfig.asset`, а не строками в коде.
 
 ## Стиль кода

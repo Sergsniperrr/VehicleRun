@@ -6,6 +6,7 @@ using _Project.Features.Economy;
 using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
+using _Project.Features.Save;
 using _Project.Features.Track;
 using _Project.UI.Windows;
 using UnityEngine;
@@ -23,8 +24,9 @@ namespace _Project.Composition
         {
             RegisterConfigs(builder);
             RegisterGameplay(builder);
+            RegisterSave(builder);
             RegisterUI(builder);
-            builder.RegisterEntryPoint<SampleStateSeeder>();
+            RegisterStartup(builder);
         }
 
         private void RegisterConfigs(IContainerBuilder builder)
@@ -34,6 +36,7 @@ namespace _Project.Composition
                 throw new InvalidOperationException(nameof(_gameConfig));
             }
 
+            builder.RegisterInstance(_gameConfig);
             builder.RegisterInstance(_gameConfig.Vehicles);
             builder.RegisterInstance(_gameConfig.Economy);
             builder.RegisterInstance(_gameConfig.Garage);
@@ -53,6 +56,21 @@ namespace _Project.Composition
             builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();
+        }
+
+        private void RegisterSave(IContainerBuilder builder)
+        {
+            builder.Register<GameSaveFactory>(Lifetime.Singleton);
+            builder.Register<GameSaveValidator>(Lifetime.Singleton);
+            builder.Register<GameStateRestorer>(Lifetime.Singleton);
+            builder.Register<ProgressLoader>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<SaveScheduler>().AsSelf();
+        }
+
+        private void RegisterStartup(IContainerBuilder builder)
+        {
+            builder.Register<SampleStateSeeder>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<GameStartup>();
         }
 
         private void RegisterUI(IContainerBuilder builder)

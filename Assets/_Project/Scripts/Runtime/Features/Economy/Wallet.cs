@@ -27,13 +27,9 @@ namespace _Project.Features.Economy
                 throw new ArgumentOutOfRangeException(nameof(amount));
             }
 
-            double total = Remainder + amount;
-            double wholeCoins = Math.Floor(total);
-            Remainder = total - wholeCoins;
-
-            if (wholeCoins > 0)
+            if (TryCollectWholeCoins(amount))
             {
-                AddWholeCoins(wholeCoins);
+                CoinsChanged?.Invoke(Coins);
             }
         }
 
@@ -55,8 +51,34 @@ namespace _Project.Features.Economy
             return true;
         }
 
-        private void AddWholeCoins(double wholeCoins)
+        public void Restore(long coins, double remainder)
         {
+            if (coins < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(coins));
+            }
+
+            if (double.IsNaN(remainder) || remainder < 0 || remainder > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(remainder));
+            }
+
+            Coins = coins;
+            Remainder = 0;
+            TryCollectWholeCoins(remainder);
+        }
+
+        private bool TryCollectWholeCoins(double amount)
+        {
+            double total = Remainder + amount;
+            double wholeCoins = Math.Floor(total);
+            Remainder = total - wholeCoins;
+
+            if (wholeCoins <= 0)
+            {
+                return false;
+            }
+
             long room = long.MaxValue - Coins;
 
             if (wholeCoins >= room)
@@ -69,7 +91,7 @@ namespace _Project.Features.Economy
                 Coins += (long)wholeCoins;
             }
 
-            CoinsChanged?.Invoke(Coins);
+            return true;
         }
     }
 }

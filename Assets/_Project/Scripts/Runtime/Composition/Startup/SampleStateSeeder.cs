@@ -5,11 +5,10 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Track;
 using _Project.Features.Vehicles;
-using VContainer.Unity;
 
 namespace _Project.Composition.Startup
 {
-    public class SampleStateSeeder : IStartable
+    public class SampleStateSeeder
     {
         private static readonly (int Slot, int Rank)[] SampleVehicles = { (0, 5), (1, 4), (2, 4), (3, 3), (4, 2), (6, 1), (8, 2) };
         private static readonly (int Slot, int Rank)[] SampleBoxes = { (7, 1) };
@@ -28,7 +27,7 @@ namespace _Project.Composition.Startup
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
         }
 
-        public void Start()
+        public void Seed()
         {
             foreach ((int slot, int rank) in SampleVehicles)
             {

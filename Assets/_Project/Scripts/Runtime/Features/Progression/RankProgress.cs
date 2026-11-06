@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using _Project.Core.Economy;
 using _Project.Core.Track;
 using _Project.Core.Vehicles;
@@ -57,6 +58,31 @@ namespace _Project.Features.Progression
             }
 
             RankUnlocked?.Invoke(rank);
+        }
+
+        public void RestoreUnlockedRanks(IReadOnlyList<int> ranks)
+        {
+            if (ranks == null)
+            {
+                throw new ArgumentNullException(nameof(ranks));
+            }
+
+            if (MaxRank != 0)
+            {
+                throw new InvalidOperationException(nameof(MaxRank));
+            }
+
+            int maxRank = 0;
+
+            foreach (int rank in ranks)
+            {
+                CheckRank(rank);
+                _unlockedRanks[rank - 1] = true;
+                maxRank = Math.Max(maxRank, rank);
+            }
+
+            MaxRank = maxRank;
+            _garage.UnlockSlots(maxRank);
         }
 
         public void Dispose()

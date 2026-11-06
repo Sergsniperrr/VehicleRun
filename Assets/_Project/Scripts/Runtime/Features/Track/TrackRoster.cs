@@ -90,6 +90,17 @@ namespace _Project.Features.Track
             return Succeed();
         }
 
+        public void RestoreRunner(int slot, float distance)
+        {
+            if (CheckSend(slot) != FailureReason.None)
+            {
+                throw new InvalidOperationException(nameof(slot));
+            }
+
+            _garage.TryGetVehicle(slot, out Vehicle vehicle);
+            AddRunner(slot, vehicle, distance % _track.LapLength);
+        }
+
         public void Advance(float deltaTime)
         {
             if (float.IsNaN(deltaTime) || deltaTime < 0)
@@ -138,10 +149,17 @@ namespace _Project.Features.Track
 
         private void Send(int slot, Vehicle vehicle)
         {
-            _garage.MarkOnTrack(slot);
-            TrackRunner runner = new TrackRunner(slot, vehicle);
-            _runners.Add(runner);
+            TrackRunner runner = AddRunner(slot, vehicle, 0f);
             VehicleSent?.Invoke(runner);
+        }
+
+        private TrackRunner AddRunner(int slot, Vehicle vehicle, float distance)
+        {
+            TrackRunner runner = new TrackRunner(slot, vehicle, distance);
+            _garage.MarkOnTrack(slot);
+            _runners.Add(runner);
+
+            return runner;
         }
 
         private void Return(TrackRunner runner)

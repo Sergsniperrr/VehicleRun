@@ -55,9 +55,9 @@ Assets/
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
 │           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
-│           ├── Features/              игровые механики: гараж, прогрессия, монеты, поставка коробок, трасса и доход, экземпляры, команды; виды гаража и трассы, всплывающая надпись (Docs/Gameplay.md)
+│           ├── Features/              игровые механики: гараж, прогрессия, монеты, поставка коробок, трасса и доход, экземпляры, команды, сохранение прогресса; виды гаража и трассы, всплывающая надпись (Docs/Gameplay.md)
 │           ├── UI/                    интерфейс: LocalizedText; HUD: монеты, доход, K/20, кнопка коробки, таймер поставки; окно переработки
-│           └── Composition/           LifetimeScope, стартовые состояния, временное стартовое состояние игры
+│           └── Composition/           LifetimeScope, стартовые состояния, старт сцены Game: загрузка сейва или временное стартовое состояние
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают
 ├── Plugins/                           DOTween Pro, Odin Inspector, UniTask
 ├── Resources/                         DOTweenSettings.asset; JTLSDK/JTLSDKSettings.asset после создания конфигурации
@@ -98,7 +98,7 @@ Assets/
 |---|---|---|
 | `RootLifetimeScope` | префаб `Assets/_Project/Prefabs/RootLifetimeScope.prefab` | все сервисы, автомат состояний и состояния |
 | `BootstrapLifetimeScope` | сцена `Bootstrap` | точку входа `Bootstrapper` |
-| `GameLifetimeScope` | сцена `Game` | части `GameConfig`, логику гаража, прогрессии, экономики и трассы, правила жестов гаража, тик экономики, форматирование монет, окно подтверждения переработки и временное стартовое состояние ([Docs/Gameplay.md](Docs/Gameplay.md), раздел 13) |
+| `GameLifetimeScope` | сцена `Game` | `GameConfig` и его части, логику гаража, прогрессии, экономики и трассы, правила жестов гаража, тик экономики, загрузку и запись сейва, форматирование монет, окно подтверждения переработки, старт сцены `GameStartup` и временное стартовое состояние ([Docs/Gameplay.md](Docs/Gameplay.md), разделы 13 и 14) |
 
 Корневой контейнер указан в `Assets/Settings/VContainerSettings.asset`. VContainer создаёт его один раз при старте, помечает `DontDestroyOnLoad` и делает родителем каждого `LifetimeScope` на сценах. Поле `Parent` у сценовых контейнеров оставляйте пустым: родитель приходит из настроек.
 
@@ -131,7 +131,7 @@ protected override void Configure(IContainerBuilder builder)
 | `ILocalizationService` | `JTLLocalizationService` | Singleton | `RegisterPlatform` |
 | `IPurchaseService` | `JTLPurchaseService` | EntryPoint | `RegisterPlatform` |
 | `IAdvertisingService` | `JTLAdvertisingService` | EntryPoint | `RegisterPlatform` |
-| `IExampleStorage` | `ExampleStorage` | Singleton | `RegisterStorage` |
+| `IProgressStorage` | `JTLProgressStorage` | Singleton | `RegisterStorage` |
 | `IStateFactory` | `StateFactory` | Singleton | `RegisterStateMachine` |
 | `IGameStateMachine` | `GameStateMachine` | Singleton | `RegisterStateMachine` |
 | `BootstrapState`, `LoadRunState`, `RunState` | сами классы | Transient | `RegisterStates` |
@@ -343,7 +343,7 @@ Play Mode запускайте со сцены `Bootstrap`, переключат
 
 | Интерфейс | Реализация | Где описан |
 |---|---|---|
-| `IAnalyticsService`, `IAdvertisingService`, `IPurchaseService`, `IExampleStorage` | `Infrastructure/JTL/*` | [Аналитика, реклама и сохранения](Docs/Analytics-Ads-Saves.md) |
+| `IAnalyticsService`, `IAdvertisingService`, `IPurchaseService`, `IProgressStorage` | `Infrastructure/JTL/*` | [Аналитика, реклама и сохранения](Docs/Analytics-Ads-Saves.md) |
 | `ILocalizationService` | `JTLLocalizationService` | [Локализация](Docs/Localization.md) |
 | `IAudioService` | `AudioService` | [Звук: AudioService](Docs/Audio.md) |
 | `ISceneLoader` | `SceneLoader` | раздел 5 |

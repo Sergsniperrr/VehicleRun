@@ -25,5 +25,22 @@ namespace _Project.Core.Vehicles
 
             return _vehicles[rank - 1];
         }
+
+        public bool TryGetById(string id, out VehicleDefinition definition)
+        {
+            foreach (VehicleDefinition vehicle in _vehicles)
+            {
+                if (vehicle.Id == id)
+                {
+                    definition = vehicle;
+
+                    return true;
+                }
+            }
+
+            definition = null;
+
+            return false;
+        }
     }
 }

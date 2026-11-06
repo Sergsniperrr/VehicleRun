@@ -99,26 +99,24 @@ namespace _Project.Features.Garage
 
         public void PlaceVehicle(int slot, Vehicle vehicle)
         {
-            if (vehicle == null)
-            {
-                throw new ArgumentNullException(nameof(vehicle));
-            }
-
-            CheckSlotAvailable(slot);
-            _vehicles[slot] = vehicle;
+            PutVehicle(slot, vehicle);
             VehiclePlaced?.Invoke(slot, vehicle);
         }
 
         public void PlaceBox(int slot, Box box)
         {
-            if (box == null)
-            {
-                throw new ArgumentNullException(nameof(box));
-            }
-
-            CheckSlotAvailable(slot);
-            _boxes[slot] = box;
+            PutBox(slot, box);
             BoxPlaced?.Invoke(slot, box);
+        }
+
+        public void RestoreVehicle(int slot, Vehicle vehicle)
+        {
+            PutVehicle(slot, vehicle);
+        }
+
+        public void RestoreBox(int slot, Box box)
+        {
+            PutBox(slot, box);
         }
 
         public void MarkOnTrack(int slot)
@@ -276,6 +274,28 @@ namespace _Project.Features.Garage
             }
 
             return Succeed();
+        }
+
+        private void PutVehicle(int slot, Vehicle vehicle)
+        {
+            if (vehicle == null)
+            {
+                throw new ArgumentNullException(nameof(vehicle));
+            }
+
+            CheckSlotAvailable(slot);
+            _vehicles[slot] = vehicle;
+        }
+
+        private void PutBox(int slot, Box box)
+        {
+            if (box == null)
+            {
+                throw new ArgumentNullException(nameof(box));
+            }
+
+            CheckSlotAvailable(slot);
+            _boxes[slot] = box;
         }
 
         private FailureReason CheckMerge(int fromSlot, int toSlot)
