@@ -279,6 +279,11 @@ namespace _Project.Core.Configs
             {
                 errors.Add(new ConfigError(turbo, $"Откат бесплатного турбо {turbo.FreeCooldownSeconds} секунд, не может быть отрицательным"));
             }
+
+            if (turbo.TapBoostSeconds <= 0)
+            {
+                errors.Add(new ConfigError(turbo, $"Ускорение машины по тапу {turbo.TapBoostSeconds} секунд, должно быть больше 0"));
+            }
         }
 
         private int ValidateSchedule(Object source, CapacitySchedule schedule, string scheduleName, int maxRank, List<ConfigError> errors)

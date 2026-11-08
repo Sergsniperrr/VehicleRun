@@ -45,6 +45,7 @@ namespace _Project.Tests.EditMode.Configs
         private const float TurboSpeedMultiplier = 2f;
         private const float TurboFreeDurationSeconds = 30f;
         private const float TurboFreeCooldownSeconds = 180f;
+        private const float TurboTapBoostSeconds = 2f;
         private const float SpritePixelsPerUnit = 100f;
 
         private readonly List<Object> _createdObjects = new List<Object>();
@@ -206,6 +207,7 @@ namespace _Project.Tests.EditMode.Configs
             turbo.FindProperty("_speedMultiplier").floatValue = TurboSpeedMultiplier;
             turbo.FindProperty("_freeDurationSeconds").floatValue = TurboFreeDurationSeconds;
             turbo.FindProperty("_freeCooldownSeconds").floatValue = TurboFreeCooldownSeconds;
+            turbo.FindProperty("_tapBoostSeconds").floatValue = TurboTapBoostSeconds;
             turbo.ApplyModifiedPropertiesWithoutUndo();
         }
 

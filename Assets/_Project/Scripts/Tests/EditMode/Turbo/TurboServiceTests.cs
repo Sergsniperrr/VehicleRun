@@ -16,6 +16,8 @@ namespace _Project.Tests.EditMode.Turbo
         private const float StepAcrossEffectEndSeconds = 3f;
         private const float OversizedTimerSeconds = 1000f;
         private const float TickSeconds = 1f;
+        private const float HalfTapBoostShare = 0.5f;
+        private const int FirstRank = 1;
         private const float DistanceTolerance = 0.001f;
         private const int PausedTickCount = 10;
 
@@ -146,31 +148,156 @@ namespace _Project.Tests.EditMode.Turbo
         }
 
         [Test]
-        public void TrackTimeIsBoostedOnlyUntilEffectEnds()
+        public void RunnerTimeIsBoostedOnlyUntilEffectEnds()
         {
-            PrepareUnlockedTrack();
+            TrackRunner runner = PrepareUnlockedTrack();
             _game.Turbo.StartTurbo();
             _game.Turbo.Advance(_fixture.Turbo.FreeDurationSeconds - LastEffectSecond);
 
-            float trackSeconds = _game.Turbo.CalculateTrackSeconds(StepAcrossEffectEndSeconds);
+            float runnerSeconds = _game.Turbo.CalculateRunnerSeconds(runner, StepAcrossEffectEndSeconds);
 
             float expectedSeconds = StepAcrossEffectEndSeconds + LastEffectSecond * (_fixture.Turbo.SpeedMultiplier - 1f);
-            Assert.That(trackSeconds, Is.EqualTo(expectedSeconds));
+            Assert.That(runnerSeconds, Is.EqualTo(expectedSeconds));
         }
 
         [Test]
-        public void TrackTimeIsNotBoostedWithoutTurbo()
+        public void RunnerTimeIsNotBoostedWithoutTurbo()
         {
-            PrepareUnlockedTrack();
+            TrackRunner runner = PrepareUnlockedTrack();
 
-            Assert.That(_game.Turbo.CalculateTrackSeconds(StepAcrossEffectEndSeconds), Is.EqualTo(StepAcrossEffectEndSeconds));
+            Assert.That(_game.Turbo.CalculateRunnerSeconds(runner, StepAcrossEffectEndSeconds), Is.EqualTo(StepAcrossEffectEndSeconds));
+            Assert.That(_game.Turbo.IsRunnerBoosted(runner), Is.False);
+        }
+
+        [Test]
+        public void ActiveTurboBoostsEveryRunner()
+        {
+            TrackRunner runner = PrepareUnlockedTrack();
+
+            _game.Turbo.StartTurbo();
+
+            Assert.That(_game.Turbo.IsRunnerBoosted(runner), Is.True);
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void TapBoostsRunnerBelowTurboUnlockRank()
+        {
+            TrackRunner runner = SendVehicle(0, FirstRank);
+
+            CommandResult result = _game.Turbo.BoostRunner(runner);
+
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(_game.Turbo.IsUnlocked, Is.False);
+            Assert.That(_game.Turbo.IsRunnerBoosted(runner), Is.True);
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(_fixture.Turbo.TapBoostSeconds));
+            Assert.That(_game.Turbo.IsActive, Is.False);
+            Assert.That(_startedCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TapBoostEndsAfterConfiguredTime()
+        {
+            TrackRunner runner = SendVehicle(0, FirstRank);
+            _game.Turbo.BoostRunner(runner);
+
+            _game.Turbo.Advance(_fixture.Turbo.TapBoostSeconds);
+
+            Assert.That(_game.Turbo.IsRunnerBoosted(runner), Is.False);
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void TapBoostSpeedsUpOnlyItsTimeInStep()
+        {
+            TrackRunner runner = SendVehicle(0, FirstRank);
+            _game.Turbo.BoostRunner(runner);
+
+            float runnerSeconds = _game.Turbo.CalculateRunnerSeconds(runner, StepAcrossEffectEndSeconds);
+
+            float expectedSeconds = StepAcrossEffectEndSeconds + _fixture.Turbo.TapBoostSeconds * (_fixture.Turbo.SpeedMultiplier - 1f);
+            Assert.That(runnerSeconds, Is.EqualTo(expectedSeconds));
+        }
+
+        [Test]
+        public void TickerDrivesOnlyTappedRunnerFaster()
+        {
+            TrackRunner tappedRunner = SendVehicle(0, FirstRank);
+            TrackRunner otherRunner = SendVehicle(1, FirstRank);
+            float tappedStart = tappedRunner.Distance;
+            float otherStart = otherRunner.Distance;
+            _game.Turbo.BoostRunner(tappedRunner);
+            _time.DeltaTime = _fixture.Turbo.TapBoostSeconds;
+
+            _ticker.Tick();
+
+            float plainDistance = tappedRunner.Vehicle.Definition.TrackSpeed * _fixture.Turbo.TapBoostSeconds;
+            float boostedDistance = plainDistance * _fixture.Turbo.SpeedMultiplier;
+            Assert.That(tappedRunner.Distance - tappedStart, Is.EqualTo(boostedDistance).Within(DistanceTolerance));
+            Assert.That(otherRunner.Distance - otherStart, Is.EqualTo(plainDistance).Within(DistanceTolerance));
+            Assert.That(_game.Turbo.IsRunnerBoosted(tappedRunner), Is.False);
+        }
+
+        [Test]
+        public void RepeatedTapRestartsBoost()
+        {
+            TrackRunner runner = SendVehicle(0, FirstRank);
+            _game.Turbo.BoostRunner(runner);
+            _game.Turbo.Advance(_fixture.Turbo.TapBoostSeconds * HalfTapBoostShare);
+
+            _game.Turbo.BoostRunner(runner);
+
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(_fixture.Turbo.TapBoostSeconds));
+        }
+
+        [Test]
+        public void TapBoostDoesNotStackWithTurbo()
+        {
+            TrackRunner runner = PrepareUnlockedTrack();
+            _game.Turbo.StartTurbo();
+            _game.Turbo.BoostRunner(runner);
+
+            float runnerSeconds = _game.Turbo.CalculateRunnerSeconds(runner, TickSeconds);
+
+            Assert.That(runnerSeconds, Is.EqualTo(TickSeconds * _fixture.Turbo.SpeedMultiplier));
+        }
+
+        [Test]
+        public void ReturnedRunnerCannotBeBoosted()
+        {
+            TrackRunner runner = SendVehicle(0, FirstRank);
+            _game.Roster.ReturnFromTrack(0);
+
+            CommandResult result = _game.Turbo.BoostRunner(runner);
+
+            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NotOnTrack));
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void PausedTickerKeepsTapBoost()
+        {
+            TrackRunner runner = SendVehicle(0, FirstRank);
+            _game.Turbo.BoostRunner(runner);
+            _time.DeltaTime = 0f;
+
+            TickPaused();
+
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(_fixture.Turbo.TapBoostSeconds));
+        }
+
+        [Test]
+        public void MissingRunnerIsRejected()
+        {
+            Assert.Throws<ArgumentNullException>(() => _game.Turbo.BoostRunner(null));
+            Assert.Throws<ArgumentNullException>(() => _game.Turbo.IsRunnerBoosted(null));
+            Assert.Throws<ArgumentNullException>(() => _game.Turbo.CalculateRunnerSeconds(null, TickSeconds));
         }
 
         [Test]
         public void TickerDrivesRunnersFasterDuringTurbo()
         {
-            PrepareUnlockedTrack();
-            TrackRunner runner = _game.Roster.Runners[0];
+            TrackRunner runner = PrepareUnlockedTrack();
             float startDistance = runner.Distance;
             _game.Turbo.StartTurbo();
             _time.DeltaTime = TickSeconds;
@@ -222,14 +349,23 @@ namespace _Project.Tests.EditMode.Turbo
         [TestCase(float.NaN)]
         public void BrokenDeltaTimeIsRejected(float deltaTime)
         {
+            TrackRunner runner = PrepareUnlockedTrack();
+
             Assert.Throws<ArgumentOutOfRangeException>(() => _game.Turbo.Advance(deltaTime));
-            Assert.Throws<ArgumentOutOfRangeException>(() => _game.Turbo.CalculateTrackSeconds(deltaTime));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _game.Turbo.CalculateRunnerSeconds(runner, deltaTime));
         }
 
-        private void PrepareUnlockedTrack()
+        private TrackRunner PrepareUnlockedTrack()
         {
-            _game.PlaceVehicle(0, _fixture.Turbo.UnlockRank);
-            _game.Roster.SendToTrack(0);
+            return SendVehicle(0, _fixture.Turbo.UnlockRank);
+        }
+
+        private TrackRunner SendVehicle(int slot, int rank)
+        {
+            _game.PlaceVehicle(slot, rank);
+            _game.Roster.SendToTrack(slot);
+
+            return _game.Roster.Runners[_game.Roster.Count - 1];
         }
 
         private void TickPaused()

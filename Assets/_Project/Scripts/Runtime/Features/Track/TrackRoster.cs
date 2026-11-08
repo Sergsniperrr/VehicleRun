@@ -101,24 +101,34 @@ namespace _Project.Features.Track
             AddRunner(slot, vehicle, distance % _track.LapLength);
         }
 
+        public bool HasRunner(TrackRunner runner)
+        {
+            return _runners.Contains(runner);
+        }
+
         public void Advance(float deltaTime)
         {
-            if (float.IsNaN(deltaTime) || deltaTime < 0)
+            ValidateDeltaTime(deltaTime);
+
+            for (int i = 0; i < _runners.Count; i++)
             {
-                throw new ArgumentOutOfRangeException(nameof(deltaTime));
+                Drive(_runners[i], deltaTime);
+            }
+        }
+
+        public void Advance(float deltaTime, IRunnerTimeScale timeScale)
+        {
+            if (timeScale == null)
+            {
+                throw new ArgumentNullException(nameof(timeScale));
             }
 
-            float lapLength = _track.LapLength;
+            ValidateDeltaTime(deltaTime);
 
             for (int i = 0; i < _runners.Count; i++)
             {
                 TrackRunner runner = _runners[i];
-                int crossings = runner.Drive(runner.Vehicle.Definition.TrackSpeed * deltaTime, lapLength);
-
-                if (crossings > 0)
-                {
-                    PayForLaps(runner, crossings);
-                }
+                Drive(runner, timeScale.CalculateRunnerSeconds(runner, deltaTime));
             }
         }
 
@@ -167,6 +177,24 @@ namespace _Project.Features.Track
             _garage.MarkInGarage(runner.Slot);
             _runners.Remove(runner);
             VehicleReturned?.Invoke(runner);
+        }
+
+        private void Drive(TrackRunner runner, float seconds)
+        {
+            int crossings = runner.Drive(runner.Vehicle.Definition.TrackSpeed * seconds, _track.LapLength);
+
+            if (crossings > 0)
+            {
+                PayForLaps(runner, crossings);
+            }
+        }
+
+        private void ValidateDeltaTime(float deltaTime)
+        {
+            if (float.IsNaN(deltaTime) || deltaTime < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(deltaTime));
+            }
         }
 
         private void PayForLaps(TrackRunner runner, int crossings)

@@ -20,6 +20,7 @@ namespace _Project.Features.Track
         public int Slot { get; }
         public Vehicle Vehicle { get; }
         public float Distance { get; private set; }
+        public float TapBoostRemainingSeconds { get; private set; }
 
         internal int Drive(float distance, float lapLength)
         {
@@ -28,6 +29,16 @@ namespace _Project.Features.Track
             Distance = Math.Max(0f, total - crossings * lapLength);
 
             return crossings;
+        }
+
+        internal void StartTapBoost(float seconds)
+        {
+            TapBoostRemainingSeconds = seconds;
+        }
+
+        internal void AdvanceTapBoost(float deltaTime)
+        {
+            TapBoostRemainingSeconds = Math.Max(0f, TapBoostRemainingSeconds - deltaTime);
         }
     }
 }

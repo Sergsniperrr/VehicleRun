@@ -16,3 +16,4 @@ MonoBehaviour:
   _speedMultiplier: 2
   _freeDurationSeconds: 30
   _freeCooldownSeconds: 180
+  _tapBoostSeconds: 2

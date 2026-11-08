@@ -1,14 +1,18 @@
 using System;
 using _Project.Features.Vehicles;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace _Project.Features.Track
 {
-    public class TrackVehicleView : MonoBehaviour
+    public class TrackVehicleView : MonoBehaviour, IPointerDownHandler
     {
         private const float SpriteForwardAngle = 90f;
 
         [SerializeField] private SpriteRenderer _body;
+        [SerializeField] private TrailRenderer _boostTrail;
+
+        public event Action<TrackVehicleView> Tapped;
 
         public void Show(Vehicle vehicle)
         {
@@ -23,6 +27,8 @@ namespace _Project.Features.Track
 
         public void Hide()
         {
+            ShowBoost(false);
+            _boostTrail.Clear();
             gameObject.SetActive(false);
         }
 
@@ -31,6 +37,21 @@ namespace _Project.Features.Track
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - SpriteForwardAngle;
             transform.localPosition = point;
             transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+        }
+
+        public void ShowBoost(bool isBoosted)
+        {
+            _boostTrail.emitting = isBoosted;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (eventData.button != PointerEventData.InputButton.Left)
+            {
+                return;
+            }
+
+            Tapped?.Invoke(this);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using _Project.Core.Turbo;
 using _Project.Features.Commands;
 using _Project.Features.Progression;
@@ -6,7 +7,7 @@ using _Project.Features.Track;
 
 namespace _Project.Features.Turbo
 {
-    public class TurboService
+    public class TurboService : IRunnerTimeScale
     {
         private readonly TurboConfig _config;
         private readonly RankProgress _progress;
@@ -51,11 +52,45 @@ namespace _Project.Features.Turbo
             return new CommandResult(FailureReason.None);
         }
 
-        public float CalculateTrackSeconds(float deltaTime)
+        public CommandResult BoostRunner(TrackRunner runner)
         {
+            if (runner == null)
+            {
+                throw new ArgumentNullException(nameof(runner));
+            }
+
+            if (_roster.HasRunner(runner) == false)
+            {
+                return new CommandResult(FailureReason.NotOnTrack);
+            }
+
+            runner.StartTapBoost(_config.TapBoostSeconds);
+
+            return new CommandResult(FailureReason.None);
+        }
+
+        public bool IsRunnerBoosted(TrackRunner runner)
+        {
+            if (runner == null)
+            {
+                throw new ArgumentNullException(nameof(runner));
+            }
+
+            return IsActive || runner.TapBoostRemainingSeconds > 0;
+        }
+
+        public float CalculateRunnerSeconds(TrackRunner runner, float deltaTime)
+        {
+            if (runner == null)
+            {
+                throw new ArgumentNullException(nameof(runner));
+            }
+
             ValidateDeltaTime(deltaTime);
 
-            float boostedSeconds = Math.Min(deltaTime, RemainingSeconds);
+            float turboSeconds = Math.Min(deltaTime, RemainingSeconds);
+            float tapBoostSeconds = Math.Min(deltaTime, runner.TapBoostRemainingSeconds);
+            float boostedSeconds = Math.Max(turboSeconds, tapBoostSeconds);
 
             return deltaTime + boostedSeconds * (_config.SpeedMultiplier - 1f);
         }
@@ -63,6 +98,7 @@ namespace _Project.Features.Turbo
         public void Advance(float deltaTime)
         {
             ValidateDeltaTime(deltaTime);
+            AdvanceTapBoosts(deltaTime);
 
             if (IsActive)
             {
@@ -113,6 +149,16 @@ namespace _Project.Features.Turbo
             }
 
             return FailureReason.None;
+        }
+
+        private void AdvanceTapBoosts(float deltaTime)
+        {
+            IReadOnlyList<TrackRunner> runners = _roster.Runners;
+
+            for (int i = 0; i < runners.Count; i++)
+            {
+                runners[i].AdvanceTapBoost(deltaTime);
+            }
         }
 
         private void AdvanceEffect(float deltaTime)

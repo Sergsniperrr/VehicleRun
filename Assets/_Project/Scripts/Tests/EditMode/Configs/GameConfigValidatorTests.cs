@@ -81,6 +81,15 @@ namespace _Project.Tests.EditMode.Configs
             AssertReportedBy(_fixture.Turbo);
         }
 
+        [TestCase(0f)]
+        [TestCase(-1f)]
+        public void TapBoostNotAboveZeroIsReported(float boostSeconds)
+        {
+            _fixture.Change(_fixture.Turbo, "_tapBoostSeconds", property => property.floatValue = boostSeconds);
+
+            AssertReportedBy(_fixture.Turbo);
+        }
+
         [Test]
         public void RankGapIsReported()
         {

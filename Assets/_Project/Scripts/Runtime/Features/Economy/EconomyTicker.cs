@@ -25,9 +25,8 @@ namespace _Project.Features.Economy
         public void Tick()
         {
             float deltaTime = _time.DeltaTime;
-            float trackSeconds = _turbo.CalculateTrackSeconds(deltaTime);
 
-            _roster.Advance(trackSeconds);
+            _roster.Advance(deltaTime, _turbo);
             _turbo.Advance(deltaTime);
             _delivery.Advance(deltaTime);
         }

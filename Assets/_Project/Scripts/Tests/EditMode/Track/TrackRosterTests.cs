@@ -171,6 +171,26 @@ namespace _Project.Tests.EditMode.Track
         }
 
         [Test]
+        public void MissingTimeScaleIsRejected()
+        {
+            Assert.Throws<ArgumentNullException>(() => _roster.Advance(1, null));
+        }
+
+        [Test]
+        public void ReturnedRunnerLeavesRoster()
+        {
+            PlaceVehicle(0, 1);
+            _roster.SendToTrack(0);
+            TrackRunner runner = _roster.Runners[0];
+
+            Assert.That(_roster.HasRunner(runner), Is.True);
+
+            _roster.ReturnFromTrack(0);
+
+            Assert.That(_roster.HasRunner(runner), Is.False);
+        }
+
+        [Test]
         public void BestLineupKeepsRunnersOnIncomeTie()
         {
             PlaceVehicle(0, 1);

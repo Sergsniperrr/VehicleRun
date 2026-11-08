@@ -65,9 +65,7 @@ namespace _Project.Editor.Balance
                 throw new ArgumentOutOfRangeException(nameof(deltaTime));
             }
 
-            float trackSeconds = Turbo.CalculateTrackSeconds(deltaTime);
-
-            Roster.Advance(trackSeconds);
+            Roster.Advance(deltaTime, Turbo);
             Turbo.Advance(deltaTime);
             Delivery.Advance(deltaTime);
             ActiveSeconds += deltaTime;
