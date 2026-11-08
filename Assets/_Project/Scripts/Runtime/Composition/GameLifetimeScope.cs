@@ -10,6 +10,7 @@ using _Project.Features.Save;
 using _Project.Features.Session;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.UI.Boxes;
 using _Project.UI.Windows;
 using UnityEngine;
 using VContainer;
@@ -92,6 +93,7 @@ namespace _Project.Composition
             }
 
             builder.Register<CoinsFormatter>(Lifetime.Singleton);
+            builder.Register<BoxPurchaseFailureText>(Lifetime.Singleton);
             builder.Register<WindowQueue>(Lifetime.Singleton).AsSelf().As<IFieldInputBlocker>();
             builder.RegisterEntryPoint<WindowGameplayReporter>();
             builder.RegisterInstance(_recycleConfirmWindow).As<IRecycleConfirmation>();

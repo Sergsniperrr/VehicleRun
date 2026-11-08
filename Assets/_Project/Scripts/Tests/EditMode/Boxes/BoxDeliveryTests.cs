@@ -31,7 +31,7 @@ namespace _Project.Tests.EditMode.Boxes
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
             _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
             _wallet = new Wallet(_fixture.Economy);
-            _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles, _fixture.Track, _progress);
+            _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles);
             _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds);
         }
 
@@ -112,6 +112,7 @@ namespace _Project.Tests.EditMode.Boxes
         [Test]
         public void BoughtBoxCostsPriceAndRaisesNextPrice()
         {
+            _wallet.Add(100);
             long startCoins = _wallet.Coins;
             PlaceVehicle(0, 1);
             PlaceVehicle(1, 1);
@@ -119,12 +120,12 @@ namespace _Project.Tests.EditMode.Boxes
             CommandResult result = _delivery.BuyBox();
 
             Assert.That(result.IsSuccess, Is.True);
-            Assert.That(_wallet.Coins, Is.EqualTo(startCoins - 20));
+            Assert.That(_wallet.Coins, Is.EqualTo(startCoins - 80));
             Assert.That(_garage.TryGetBox(2, out Box box), Is.True);
             Assert.That(box.Source, Is.EqualTo(BoxSource.Purchased));
             Assert.That(box.Rank, Is.EqualTo(1));
             Assert.That(_pricing.GetPurchaseCount(1), Is.EqualTo(1));
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(21));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(86));
         }
 
         [Test]
@@ -158,12 +159,14 @@ namespace _Project.Tests.EditMode.Boxes
         [Test]
         public void MissingCoinsIsPriceMinusCoins()
         {
+            _wallet.Add(100);
+
             Assert.That(_delivery.MissingCoins, Is.EqualTo(0));
 
             _wallet.TrySpend(_wallet.Coins - 5);
 
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(20));
-            Assert.That(_delivery.MissingCoins, Is.EqualTo(15));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(80));
+            Assert.That(_delivery.MissingCoins, Is.EqualTo(75));
         }
 
         [Test]
@@ -206,22 +209,89 @@ namespace _Project.Tests.EditMode.Boxes
 
             Assert.That(CountBoxes(), Is.EqualTo(1));
             Assert.That(_pricing.GetPurchaseCount(1), Is.EqualTo(0));
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(20));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(80));
         }
 
         [Test]
-        public void BoxAtMaxRankTenIsRankFiveForTwentyThreeThousandCoins()
+        public void BoxAtMaxRankTenIsRankFiveForFortyThreeThousandCoins()
         {
             UnlockRanksUpTo(10);
-            _wallet.Add(30000);
+            _wallet.Add(50000);
             long coins = _wallet.Coins;
 
             CommandResult result = _delivery.BuyBox();
 
             Assert.That(result.IsSuccess, Is.True);
-            Assert.That(_wallet.Coins, Is.EqualTo(coins - 23181));
+            Assert.That(_wallet.Coins, Is.EqualTo(coins - 43000));
             Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
             Assert.That(box.Rank, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void LowerRankBoxCostsItsPriceAndRaisesOnlyItsPrice()
+        {
+            UnlockRanksUpTo(10);
+            _wallet.Add(10000);
+            long coins = _wallet.Coins;
+
+            CommandResult result = _delivery.BuyBox(3);
+
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(_wallet.Coins, Is.EqualTo(coins - 5700));
+            Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
+            Assert.That(box.Rank, Is.EqualTo(3));
+            Assert.That(box.Source, Is.EqualTo(BoxSource.Purchased));
+            Assert.That(_delivery.GetPrice(3), Is.EqualTo(6698));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(43000));
+        }
+
+        [Test]
+        public void RankAboveBoxRankIsNotSold()
+        {
+            UnlockRanksUpTo(10);
+            _wallet.Add(1000000);
+            long coins = _wallet.Coins;
+
+            CommandResult result = _delivery.BuyBox(6);
+
+            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.BoxRankLocked));
+            Assert.That(_wallet.Coins, Is.EqualTo(coins));
+            Assert.That(CountBoxes(), Is.EqualTo(0));
+            Assert.That(_pricing.GetPurchaseCount(6), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void RanksUpToBoxRankAreForSale()
+        {
+            UnlockRanksUpTo(10);
+
+            Assert.That(_delivery.IsRankForSale(1), Is.True);
+            Assert.That(_delivery.IsRankForSale(5), Is.True);
+            Assert.That(_delivery.IsRankForSale(6), Is.False);
+            Assert.That(_delivery.IsRankForSale(_fixture.Vehicles.MaxRank), Is.False);
+        }
+
+        [Test]
+        public void MissingCoinsForRankUseThatRankPrice()
+        {
+            UnlockRanksUpTo(10);
+            _wallet.TrySpend(_wallet.Coins);
+            _wallet.Add(1000);
+
+            Assert.That(_delivery.GetMissingCoins(1), Is.EqualTo(0));
+            Assert.That(_delivery.GetMissingCoins(2), Is.EqualTo(200));
+            Assert.That(_delivery.GetMissingCoins(5), Is.EqualTo(42000));
+        }
+
+        [Test]
+        public void RankOutsideCatalogThrows()
+        {
+            int outsideRank = _fixture.Vehicles.MaxRank + 1;
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.BuyBox(0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.BuyBox(outsideRank));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.IsRankForSale(0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.IsRankForSale(outsideRank));
         }
 
         [Test]

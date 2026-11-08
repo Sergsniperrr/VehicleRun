@@ -23,7 +23,7 @@ namespace _Project.Tests.EditMode.Save
             Garage = new GarageBoard(fixture.Garage, fixture.Vehicles, InstanceIds);
             Progress = new RankProgress(fixture.Vehicles, fixture.Economy, fixture.Track, Garage);
             Wallet = new Wallet(fixture.Economy);
-            Pricing = new BoxPricing(fixture.Economy, fixture.Vehicles, fixture.Track, Progress);
+            Pricing = new BoxPricing(fixture.Economy, fixture.Vehicles);
             Delivery = new BoxDelivery(fixture.Economy, fixture.Vehicles, Garage, Progress, Wallet, Pricing, InstanceIds);
             Roster = new TrackRoster(Garage, Progress, fixture.Track, Wallet);
             Turbo = new TurboService(fixture.Turbo, Progress, Roster);

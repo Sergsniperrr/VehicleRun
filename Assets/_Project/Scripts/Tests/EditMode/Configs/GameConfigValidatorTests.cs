@@ -163,6 +163,31 @@ namespace _Project.Tests.EditMode.Configs
         }
 
         [Test]
+        public void BoxBasePriceCountDifferentFromRanksIsReported()
+        {
+            _fixture.Change(_fixture.Economy, "_boxBasePrices", property => property.arraySize = _fixture.Vehicles.MaxRank - 1);
+
+            AssertReportedBy(_fixture.Economy);
+        }
+
+        [TestCase(0)]
+        [TestCase(-1)]
+        public void BoxBasePriceNotAboveZeroIsReported(long price)
+        {
+            _fixture.Change(_fixture.Economy, "_boxBasePrices.Array.data[0]", property => property.longValue = price);
+
+            AssertReportedBy(_fixture.Economy);
+        }
+
+        [Test]
+        public void BoxBasePriceBelowPreviousRankIsReported()
+        {
+            _fixture.Change(_fixture.Economy, "_boxBasePrices.Array.data[2]", property => property.longValue = 1000);
+
+            AssertReportedBy(_fixture.Economy);
+        }
+
+        [Test]
         public void StartVehiclesBeyondOpenSlotsAreReported()
         {
             _fixture.Change(_fixture.Economy, "_startVehicleCount", property => property.intValue = 7);

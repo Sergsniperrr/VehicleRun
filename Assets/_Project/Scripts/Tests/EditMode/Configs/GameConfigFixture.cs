@@ -16,6 +16,7 @@ namespace _Project.Tests.EditMode.Configs
     public class GameConfigFixture : IDisposable
     {
         private static readonly long[] CoinsPerLap = { 4, 8, 17, 37, 77, 163, 346, 733, 1554, 3301, 7020, 14946 };
+        private static readonly long[] BoxBasePrices = { 80, 1200, 5700, 16000, 43000, 110000, 290000, 770000, 1900000, 5000000, 14000000, 33000000 };
         private static readonly float[] TrackSpeeds = { 3.965f, 4.361f, 4.515f, 4.564f, 4.825f, 5.014f, 5.197f, 5.397f, 5.6f, 5.8f, 6f, 6.2f };
         private static readonly (int Rank, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
         private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
@@ -25,8 +26,7 @@ namespace _Project.Tests.EditMode.Configs
         private const int StartVehicleRank = 1;
         private const int StartVehicleCount = 2;
         private const int BoxRankLag = 5;
-        private const double BoxBasePriceIncomeSeconds = 48;
-        private const double BoxPriceGrowth = 1.3;
+        private const double BoxPriceGrowth = 1.175;
         private const double FirstRankBoxPriceGrowth = 1.07;
         private const bool IsBoxPriceGrowthLimited = false;
         private const int BoxPriceGrowthPurchaseLimit = 20;
@@ -169,7 +169,7 @@ namespace _Project.Tests.EditMode.Configs
             economy.FindProperty("_startVehicleRank").intValue = StartVehicleRank;
             economy.FindProperty("_startVehicleCount").intValue = StartVehicleCount;
             economy.FindProperty("_boxRankLag").intValue = BoxRankLag;
-            economy.FindProperty("_boxBasePriceIncomeSeconds").doubleValue = BoxBasePriceIncomeSeconds;
+            FillBoxBasePrices(economy.FindProperty("_boxBasePrices"));
             economy.FindProperty("_boxPriceGrowth").doubleValue = BoxPriceGrowth;
             economy.FindProperty("_firstRankBoxPriceGrowth").doubleValue = FirstRankBoxPriceGrowth;
             economy.FindProperty("_isBoxPriceGrowthLimited").boolValue = IsBoxPriceGrowthLimited;
@@ -179,6 +179,16 @@ namespace _Project.Tests.EditMode.Configs
             economy.FindProperty("_offlineMaxAwaySeconds").floatValue = OfflineMaxAwaySeconds;
             economy.FindProperty("_offlineIncomeRate").doubleValue = OfflineIncomeRate;
             economy.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private void FillBoxBasePrices(SerializedProperty pricesProperty)
+        {
+            pricesProperty.arraySize = BoxBasePrices.Length;
+
+            for (int i = 0; i < BoxBasePrices.Length; i++)
+            {
+                pricesProperty.GetArrayElementAtIndex(i).longValue = BoxBasePrices[i];
+            }
         }
 
         private void FillGarage()

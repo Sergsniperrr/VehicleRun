@@ -11,6 +11,8 @@ namespace _Project.Features.Boxes
 {
     public class BoxDelivery
     {
+        private const int FirstRank = 1;
+
         private readonly EconomyConfig _economy;
         private readonly VehicleCatalogConfig _catalog;
         private readonly GarageBoard _garage;
@@ -42,7 +44,7 @@ namespace _Project.Features.Boxes
         public float FreeBoxProgress => 1f - FreeBoxRemainingSeconds / _economy.FreeBoxIntervalSeconds;
         public bool HasReadyDelivery { get; private set; }
         public long BoxPrice => _pricing.GetPrice(_progress.BoxRank);
-        public long MissingCoins => Math.Max(0, BoxPrice - _wallet.Coins);
+        public long MissingCoins => GetMissingCoins(_progress.BoxRank);
 
         public void Advance(float deltaTime)
         {
@@ -69,8 +71,38 @@ namespace _Project.Features.Boxes
             DeliverReadyBox();
         }
 
+        public long GetPrice(int rank)
+        {
+            return _pricing.GetPrice(rank);
+        }
+
+        public long GetMissingCoins(int rank)
+        {
+            return Math.Max(0, _pricing.GetPrice(rank) - _wallet.Coins);
+        }
+
+        public bool IsRankForSale(int rank)
+        {
+            if (rank < FirstRank || rank > _catalog.MaxRank)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rank));
+            }
+
+            return rank <= _progress.BoxRank;
+        }
+
         public CommandResult BuyBox()
         {
+            return BuyBox(_progress.BoxRank);
+        }
+
+        public CommandResult BuyBox(int rank)
+        {
+            if (IsRankForSale(rank) == false)
+            {
+                return new CommandResult(FailureReason.BoxRankLocked);
+            }
+
             if (HasReadyDelivery)
             {
                 DeliverReadyBox();
@@ -81,15 +113,13 @@ namespace _Project.Features.Boxes
                 return new CommandResult(FailureReason.NoFreeSlot);
             }
 
-            int rank = _progress.BoxRank;
-
             if (_wallet.TrySpend(_pricing.GetPrice(rank)) == false)
             {
                 return new CommandResult(FailureReason.NotEnoughCoins);
             }
 
             _pricing.RecordPurchase(rank);
-            PlaceBox(slot, BoxSource.Purchased);
+            PlaceBox(slot, BoxSource.Purchased, rank);
 
             return new CommandResult(FailureReason.None);
         }
@@ -114,12 +144,12 @@ namespace _Project.Features.Boxes
 
             HasReadyDelivery = false;
             FreeBoxRemainingSeconds = _economy.FreeBoxIntervalSeconds;
-            PlaceBox(slot, BoxSource.Free);
+            PlaceBox(slot, BoxSource.Free, _progress.BoxRank);
         }
 
-        private void PlaceBox(int slot, BoxSource source)
+        private void PlaceBox(int slot, BoxSource source, int rank)
         {
-            VehicleDefinition content = _catalog.GetByRank(_progress.BoxRank);
+            VehicleDefinition content = _catalog.GetByRank(rank);
             _garage.PlaceBox(slot, new Box(_instanceIds.Create(), source, content));
         }
     }

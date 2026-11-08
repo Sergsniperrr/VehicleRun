@@ -22,5 +22,6 @@ namespace _Project.Features.Commands
         TurboActive,
         TurboCooldown,
         TrackEmpty,
+        BoxRankLocked,
     }
 }

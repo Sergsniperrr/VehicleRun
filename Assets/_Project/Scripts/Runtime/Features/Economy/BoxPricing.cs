@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using _Project.Core.Economy;
-using _Project.Core.Track;
 using _Project.Core.Vehicles;
-using _Project.Features.Progression;
 
 namespace _Project.Features.Economy
 {
@@ -11,19 +9,16 @@ namespace _Project.Features.Economy
     {
         private const double MaxPrice = long.MaxValue;
         private const int FirstRank = 1;
+        private const double RoundingTolerance = 1e-9;
 
         private readonly EconomyConfig _economy;
         private readonly VehicleCatalogConfig _catalog;
-        private readonly TrackConfig _track;
-        private readonly RankProgress _progress;
         private readonly int[] _purchasesByRank;
 
-        public BoxPricing(EconomyConfig economy, VehicleCatalogConfig catalog, TrackConfig track, RankProgress progress)
+        public BoxPricing(EconomyConfig economy, VehicleCatalogConfig catalog)
         {
             _economy = economy ?? throw new ArgumentNullException(nameof(economy));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
-            _track = track ?? throw new ArgumentNullException(nameof(track));
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _purchasesByRank = new int[catalog.MaxRank];
         }
 
@@ -37,7 +32,8 @@ namespace _Project.Features.Economy
         public long GetPrice(int rank)
         {
             double growth = Math.Pow(GetGrowth(rank), CountGrowthSteps(rank));
-            double price = Math.Ceiling(_economy.BoxBasePriceIncomeSeconds * CalculateTopRankIncome() * growth);
+            double rawPrice = _economy.BoxBasePrices[rank - 1] * growth;
+            double price = Math.Ceiling(rawPrice - rawPrice * RoundingTolerance);
 
             if (price >= MaxPrice)
             {
@@ -76,13 +72,6 @@ namespace _Project.Features.Economy
             }
         }
 
-        private double CalculateTopRankIncome()
-        {
-            int topRank = Math.Max(FirstRank, _progress.MaxRank);
-
-            return _catalog.GetByRank(topRank).CalculateAverageIncome(_track.LapLength);
-        }
-
         private double GetGrowth(int rank)
         {
             if (rank == FirstRank)
@@ -107,7 +96,7 @@ namespace _Project.Features.Economy
 
         private void CheckRank(int rank)
         {
-            if (rank < 1 || rank > _catalog.MaxRank)
+            if (rank < FirstRank || rank > _catalog.MaxRank)
             {
                 throw new ArgumentOutOfRangeException(nameof(rank));
             }

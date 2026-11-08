@@ -8,6 +8,7 @@ namespace _Project.UI.Windows
 {
     public class Window : MonoBehaviour, IWindow
     {
+        private const float PopInStartScale = 0.01f;
         private const float PopInPeakScale = 1.06f;
         private const float PopInRiseSeconds = 0.25f;
         private const float PopInSettleSeconds = 0.18f;
@@ -40,7 +41,7 @@ namespace _Project.UI.Windows
             _windows = windows ?? throw new ArgumentNullException(nameof(windows));
         }
 
-        public void Show()
+        public virtual void Show()
         {
             _root.SetActive(true);
             PlayPopIn();
@@ -71,7 +72,7 @@ namespace _Project.UI.Windows
         private void PlayPopIn()
         {
             _popIn?.Kill();
-            _frame.localScale = Vector3.zero;
+            _frame.localScale = Vector3.one * PopInStartScale;
             _popIn = DOTween.Sequence()
                 .Append(_frame.DOScale(PopInPeakScale, PopInRiseSeconds).SetEase(Ease.OutQuad))
                 .Append(_frame.DOScale(1f, PopInSettleSeconds).SetEase(Ease.InOutQuad))

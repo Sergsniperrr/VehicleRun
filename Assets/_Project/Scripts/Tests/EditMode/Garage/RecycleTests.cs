@@ -34,7 +34,7 @@ namespace _Project.Tests.EditMode.Garage
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
             _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
             _wallet = new Wallet(_fixture.Economy);
-            _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles, _fixture.Track, _progress);
+            _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles);
             _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds);
             _roster = new TrackRoster(_garage, _progress, _fixture.Track, _wallet);
         }

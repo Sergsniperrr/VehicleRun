@@ -33,7 +33,7 @@ namespace _Project.Editor.Balance
             InstanceIdGenerator instanceIds = new InstanceIdGenerator();
             Garage = new GarageBoard(config.Garage, config.Vehicles, instanceIds);
             Progress = new RankProgress(config.Vehicles, economy, config.Track, Garage);
-            BoxPricing pricing = new BoxPricing(economy, config.Vehicles, config.Track, Progress);
+            BoxPricing pricing = new BoxPricing(economy, config.Vehicles);
             Wallet = new Wallet(economy);
             Delivery = new BoxDelivery(economy, config.Vehicles, Garage, Progress, Wallet, pricing, instanceIds);
             Roster = new TrackRoster(Garage, Progress, config.Track, Wallet);

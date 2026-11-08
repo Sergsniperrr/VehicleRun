@@ -183,10 +183,7 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(economy, $"Отставание ранга коробки {economy.BoxRankLag} отрицательное: ранг коробки b = max(1, K − отставание) выйдет за K"));
             }
 
-            if (economy.BoxBasePriceIncomeSeconds <= 0)
-            {
-                errors.Add(new ConfigError(economy, $"Базовая цена коробки {economy.BoxBasePriceIncomeSeconds} секунд дохода, должна быть больше 0"));
-            }
+            ValidateBoxBasePrices(economy, maxRank, errors);
 
             if (economy.BoxPriceGrowth < 1)
             {
@@ -221,6 +218,33 @@ namespace _Project.Core.Configs
             if (economy.OfflineIncomeRate <= 0 || economy.OfflineIncomeRate > 1)
             {
                 errors.Add(new ConfigError(economy, $"Доля офлайн-дохода {economy.OfflineIncomeRate}, должна быть больше 0 и не больше 1"));
+            }
+        }
+
+        private void ValidateBoxBasePrices(EconomyConfig economy, int maxRank, List<ConfigError> errors)
+        {
+            IReadOnlyList<long> prices = economy.BoxBasePrices;
+
+            if (prices.Count != maxRank)
+            {
+                errors.Add(new ConfigError(economy, $"Базовых цен коробок {prices.Count}, а рангов в каталоге {maxRank}"));
+
+                return;
+            }
+
+            for (int i = 0; i < prices.Count; i++)
+            {
+                int rank = i + 1;
+
+                if (prices[i] <= 0)
+                {
+                    errors.Add(new ConfigError(economy, $"Базовая цена коробки ранга {rank} {prices[i]}, должна быть больше 0"));
+                }
+
+                if (i > 0 && prices[i] < prices[i - 1])
+                {
+                    errors.Add(new ConfigError(economy, $"Базовая цена коробки ранга {rank} {prices[i]} меньше цены ранга {rank - 1} {prices[i - 1]}"));
+                }
             }
         }
 

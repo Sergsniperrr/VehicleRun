@@ -1,5 +1,4 @@
 using System;
-using _Project.Core.Localization;
 using _Project.Core.Vehicles;
 using _Project.Features.Boxes;
 using _Project.Features.Commands;
@@ -7,6 +6,7 @@ using _Project.Features.Economy;
 using _Project.Features.Effects;
 using _Project.Features.Garage;
 using _Project.Features.Progression;
+using _Project.UI.Boxes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,9 +16,6 @@ namespace _Project.UI.Hud
 {
     public class BoxButtonView : MonoBehaviour
     {
-        private const string NoFreeSlotKey = "ui.hud.no_free_slot";
-        private const string NotEnoughCoinsKey = "ui.hud.not_enough_coins";
-
         [SerializeField] private Button _button;
         [SerializeField] private Image _icon;
         [SerializeField] private Image _rankBadge;
@@ -32,7 +29,7 @@ namespace _Project.UI.Hud
         private GarageBoard _garage;
         private VehicleCatalogConfig _catalog;
         private CoinsFormatter _formatter;
-        private ILocalizationService _localization;
+        private BoxPurchaseFailureText _failureText;
 
         private void Awake()
         {
@@ -61,14 +58,14 @@ namespace _Project.UI.Hud
             GarageBoard garage,
             VehicleCatalogConfig catalog,
             CoinsFormatter formatter,
-            ILocalizationService localization)
+            BoxPurchaseFailureText failureText)
         {
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
-            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _failureText = failureText ?? throw new ArgumentNullException(nameof(failureText));
         }
 
         private void ShowOffer()
@@ -84,22 +81,8 @@ namespace _Project.UI.Hud
 
         private void ShowFailure(FailureReason reason)
         {
-            string message = CreateFailureMessage(reason);
+            string message = _failureText.Create(reason, _delivery.MissingCoins);
             _failureMessage.Show(message, _failureMessagePosition);
-        }
-
-        private string CreateFailureMessage(FailureReason reason)
-        {
-            switch (reason)
-            {
-                case FailureReason.NoFreeSlot:
-                    return _localization.Get(NoFreeSlotKey);
-                case FailureReason.NotEnoughCoins:
-                    string missingCoins = _formatter.FormatExact(_delivery.MissingCoins);
-                    return string.Format(_localization.Get(NotEnoughCoinsKey), missingCoins);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(reason));
-            }
         }
 
         private void OnButtonClicked()

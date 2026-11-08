@@ -7,6 +7,8 @@ namespace _Project.Editor.Balance
     public class GreedyPlayer
     {
         private const int NoSlot = -1;
+        private const int FirstRank = 1;
+        private const double MergeSize = 2;
 
         private readonly SimulatedGame _game;
         private readonly BalanceScenario _scenario;
@@ -135,14 +137,52 @@ namespace _Project.Editor.Balance
 
         private bool TryBuyBox()
         {
-            if (_scenario.BuysBoxes == false || HasFreeSlot() == false || _game.Delivery.MissingCoins > 0)
+            if (_scenario.BuysBoxes == false || HasFreeSlot() == false)
             {
                 return false;
             }
 
-            _game.Delivery.BuyBox();
+            int rank = ChooseBoxRank();
 
-            return true;
+            if (_game.Delivery.GetMissingCoins(rank) > 0)
+            {
+                return false;
+            }
+
+            return _game.Delivery.BuyBox(rank).IsSuccess;
+        }
+
+        private int ChooseBoxRank()
+        {
+            int boxRank = _game.Progress.BoxRank;
+
+            if (_scenario.BuysCheapestRank == false)
+            {
+                return boxRank;
+            }
+
+            int cheapestRank = boxRank;
+            double cheapestUnitPrice = CalculateUnitPrice(boxRank);
+
+            for (int rank = FirstRank; rank < boxRank; rank++)
+            {
+                double unitPrice = CalculateUnitPrice(rank);
+
+                if (unitPrice < cheapestUnitPrice)
+                {
+                    cheapestRank = rank;
+                    cheapestUnitPrice = unitPrice;
+                }
+            }
+
+            return cheapestRank;
+        }
+
+        private double CalculateUnitPrice(int rank)
+        {
+            double firstRankVehicles = Math.Pow(MergeSize, rank - FirstRank);
+
+            return _game.Delivery.GetPrice(rank) / firstRankVehicles;
         }
 
         private bool TryRecycle()
@@ -164,7 +204,7 @@ namespace _Project.Editor.Balance
 
         private bool IsWaitingForCoins()
         {
-            return _scenario.BuysBoxes && HasFreeSlot() && _game.Delivery.MissingCoins > 0;
+            return _scenario.BuysBoxes && HasFreeSlot() && _game.Delivery.GetMissingCoins(ChooseBoxRank()) > 0;
         }
 
         private bool HasFreeSlot()
