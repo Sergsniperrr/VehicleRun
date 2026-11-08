@@ -9,6 +9,7 @@ using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Session;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 
 namespace _Project.Editor.Balance
 {
@@ -16,8 +17,6 @@ namespace _Project.Editor.Balance
     {
         private readonly EconomyConfig _economy;
         private readonly BalanceSimulationSettings _settings;
-        private float _turboRemainingSeconds;
-        private float _turboCooldownRemainingSeconds;
 
         public SimulatedGame(GameConfig config, EconomyConfig economy, BalanceSimulationSettings settings)
         {
@@ -38,8 +37,9 @@ namespace _Project.Editor.Balance
             Wallet = new Wallet(economy);
             Delivery = new BoxDelivery(economy, config.Vehicles, Garage, Progress, Wallet, pricing, instanceIds);
             Roster = new TrackRoster(Garage, Progress, config.Track, Wallet);
+            Turbo = new TurboService(config.Turbo, Progress, Roster);
             Gestures = new GarageGestures(Garage, Roster);
-            Income = new IncomeService(Roster, config.Track);
+            Income = new IncomeService(Roster, config.Track, Turbo);
 
             Roster.FinishCrossed += OnFinishCrossed;
             new NewGameSetup(economy, config.Vehicles, Garage, Progress, instanceIds).Apply();
@@ -52,27 +52,11 @@ namespace _Project.Editor.Balance
         public Wallet Wallet { get; }
         public BoxDelivery Delivery { get; }
         public TrackRoster Roster { get; }
+        public TurboService Turbo { get; }
         public GarageGestures Gestures { get; }
         public IncomeService Income { get; }
         public double ActiveSeconds { get; private set; }
-        public bool IsTurboActive => _turboRemainingSeconds > 0;
         public double DecorMultiplier => 1 + _settings.DecorIncomeBonus * CountDecorObjects();
-
-        public bool CanActivateTurbo =>
-            Progress.MaxRank >= _settings.TurboUnlockRank
-            && IsTurboActive == false
-            && _turboCooldownRemainingSeconds <= 0
-            && Roster.Count > 0;
-
-        public void ActivateTurbo()
-        {
-            if (CanActivateTurbo == false)
-            {
-                throw new InvalidOperationException(nameof(CanActivateTurbo));
-            }
-
-            _turboRemainingSeconds = _settings.TurboDurationSeconds;
-        }
 
         public void Advance(float deltaTime)
         {
@@ -81,10 +65,11 @@ namespace _Project.Editor.Balance
                 throw new ArgumentOutOfRangeException(nameof(deltaTime));
             }
 
-            float speedMultiplier = IsTurboActive ? _settings.TurboSpeedMultiplier : 1f;
-            Roster.Advance(deltaTime * speedMultiplier);
+            float trackSeconds = Turbo.CalculateTrackSeconds(deltaTime);
+
+            Roster.Advance(trackSeconds);
+            Turbo.Advance(deltaTime);
             Delivery.Advance(deltaTime);
-            AdvanceTurbo(deltaTime);
             ActiveSeconds += deltaTime;
         }
 
@@ -96,7 +81,7 @@ namespace _Project.Editor.Balance
             }
 
             double countedSeconds = Math.Min(awaySeconds, _economy.OfflineMaxAwaySeconds);
-            double incomePerSecond = DecorMultiplier * Income.CalculateIncomePerSecond();
+            double incomePerSecond = DecorMultiplier * Income.CalculateIncomePerSecondWithoutTurbo();
             double offlineIncome = Math.Floor(countedSeconds * _economy.OfflineIncomeRate * incomePerSecond);
             Wallet.Add(offlineIncome);
 
@@ -107,24 +92,6 @@ namespace _Project.Editor.Balance
         {
             Roster.FinishCrossed -= OnFinishCrossed;
             Progress.Dispose();
-        }
-
-        private void AdvanceTurbo(float deltaTime)
-        {
-            if (IsTurboActive)
-            {
-                _turboRemainingSeconds -= deltaTime;
-
-                if (IsTurboActive == false)
-                {
-                    _turboRemainingSeconds = 0;
-                    _turboCooldownRemainingSeconds = _settings.TurboCooldownSeconds;
-                }
-
-                return;
-            }
-
-            _turboCooldownRemainingSeconds = Math.Max(0, _turboCooldownRemainingSeconds - deltaTime);
         }
 
         private int CountDecorObjects()

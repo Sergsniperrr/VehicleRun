@@ -16,6 +16,8 @@ namespace _Project.Core.Save
         public int[] BoxPurchaseCounts;
         public float FreeBoxRemainingSeconds;
         public bool HasReadyDelivery;
+        public float TurboRemainingSeconds;
+        public float TurboCooldownRemainingSeconds;
         public VehicleSave[] Vehicles;
         public BoxSave[] Boxes;
         public TrackRunnerSave[] TrackRunners;

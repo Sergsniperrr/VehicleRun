@@ -18,5 +18,9 @@ namespace _Project.Features.Commands
         NotOnTrack,
         TrackFull,
         SlotEmpty,
+        TurboLocked,
+        TurboActive,
+        TurboCooldown,
+        TrackEmpty,
     }
 }

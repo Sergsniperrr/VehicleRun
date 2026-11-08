@@ -25,7 +25,7 @@ namespace _Project.Tests.EditMode.Save
             _game = new SaveTestGame(_fixture);
             _storage = new FakeProgressStorage();
             _time = new FakeTimeService { DeltaTime = FrameSeconds };
-            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _time);
+            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, _time);
         }
 
         [TearDown]
@@ -92,6 +92,20 @@ namespace _Project.Tests.EditMode.Save
 
             _game.Garage.Recycle(3);
             AssertWrittenAfterTick(9);
+        }
+
+        [Test]
+        public void TurboStartIsWrittenAsImportant()
+        {
+            _scheduler.StartWriting();
+            _game.PlaceVehicle(0, _fixture.Turbo.UnlockRank);
+            _game.Roster.SendToTrack(0);
+            AssertWrittenAfterTick(1);
+
+            _game.Turbo.StartTurbo();
+
+            AssertWrittenAfterTick(2);
+            Assert.That(_storage.State.TurboRemainingSeconds, Is.EqualTo(_fixture.Turbo.FreeDurationSeconds));
         }
 
         [Test]

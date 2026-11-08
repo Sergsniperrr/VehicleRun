@@ -6,6 +6,7 @@ using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
 using _Project.Tests.EditMode.Configs;
 
@@ -25,8 +26,9 @@ namespace _Project.Tests.EditMode.Save
             Pricing = new BoxPricing(fixture.Economy, fixture.Vehicles, fixture.Track, Progress);
             Delivery = new BoxDelivery(fixture.Economy, fixture.Vehicles, Garage, Progress, Wallet, Pricing, InstanceIds);
             Roster = new TrackRoster(Garage, Progress, fixture.Track, Wallet);
-            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster);
-            Restorer = new GameStateRestorer(fixture.Vehicles, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster);
+            Turbo = new TurboService(fixture.Turbo, Progress, Roster);
+            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo);
+            Restorer = new GameStateRestorer(fixture.Vehicles, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo);
         }
 
         public InstanceIdGenerator InstanceIds { get; }
@@ -36,6 +38,7 @@ namespace _Project.Tests.EditMode.Save
         public BoxPricing Pricing { get; }
         public BoxDelivery Delivery { get; }
         public TrackRoster Roster { get; }
+        public TurboService Turbo { get; }
         public GameSaveFactory Factory { get; }
         public GameStateRestorer Restorer { get; }
 

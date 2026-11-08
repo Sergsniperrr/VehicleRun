@@ -7,6 +7,7 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
 
 namespace _Project.Features.Save
@@ -21,6 +22,7 @@ namespace _Project.Features.Save
         private readonly BoxPricing _pricing;
         private readonly BoxDelivery _delivery;
         private readonly TrackRoster _roster;
+        private readonly TurboService _turbo;
 
         public GameStateRestorer(
             VehicleCatalogConfig catalog,
@@ -30,7 +32,8 @@ namespace _Project.Features.Save
             Wallet wallet,
             BoxPricing pricing,
             BoxDelivery delivery,
-            TrackRoster roster)
+            TrackRoster roster,
+            TurboService turbo)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -40,6 +43,7 @@ namespace _Project.Features.Save
             _pricing = pricing ?? throw new ArgumentNullException(nameof(pricing));
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
+            _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
         }
 
         public void Restore(GameSave save)
@@ -70,6 +74,7 @@ namespace _Project.Features.Save
             _wallet.Restore(save.Coins, save.CoinsRemainder);
             _pricing.RestorePurchaseCounts(save.BoxPurchaseCounts);
             _delivery.Restore(save.FreeBoxRemainingSeconds, save.HasReadyDelivery);
+            _turbo.Restore(save.TurboRemainingSeconds, save.TurboCooldownRemainingSeconds);
         }
 
         private VehicleDefinition GetDefinition(string vehicleId)

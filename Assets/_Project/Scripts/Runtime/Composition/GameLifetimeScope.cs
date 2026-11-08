@@ -9,6 +9,7 @@ using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Session;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.UI.Windows;
 using UnityEngine;
 using VContainer;
@@ -56,6 +57,7 @@ namespace _Project.Composition
             builder.Register<BoxDelivery>(Lifetime.Singleton);
             builder.Register<TrackPath>(Lifetime.Singleton);
             builder.Register<TrackRoster>(Lifetime.Singleton);
+            builder.Register<TurboService>(Lifetime.Singleton);
             builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();

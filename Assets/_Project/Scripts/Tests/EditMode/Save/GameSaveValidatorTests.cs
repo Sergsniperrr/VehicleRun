@@ -84,6 +84,17 @@ namespace _Project.Tests.EditMode.Save
         }
 
         [Test]
+        public void BrokenTurboTimersAreInvalid()
+        {
+            AssertInvalid(save => save.TurboRemainingSeconds = -1);
+            AssertInvalid(save => save.TurboRemainingSeconds = float.NaN);
+            AssertInvalid(save => save.TurboRemainingSeconds = float.PositiveInfinity);
+            AssertInvalid(save => save.TurboCooldownRemainingSeconds = -1);
+            AssertInvalid(save => save.TurboCooldownRemainingSeconds = float.NaN);
+            AssertInvalid(save => save.TurboCooldownRemainingSeconds = float.PositiveInfinity);
+        }
+
+        [Test]
         public void BrokenRanksAreInvalid()
         {
             AssertInvalid(save => save.UnlockedRanks = Array.Empty<int>());

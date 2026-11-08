@@ -4,6 +4,7 @@ using _Project.Core.Time;
 using _Project.Features.Boxes;
 using _Project.Features.Garage;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
 using VContainer.Unity;
 
@@ -17,18 +18,26 @@ namespace _Project.Features.Save
         private readonly GameSaveFactory _factory;
         private readonly GarageBoard _garage;
         private readonly TrackRoster _roster;
+        private readonly TurboService _turbo;
         private readonly ITimeService _time;
 
         private bool _isWriting;
         private bool _hasImportantChanges;
         private float _secondsSinceWrite;
 
-        public SaveScheduler(IProgressStorage storage, GameSaveFactory factory, GarageBoard garage, TrackRoster roster, ITimeService time)
+        public SaveScheduler(
+            IProgressStorage storage,
+            GameSaveFactory factory,
+            GarageBoard garage,
+            TrackRoster roster,
+            TurboService turbo,
+            ITimeService time)
         {
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
+            _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _time = time ?? throw new ArgumentNullException(nameof(time));
         }
 
@@ -49,6 +58,7 @@ namespace _Project.Features.Save
             _garage.BoxRecycled += OnBoxRecycled;
             _roster.VehicleSent += OnVehicleSent;
             _roster.VehicleReturned += OnVehicleReturned;
+            _turbo.TurboStarted += OnTurboStarted;
         }
 
         public void LateTick()
@@ -87,6 +97,7 @@ namespace _Project.Features.Save
             _garage.BoxRecycled -= OnBoxRecycled;
             _roster.VehicleSent -= OnVehicleSent;
             _roster.VehicleReturned -= OnVehicleReturned;
+            _turbo.TurboStarted -= OnTurboStarted;
         }
 
         private void Write(bool isImportant)
@@ -142,6 +153,11 @@ namespace _Project.Features.Save
         }
 
         private void OnVehicleReturned(TrackRunner runner)
+        {
+            MarkImportantChange();
+        }
+
+        private void OnTurboStarted()
         {
             MarkImportantChange();
         }

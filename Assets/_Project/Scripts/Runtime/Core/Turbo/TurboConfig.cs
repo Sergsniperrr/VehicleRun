@@ -6,7 +6,13 @@ namespace _Project.Core.Turbo
     public class TurboConfig : ScriptableObject
     {
         [SerializeField] private int _unlockRank;
+        [SerializeField] private float _speedMultiplier;
+        [SerializeField] private float _freeDurationSeconds;
+        [SerializeField] private float _freeCooldownSeconds;
 
         public int UnlockRank => _unlockRank;
+        public float SpeedMultiplier => _speedMultiplier;
+        public float FreeDurationSeconds => _freeDurationSeconds;
+        public float FreeCooldownSeconds => _freeCooldownSeconds;
     }
 }

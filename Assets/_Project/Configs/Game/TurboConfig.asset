@@ -13,3 +13,6 @@ MonoBehaviour:
   m_Name: TurboConfig
   m_EditorClassIdentifier: 
   _unlockRank: 3
+  _speedMultiplier: 2
+  _freeDurationSeconds: 30
+  _freeCooldownSeconds: 180

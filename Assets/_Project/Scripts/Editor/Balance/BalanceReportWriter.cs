@@ -57,7 +57,7 @@ namespace _Project.Editor.Balance
             report.AppendLine();
             report.AppendLine("Время считается по активной игре в формате ч:мм:сс, офлайн в него не входит. Жадный игрок раз в «секунд на действие» делает одно действие: открывает коробку, сливает старшую пару, включает турбо, меняет состав трассы, покупает коробку или перерабатывает младшую машину в полном гараже. Машины трассы занимают слоты гаража.");
             report.AppendLine();
-            report.AppendLine($"Учтены правила ГДД, которых ещё нет в логике игры: декор D = 1 + {Format(_settings.DecorIncomeBonus)} × floor(K / {_settings.DecorRankStep}), турбо ×{Format(_settings.TurboSpeedMultiplier)} к скорости на {Format(_settings.TurboDurationSeconds)} с с откатом {Format(_settings.TurboCooldownSeconds)} с начиная с K = {_settings.TurboUnlockRank}, офлайн-доход по ГДД 16. Обучения нет: игра начинается с монет и машин из `EconomyConfig`. Предел симуляции {FormatTime(_settings.ActiveTimeLimitSeconds)} активной игры.");
+            report.AppendLine($"Учтены правила ГДД, которых ещё нет в логике игры: декор D = 1 + {Format(_settings.DecorIncomeBonus)} × floor(K / {_settings.DecorRankStep}) и офлайн-доход по ГДД 16. Турбо берётся из логики игры и `TurboConfig`. Обучения нет: игра начинается с монет и машин из `EconomyConfig`. Предел симуляции {FormatTime(_settings.ActiveTimeLimitSeconds)} активной игры.");
             report.AppendLine();
             report.AppendLine($"Метки: {InTarget} в цели ГДД 10, {FasterThanTarget} быстрее цели, {SlowerThanTarget} медленнее цели, {NotReached} не достигнуто до предела.");
             report.AppendLine();

@@ -3,6 +3,7 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
 using _Project.Tests.EditMode.Configs;
 using NUnit.Framework;
@@ -18,6 +19,7 @@ namespace _Project.Tests.EditMode.Economy
         private GarageBoard _garage;
         private RankProgress _progress;
         private TrackRoster _roster;
+        private TurboService _turbo;
         private IncomeService _income;
 
         [SetUp]
@@ -28,7 +30,8 @@ namespace _Project.Tests.EditMode.Economy
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
             _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
             _roster = new TrackRoster(_garage, _progress, _fixture.Track, new Wallet(_fixture.Economy));
-            _income = new IncomeService(_roster, _fixture.Track);
+            _turbo = new TurboService(_fixture.Turbo, _progress, _roster);
+            _income = new IncomeService(_roster, _fixture.Track, _turbo);
         }
 
         [TearDown]
@@ -68,6 +71,21 @@ namespace _Project.Tests.EditMode.Economy
             _roster.ReturnFromTrack(1);
 
             Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(4.26).Within(Tolerance));
+        }
+
+        [Test]
+        public void TurboMultipliesShownIncomeOnly()
+        {
+            PlaceVehicle(0, 4);
+            PlaceVehicle(1, 4);
+            _roster.SendToTrack(0);
+            _roster.SendToTrack(1);
+
+            _turbo.StartTurbo();
+
+            double expectedIncome = 8.52 * _fixture.Turbo.SpeedMultiplier;
+            Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(expectedIncome).Within(Tolerance));
+            Assert.That(_income.CalculateIncomePerSecondWithoutTurbo(), Is.EqualTo(8.52).Within(Tolerance));
         }
 
         private void PlaceVehicle(int slot, int rank)

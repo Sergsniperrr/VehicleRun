@@ -94,14 +94,12 @@ namespace _Project.Editor.Balance
 
         private bool TryActivateTurbo()
         {
-            if (_scenario.UsesTurbo == false || _game.CanActivateTurbo == false)
+            if (_scenario.UsesTurbo == false)
             {
                 return false;
             }
 
-            _game.ActivateTurbo();
-
-            return true;
+            return _game.Turbo.StartTurbo().IsSuccess;
         }
 
         private bool TryChangeLineup()

@@ -42,6 +42,9 @@ namespace _Project.Tests.EditMode.Configs
         private const float StartDistance = 5.59f;
         private const int TrackInitialCapacity = 2;
         private const int TurboUnlockRank = 3;
+        private const float TurboSpeedMultiplier = 2f;
+        private const float TurboFreeDurationSeconds = 30f;
+        private const float TurboFreeCooldownSeconds = 180f;
         private const float SpritePixelsPerUnit = 100f;
 
         private readonly List<Object> _createdObjects = new List<Object>();
@@ -200,6 +203,9 @@ namespace _Project.Tests.EditMode.Configs
         {
             SerializedObject turbo = new SerializedObject(Turbo);
             turbo.FindProperty("_unlockRank").intValue = TurboUnlockRank;
+            turbo.FindProperty("_speedMultiplier").floatValue = TurboSpeedMultiplier;
+            turbo.FindProperty("_freeDurationSeconds").floatValue = TurboFreeDurationSeconds;
+            turbo.FindProperty("_freeCooldownSeconds").floatValue = TurboFreeCooldownSeconds;
             turbo.ApplyModifiedPropertiesWithoutUndo();
         }
 

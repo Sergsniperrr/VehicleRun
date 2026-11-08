@@ -8,6 +8,7 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
 
 namespace _Project.Features.Save
@@ -22,6 +23,7 @@ namespace _Project.Features.Save
         private readonly BoxPricing _pricing;
         private readonly BoxDelivery _delivery;
         private readonly TrackRoster _roster;
+        private readonly TurboService _turbo;
 
         public GameSaveFactory(
             GameConfig config,
@@ -31,7 +33,8 @@ namespace _Project.Features.Save
             Wallet wallet,
             BoxPricing pricing,
             BoxDelivery delivery,
-            TrackRoster roster)
+            TrackRoster roster,
+            TurboService turbo)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -41,6 +44,7 @@ namespace _Project.Features.Save
             _pricing = pricing ?? throw new ArgumentNullException(nameof(pricing));
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
+            _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
         }
 
         public GameSave Create()
@@ -56,6 +60,8 @@ namespace _Project.Features.Save
                 BoxPurchaseCounts = CollectBoxPurchaseCounts(),
                 FreeBoxRemainingSeconds = _delivery.FreeBoxRemainingSeconds,
                 HasReadyDelivery = _delivery.HasReadyDelivery,
+                TurboRemainingSeconds = _turbo.RemainingSeconds,
+                TurboCooldownRemainingSeconds = _turbo.CooldownRemainingSeconds,
                 Vehicles = CollectVehicles(),
                 Boxes = CollectBoxes(),
                 TrackRunners = CollectTrackRunners(),

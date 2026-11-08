@@ -13,6 +13,8 @@ namespace _Project.Tests.EditMode.Save
         private const float DrivingSeconds = 13.7f;
         private const double BonusCoins = 2000.1;
         private const float PartialDeliverySeconds = 7.5f;
+        private const float PartialTurboSeconds = 12.5f;
+        private const float PartialCooldownSeconds = 40f;
         private const double AlmostWholeRemainder = 0.99999999999999989;
         private const float OversizedTimerSeconds = 1000f;
         private const float DistanceTolerance = 0.001f;
@@ -200,6 +202,34 @@ namespace _Project.Tests.EditMode.Save
         }
 
         [Test]
+        public void RestoredTurboContinuesWithoutEvents()
+        {
+            PlaySourceGame();
+            int eventCount = 0;
+            _target.Turbo.TurboStarted += () => eventCount++;
+            _target.Turbo.TurboEnded += () => eventCount++;
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.Turbo.RemainingSeconds, Is.EqualTo(_source.Turbo.RemainingSeconds));
+            Assert.That(_target.Turbo.SpeedMultiplier, Is.EqualTo(_fixture.Turbo.SpeedMultiplier));
+            Assert.That(eventCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void RestoredTurboCooldownContinues()
+        {
+            PlaySourceGame();
+            _source.Turbo.Advance(_source.Turbo.RemainingSeconds + PartialCooldownSeconds);
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.Turbo.IsActive, Is.False);
+            Assert.That(_target.Turbo.CooldownRemainingSeconds, Is.EqualTo(_source.Turbo.CooldownRemainingSeconds));
+            Assert.That(_target.Turbo.CanStartTurbo(), Is.False);
+        }
+
+        [Test]
         public void RestoreWrapsDistanceAndLimitsTimer()
         {
             PlaySourceGame();
@@ -207,11 +237,15 @@ namespace _Project.Tests.EditMode.Save
             float distance = save.TrackRunners[0].Distance;
             save.TrackRunners[0].Distance += _fixture.Track.LapLength;
             save.FreeBoxRemainingSeconds = OversizedTimerSeconds;
+            save.TurboRemainingSeconds = OversizedTimerSeconds;
+            save.TurboCooldownRemainingSeconds = OversizedTimerSeconds;
 
             _target.Restorer.Restore(save);
 
             Assert.That(_target.Roster.Runners[0].Distance, Is.EqualTo(distance).Within(DistanceTolerance));
             Assert.That(_target.Delivery.FreeBoxRemainingSeconds, Is.EqualTo(_fixture.Economy.FreeBoxIntervalSeconds));
+            Assert.That(_target.Turbo.RemainingSeconds, Is.EqualTo(_fixture.Turbo.FreeDurationSeconds));
+            Assert.That(_target.Turbo.CooldownRemainingSeconds, Is.EqualTo(_fixture.Turbo.FreeCooldownSeconds));
         }
 
         private GameSave PassThroughJson(GameSave save)
@@ -236,6 +270,8 @@ namespace _Project.Tests.EditMode.Save
             _source.Delivery.BuyBox();
             _source.Garage.OpenBox(6);
             _source.Delivery.Advance(PartialDeliverySeconds);
+            _source.Turbo.StartTurbo();
+            _source.Turbo.Advance(PartialTurboSeconds);
         }
     }
 }

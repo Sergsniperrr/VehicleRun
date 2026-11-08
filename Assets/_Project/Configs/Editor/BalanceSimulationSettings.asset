@@ -16,10 +16,6 @@ MonoBehaviour:
   _reportPath: Docs/Balance/SimulationReport.md
   _stepSeconds: 0.1
   _activeTimeLimitSeconds: 21600
-  _turboSpeedMultiplier: 2
-  _turboDurationSeconds: 30
-  _turboCooldownSeconds: 180
-  _turboUnlockRank: 3
   _decorRankStep: 4
   _decorIncomeBonus: 0.1
   _firstMergeTargetSeconds: 45

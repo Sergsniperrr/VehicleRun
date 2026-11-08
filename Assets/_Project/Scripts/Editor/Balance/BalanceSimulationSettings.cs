@@ -11,10 +11,6 @@ namespace _Project.Editor.Balance
         [SerializeField] private string _reportPath;
         [SerializeField] private float _stepSeconds;
         [SerializeField] private float _activeTimeLimitSeconds;
-        [SerializeField] private float _turboSpeedMultiplier;
-        [SerializeField] private float _turboDurationSeconds;
-        [SerializeField] private float _turboCooldownSeconds;
-        [SerializeField] private int _turboUnlockRank;
         [SerializeField] private int _decorRankStep;
         [SerializeField] private double _decorIncomeBonus;
         [SerializeField] private float _firstMergeTargetSeconds;
@@ -27,10 +23,6 @@ namespace _Project.Editor.Balance
         public string ReportPath => _reportPath;
         public float StepSeconds => _stepSeconds;
         public float ActiveTimeLimitSeconds => _activeTimeLimitSeconds;
-        public float TurboSpeedMultiplier => _turboSpeedMultiplier;
-        public float TurboDurationSeconds => _turboDurationSeconds;
-        public float TurboCooldownSeconds => _turboCooldownSeconds;
-        public int TurboUnlockRank => _turboUnlockRank;
         public int DecorRankStep => _decorRankStep;
         public double DecorIncomeBonus => _decorIncomeBonus;
         public float FirstMergeTargetSeconds => _firstMergeTargetSeconds;

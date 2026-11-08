@@ -95,6 +95,11 @@ namespace _Project.Features.Save
                 return false;
             }
 
+            if (IsNonNegativeNumber(save.TurboRemainingSeconds) == false || IsNonNegativeNumber(save.TurboCooldownRemainingSeconds) == false)
+            {
+                return false;
+            }
+
             if (save.BoxPurchaseCounts.Length > _catalog.MaxRank)
             {
                 return false;

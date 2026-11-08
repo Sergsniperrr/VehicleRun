@@ -55,6 +55,32 @@ namespace _Project.Tests.EditMode.Configs
             AssertReportedBy(_fixture.Turbo);
         }
 
+        [TestCase(1f)]
+        [TestCase(0.5f)]
+        public void TurboSpeedMultiplierNotAboveOneIsReported(float speedMultiplier)
+        {
+            _fixture.Change(_fixture.Turbo, "_speedMultiplier", property => property.floatValue = speedMultiplier);
+
+            AssertReportedBy(_fixture.Turbo);
+        }
+
+        [TestCase(0f)]
+        [TestCase(-1f)]
+        public void TurboDurationNotAboveZeroIsReported(float durationSeconds)
+        {
+            _fixture.Change(_fixture.Turbo, "_freeDurationSeconds", property => property.floatValue = durationSeconds);
+
+            AssertReportedBy(_fixture.Turbo);
+        }
+
+        [Test]
+        public void NegativeTurboCooldownIsReported()
+        {
+            _fixture.Change(_fixture.Turbo, "_freeCooldownSeconds", property => property.floatValue = -1f);
+
+            AssertReportedBy(_fixture.Turbo);
+        }
+
         [Test]
         public void RankGapIsReported()
         {

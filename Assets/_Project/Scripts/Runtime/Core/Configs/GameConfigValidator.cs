@@ -264,6 +264,21 @@ namespace _Project.Core.Configs
             {
                 errors.Add(new ConfigError(turbo, $"Ранг открытия турбо {turbo.UnlockRank} вне каталога 1..{maxRank}"));
             }
+
+            if (turbo.SpeedMultiplier <= 1f)
+            {
+                errors.Add(new ConfigError(turbo, $"Множитель скорости турбо {turbo.SpeedMultiplier}, должен быть больше 1"));
+            }
+
+            if (turbo.FreeDurationSeconds <= 0)
+            {
+                errors.Add(new ConfigError(turbo, $"Длительность бесплатного турбо {turbo.FreeDurationSeconds} секунд, должна быть больше 0"));
+            }
+
+            if (turbo.FreeCooldownSeconds < 0)
+            {
+                errors.Add(new ConfigError(turbo, $"Откат бесплатного турбо {turbo.FreeCooldownSeconds} секунд, не может быть отрицательным"));
+            }
         }
 
         private int ValidateSchedule(Object source, CapacitySchedule schedule, string scheduleName, int maxRank, List<ConfigError> errors)

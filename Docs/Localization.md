@@ -60,7 +60,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 44 записи:
+Сейчас в ассете 45 записей:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -74,6 +74,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
   - `ui.hud.no_free_slot` — «Освободите место»;
   - `ui.hud.not_enough_coins` — «Не хватает {0}», где `{0}` — недостающая сумма точным числом с разделителем разрядов;
   - `ui.hud.best_lineup` — «Лучший состав» / «Best lineup»;
+  - `ui.hud.turbo_track_empty` — «Отправьте машину на трассу» / «Send a vehicle to the track»: нажатие турбо без машин на трассе;
 - запись чисел (`CoinsFormatter`, [Gameplay.md](Gameplay.md), раздел 13):
   - `ui.number.decimal_separator` — «,» / «.»;
   - `ui.number.thousand`, `ui.number.million`, `ui.number.billion` — «{0} тыс.», «{0} млн», «{0} млрд» / «{0}K», «{0}M», «{0}B». Между числом и сокращением в русском тексте стоит неразрывный пробел, `{0}` — число с одним знаком после запятой или целое;
