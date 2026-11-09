@@ -54,6 +54,7 @@ namespace _Project.Composition
             builder.Register<GarageBoard>(Lifetime.Singleton);
             builder.Register<RankProgress>(Lifetime.Singleton);
             builder.Register<Wallet>(Lifetime.Singleton);
+            builder.Register<CollectionMilestones>(Lifetime.Singleton);
             builder.Register<BoxPricing>(Lifetime.Singleton);
             builder.Register<BoxDelivery>(Lifetime.Singleton);
             builder.Register<TrackPath>(Lifetime.Singleton);

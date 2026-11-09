@@ -17,6 +17,8 @@ namespace _Project.Tests.EditMode.Configs
     {
         private static readonly long[] CoinsPerLap = { 4, 8, 17, 37, 77, 163, 346, 733, 1554, 3301, 7020, 14946 };
         private static readonly long[] BoxBasePrices = { 80, 1200, 5700, 16000, 43000, 110000, 290000, 770000, 1900000, 5000000, 14000000, 33000000 };
+        private static readonly int[] MilestoneRanks = { 4, 8 };
+        private static readonly long[] MilestoneCoins = { 1000, 50000 };
         private static readonly float[] TrackSpeeds = { 3.965f, 4.361f, 4.515f, 4.564f, 4.825f, 5.014f, 5.197f, 5.397f, 5.6f, 5.8f, 6f, 6.2f };
         private static readonly (int Rank, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
         private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
@@ -178,7 +180,20 @@ namespace _Project.Tests.EditMode.Configs
             economy.FindProperty("_offlineMinAwaySeconds").floatValue = OfflineMinAwaySeconds;
             economy.FindProperty("_offlineMaxAwaySeconds").floatValue = OfflineMaxAwaySeconds;
             economy.FindProperty("_offlineIncomeRate").doubleValue = OfflineIncomeRate;
+            FillMilestones(economy.FindProperty("_milestoneRewards"));
             economy.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private void FillMilestones(SerializedProperty milestonesProperty)
+        {
+            milestonesProperty.arraySize = MilestoneRanks.Length;
+
+            for (int i = 0; i < MilestoneRanks.Length; i++)
+            {
+                SerializedProperty element = milestonesProperty.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("_rank").intValue = MilestoneRanks[i];
+                element.FindPropertyRelative("_coins").longValue = MilestoneCoins[i];
+            }
         }
 
         private void FillBoxBasePrices(SerializedProperty pricesProperty)

@@ -3,6 +3,7 @@ using _Project.Core.Save;
 using _Project.Core.Time;
 using _Project.Features.Boxes;
 using _Project.Features.Garage;
+using _Project.Features.Progression;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
@@ -19,6 +20,7 @@ namespace _Project.Features.Save
         private readonly GarageBoard _garage;
         private readonly TrackRoster _roster;
         private readonly TurboService _turbo;
+        private readonly CollectionMilestones _milestones;
         private readonly ITimeService _time;
 
         private bool _isWriting;
@@ -31,6 +33,7 @@ namespace _Project.Features.Save
             GarageBoard garage,
             TrackRoster roster,
             TurboService turbo,
+            CollectionMilestones milestones,
             ITimeService time)
         {
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -38,6 +41,7 @@ namespace _Project.Features.Save
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
+            _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _time = time ?? throw new ArgumentNullException(nameof(time));
         }
 
@@ -59,6 +63,7 @@ namespace _Project.Features.Save
             _roster.VehicleSent += OnVehicleSent;
             _roster.VehicleReturned += OnVehicleReturned;
             _turbo.TurboStarted += OnTurboStarted;
+            _milestones.MilestoneClaimed += OnMilestoneClaimed;
         }
 
         public void LateTick()
@@ -98,6 +103,7 @@ namespace _Project.Features.Save
             _roster.VehicleSent -= OnVehicleSent;
             _roster.VehicleReturned -= OnVehicleReturned;
             _turbo.TurboStarted -= OnTurboStarted;
+            _milestones.MilestoneClaimed -= OnMilestoneClaimed;
         }
 
         private void Write(bool isImportant)
@@ -158,6 +164,11 @@ namespace _Project.Features.Save
         }
 
         private void OnTurboStarted()
+        {
+            MarkImportantChange();
+        }
+
+        private void OnMilestoneClaimed(int rank)
         {
             MarkImportantChange();
         }

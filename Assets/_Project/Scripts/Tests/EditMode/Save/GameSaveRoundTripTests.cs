@@ -1,5 +1,6 @@
 using _Project.Core.Save;
 using _Project.Features.Boxes;
+using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Track;
 using _Project.Tests.EditMode.Configs;
@@ -53,6 +54,18 @@ namespace _Project.Tests.EditMode.Save
             saved.CoinsRemainder = 0;
             restored.CoinsRemainder = 0;
             Assert.That(JsonUtility.ToJson(restored), Is.EqualTo(JsonUtility.ToJson(saved)));
+        }
+
+        [Test]
+        public void JsonKeepsClaimedMilestones()
+        {
+            _source.PlaceVehicle(0, 4);
+            _source.Milestones.Claim(4);
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.Milestones.ClaimedRanks, Does.Contain(4));
+            Assert.That(_target.Milestones.GetState(4), Is.EqualTo(MilestoneState.Claimed));
         }
 
         [Test]

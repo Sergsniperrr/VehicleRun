@@ -23,5 +23,6 @@ namespace _Project.Features.Commands
         TurboCooldown,
         TrackEmpty,
         BoxRankLocked,
+        MilestoneUnavailable,
     }
 }

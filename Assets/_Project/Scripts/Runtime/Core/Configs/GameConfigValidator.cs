@@ -46,6 +46,7 @@ namespace _Project.Core.Configs
             int maxRank = config.Vehicles.Count;
 
             ValidateEconomy(config.Economy, maxRank, config.Garage.OpenSlots.Initial, errors);
+            ValidateMilestones(config.Economy, maxRank, errors);
             ValidateGarage(config.Garage, maxRank, errors);
             ValidateTrack(config.Track, maxRank, errors);
             ValidateTurbo(config.Turbo, maxRank, errors);
@@ -245,6 +246,31 @@ namespace _Project.Core.Configs
                 {
                     errors.Add(new ConfigError(economy, $"Базовая цена коробки ранга {rank} {prices[i]} меньше цены ранга {rank - 1} {prices[i - 1]}"));
                 }
+            }
+        }
+
+        private void ValidateMilestones(EconomyConfig economy, int maxRank, List<ConfigError> errors)
+        {
+            int previousRank = 0;
+
+            foreach (EconomyConfig.MilestoneReward reward in economy.MilestoneRewards)
+            {
+                if (reward.Rank < FirstRank || reward.Rank > maxRank)
+                {
+                    errors.Add(new ConfigError(economy, $"Порог награды коллекции {reward.Rank} вне каталога {FirstRank}..{maxRank}"));
+                }
+
+                if (reward.Rank <= previousRank)
+                {
+                    errors.Add(new ConfigError(economy, $"Пороги наград коллекции должны расти: {reward.Rank} после {previousRank}"));
+                }
+
+                if (reward.Coins <= 0)
+                {
+                    errors.Add(new ConfigError(economy, $"Награда коллекции на пороге {reward.Rank} должна быть больше 0"));
+                }
+
+                previousRank = reward.Rank;
             }
         }
 

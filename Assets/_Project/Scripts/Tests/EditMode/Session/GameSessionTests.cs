@@ -32,7 +32,7 @@ namespace _Project.Tests.EditMode.Session
             FakeTimeService time = new FakeTimeService { DeltaTime = FrameSeconds };
             GameSaveValidator validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track);
             ProgressLoader loader = new ProgressLoader(_storage, validator, _game.Restorer);
-            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, time);
+            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, _game.Milestones, time);
             NewGameSetup newGameSetup = new NewGameSetup(_fixture.Economy, _fixture.Vehicles, _game.Garage, _game.Progress, _game.InstanceIds);
             _session = new GameSession(loader, _scheduler, newGameSetup);
         }

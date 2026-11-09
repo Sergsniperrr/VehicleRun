@@ -21,5 +21,6 @@ namespace _Project.Core.Save
         public VehicleSave[] Vehicles;
         public BoxSave[] Boxes;
         public TrackRunnerSave[] TrackRunners;
+        public int[] ClaimedMilestoneRanks = Array.Empty<int>();
     }
 }

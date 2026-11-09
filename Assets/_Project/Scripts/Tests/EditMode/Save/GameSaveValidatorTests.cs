@@ -49,6 +49,23 @@ namespace _Project.Tests.EditMode.Save
         }
 
         [Test]
+        public void ClaimedMilestonesAreValid()
+        {
+            _game.Milestones.Claim(4);
+
+            Assert.That(_validator.IsValid(_game.Factory.Create()), Is.True);
+        }
+
+        [Test]
+        public void BrokenMilestonesAreInvalid()
+        {
+            AssertInvalid(save => save.ClaimedMilestoneRanks = null);
+            AssertInvalid(save => save.ClaimedMilestoneRanks = new[] { 4, 4 });
+            AssertInvalid(save => save.ClaimedMilestoneRanks = new[] { 0 });
+            AssertInvalid(save => save.ClaimedMilestoneRanks = new[] { _fixture.Vehicles.MaxRank + 1 });
+        }
+
+        [Test]
         public void MissingSaveOrSchemaIsInvalid()
         {
             Assert.That(_validator.IsValid(null), Is.False);

@@ -25,3 +25,14 @@ MonoBehaviour:
   _offlineMinAwaySeconds: 60
   _offlineMaxAwaySeconds: 14400
   _offlineIncomeRate: 0.5
+  _milestoneRewards:
+  - _rank: 4
+    _coins: 8000
+  - _rank: 8
+    _coins: 400000
+  - _rank: 12
+    _coins: 15000000
+  - _rank: 16
+    _coins: 500000000
+  - _rank: 20
+    _coins: 30000000000

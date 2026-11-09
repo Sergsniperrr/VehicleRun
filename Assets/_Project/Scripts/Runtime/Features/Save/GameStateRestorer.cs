@@ -23,6 +23,7 @@ namespace _Project.Features.Save
         private readonly BoxDelivery _delivery;
         private readonly TrackRoster _roster;
         private readonly TurboService _turbo;
+        private readonly CollectionMilestones _milestones;
 
         public GameStateRestorer(
             VehicleCatalogConfig catalog,
@@ -33,7 +34,8 @@ namespace _Project.Features.Save
             BoxPricing pricing,
             BoxDelivery delivery,
             TrackRoster roster,
-            TurboService turbo)
+            TurboService turbo,
+            CollectionMilestones milestones)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -44,6 +46,7 @@ namespace _Project.Features.Save
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
+            _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
         }
 
         public void Restore(GameSave save)
@@ -75,6 +78,7 @@ namespace _Project.Features.Save
             _pricing.RestorePurchaseCounts(save.BoxPurchaseCounts);
             _delivery.Restore(save.FreeBoxRemainingSeconds, save.HasReadyDelivery);
             _turbo.Restore(save.TurboRemainingSeconds, save.TurboCooldownRemainingSeconds);
+            _milestones.RestoreClaimed(save.ClaimedMilestoneRanks);
         }
 
         private VehicleDefinition GetDefinition(string vehicleId)

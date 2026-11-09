@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,16 @@ namespace _Project.Core.Economy
     [CreateAssetMenu(fileName = "EconomyConfig", menuName = "_Project/Game/Economy Config", order = 2)]
     public class EconomyConfig : ScriptableObject
     {
+        [Serializable]
+        public class MilestoneReward
+        {
+            [SerializeField] private int _rank;
+            [SerializeField] private long _coins;
+
+            public int Rank => _rank;
+            public long Coins => _coins;
+        }
+
         [SerializeField] private long _startCoins;
         [SerializeField] private int _startVehicleRank;
         [SerializeField] private int _startVehicleCount;
@@ -19,6 +30,7 @@ namespace _Project.Core.Economy
         [SerializeField] private float _offlineMinAwaySeconds;
         [SerializeField] private float _offlineMaxAwaySeconds;
         [SerializeField] private double _offlineIncomeRate;
+        [SerializeField] private List<MilestoneReward> _milestoneRewards = new List<MilestoneReward>();
 
         public long StartCoins => _startCoins;
         public int StartVehicleRank => _startVehicleRank;
@@ -33,5 +45,6 @@ namespace _Project.Core.Economy
         public float OfflineMinAwaySeconds => _offlineMinAwaySeconds;
         public float OfflineMaxAwaySeconds => _offlineMaxAwaySeconds;
         public double OfflineIncomeRate => _offlineIncomeRate;
+        public IReadOnlyList<MilestoneReward> MilestoneRewards => _milestoneRewards;
     }
 }

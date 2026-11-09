@@ -25,7 +25,7 @@ namespace _Project.Tests.EditMode.Save
             _game = new SaveTestGame(_fixture);
             _storage = new FakeProgressStorage();
             _time = new FakeTimeService { DeltaTime = FrameSeconds };
-            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, _time);
+            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, _game.Milestones, _time);
         }
 
         [TearDown]

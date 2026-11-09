@@ -24,6 +24,7 @@ namespace _Project.Features.Save
         private readonly BoxDelivery _delivery;
         private readonly TrackRoster _roster;
         private readonly TurboService _turbo;
+        private readonly CollectionMilestones _milestones;
 
         public GameSaveFactory(
             GameConfig config,
@@ -34,7 +35,8 @@ namespace _Project.Features.Save
             BoxPricing pricing,
             BoxDelivery delivery,
             TrackRoster roster,
-            TurboService turbo)
+            TurboService turbo,
+            CollectionMilestones milestones)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -45,6 +47,7 @@ namespace _Project.Features.Save
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
+            _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
         }
 
         public GameSave Create()
@@ -65,7 +68,16 @@ namespace _Project.Features.Save
                 Vehicles = CollectVehicles(),
                 Boxes = CollectBoxes(),
                 TrackRunners = CollectTrackRunners(),
+                ClaimedMilestoneRanks = CollectClaimedMilestones(),
             };
+        }
+
+        private int[] CollectClaimedMilestones()
+        {
+            List<int> ranks = new List<int>(_milestones.ClaimedRanks);
+            ranks.Sort();
+
+            return ranks.ToArray();
         }
 
         private int[] CollectUnlockedRanks()

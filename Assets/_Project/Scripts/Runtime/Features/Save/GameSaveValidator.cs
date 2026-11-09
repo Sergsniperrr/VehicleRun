@@ -34,6 +34,11 @@ namespace _Project.Features.Save
                 return false;
             }
 
+            if (AreMilestonesValid(save.ClaimedMilestoneRanks) == false)
+            {
+                return false;
+            }
+
             HashSet<int> unlockedRanks = new HashSet<int>(save.UnlockedRanks);
             int maxRank = FindMaxRank(save.UnlockedRanks);
             int openSlotCount = Math.Min(_garage.OpenSlots.GetCapacity(maxRank), _garage.SlotCount);
@@ -75,7 +80,23 @@ namespace _Project.Features.Save
                 && save.BoxPurchaseCounts != null
                 && save.Vehicles != null
                 && save.Boxes != null
-                && save.TrackRunners != null;
+                && save.TrackRunners != null
+                && save.ClaimedMilestoneRanks != null;
+        }
+
+        private bool AreMilestonesValid(int[] ranks)
+        {
+            HashSet<int> uniqueRanks = new HashSet<int>();
+
+            foreach (int rank in ranks)
+            {
+                if (rank < 1 || rank > _catalog.MaxRank || uniqueRanks.Add(rank) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool AreCountersValid(GameSave save)
