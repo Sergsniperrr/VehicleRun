@@ -24,6 +24,7 @@ namespace _Project.Composition
     public class RootLifetimeScope : LifetimeScope
     {
         [SerializeField] private LocalizationConfig _localizationConfig;
+        [SerializeField] private AudioAsset _gameplayMusic;
         [SerializeField] private string _yandexMetricaCounterId;
 
         protected override void Configure(IContainerBuilder builder)
@@ -79,7 +80,7 @@ namespace _Project.Composition
         {
             builder.Register<BootstrapState>(Lifetime.Transient);
             builder.Register<LoadRunState>(Lifetime.Transient);
-            builder.Register<RunState>(Lifetime.Transient);
+            builder.Register<RunState>(Lifetime.Transient).WithParameter<AudioAsset>(_gameplayMusic);
         }
     }
 }

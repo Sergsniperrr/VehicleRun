@@ -49,3 +49,5 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   _localizationConfig: {fileID: 11400000, guid: 4b73c029476e34ede8d91e98bf394572, type: 2}
+  _gameplayMusic: {fileID: 11400000, guid: 2ad022961eb6b534fb8313cca4c0079b, type: 2}
+  _yandexMetricaCounterId: 

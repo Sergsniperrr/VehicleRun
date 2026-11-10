@@ -68,6 +68,9 @@
   - Регистрация: `JTLSettingsStorage` в `RootLifetimeScope`, микшер + `AudioMixerControl` + `AudioVolumeSettings` в `GameLifetimeScope` (новый метод `RegisterAudio`). Окно `SettingsWindow` внедряется автоматически, как магазин и каталог.
   - Звука в игре пока нет (музыка и SFX — задача 3.5), поэтому слайдеры управляют громкостью групп микшера без слышимого эффекта; инфраструктура готова к моменту появления звука. Полное окно настроек (язык, «меньше эффектов», данные) — остаток задачи 3.6.
   - Мои решения по деталям — «предложено» в [TechPlan.md](TechPlan.md), раздел 2: вид слайдеров (полоса `ExpBar`, ручка `PlaceLevelBack`, иконки `BGM`/`Sound`), запись неважной записью, подписи «Музыка»/«Эффекты».
+- Вне списка задач: фоновая музыка геймплея (указание владельца 10.11.2026, задача 3.5 частично; [Audio.md](Audio.md), разделы 3–4).
+  - Владелец положил файл `Assets/_Project/Audio/Music/VehicleRunMusic.ogg` (40 секунд, моно, 44,1 кГц). На нём создан `AudioAsset` `Music_Gameplay.asset` (категория Music, группа микшера Music, громкость 1, pitch 1).
+  - Музыка включается зацикленно через встроенный `IAudioService.PlayMusic` в `RunState.Enter()` — в момент «геймплей начался» (как музыка в состоянии из README, раздел 4.3). Ассет приходит в `RunState` через `WithParameter<AudioAsset>` из нового поля `_gameplayMusic` на префабе `RootLifetimeScope`. Громкостью музыки управляет слайдер настроек (группа Music).
 
 Подробности в [TechPlan.md](TechPlan.md), раздел 7.
 
@@ -148,6 +151,7 @@ Git:
 | EditMode-тесты, всего 308: пустой тест сборки, 31 тест проверки конфигов, 16 тестов гаража, 11 тестов переработки, 20 тестов жестов гаража, 25 тестов прогрессии, 10 тестов наград коллекции, 11 тестов кошелька, 24 теста записи чисел, 11 тестов цены коробки, 18 тестов поставки, 6 тестов пути трассы, 14 тестов состава трассы, 4 теста дохода, 27 тестов турбо и ускорения тапом, 9 тестов громкости звука, 14 тестов сейва через JSON, 19 тестов проверки сейва, 6 тестов загрузки, 6 тестов расписания записи, 5 тестов новой игры, 5 тестов открытия сессии, 10 тестов очереди окон, 5 тестов остановки геймплея окнами | `Assets/_Project/Scripts/Tests/EditMode/` |
 | Симулятор баланса: меню `_Project › Balance › Run Simulation`, настройки, отчёт | `Assets/_Project/Scripts/Editor/Balance/`, `Assets/_Project/Configs/Editor/BalanceSimulationSettings.asset`, [Balance/SimulationReport.md](Balance/SimulationReport.md), описание в [Configs.md](Configs.md), раздел 4 |
 | Микшер Master, Music, SFX с exposed-параметрами `MusicVolume` и `SFXVolume`; громкость из кода через `IAudioMixerControl`/`AudioMixerControl` (`Core/Audio`, `Infrastructure/Audio`) | `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer`, описание в [Audio.md](Audio.md), раздел 6 |
+| Фоновая музыка геймплея: файл владельца `VehicleRunMusic.ogg` и `AudioAsset` `Music_Gameplay` (категория Music, группа Music); играет зацикленно через `IAudioService.PlayMusic` в `RunState.Enter()` | `Assets/_Project/Audio/Music/`, описание в [Audio.md](Audio.md), разделы 3–4 |
 | Ассеты из выгрузки референса (108 файлов: 93 из задачи 0.7, 9 спрайтов песка, монета, `SpeedUp`, `Album`, `Sell`, `Sell_Light`, пальма `Tree` для таблички старта) | `Assets/_Project/Art/Placeholders/`, описание в [TechPlan.md](TechPlan.md), раздел 3.3 |
 | 40 спрайтов машин `Vehicle_NN_Garage` и `Vehicle_NN_Track`, своя коробка `Box_Closed` и `Box_Open` | `Assets/_Project/Sprites/` |
 
@@ -315,6 +319,14 @@ Git:
   - Play со сцены `Bootstrap` (сейв владельца сохранён в файл и возвращён): кнопка открывает окно, подписи локализованы («Settings», «Music», «Effects» — в редакторе язык английский), слайдеры задают `MusicVolume`/`SfxVolume`, микшер получает −10.46 дБ при 0.3 и −6.02 дБ при 0.5, после выхода из Play `settings.audio` записан в `JTLSDK.Data`. Ошибок в консоли нет.
   - Документы: [Journal.md](Journal.md), [Audio.md](Audio.md) (раздел 6), [Localization.md](Localization.md) (раздел 2), [Gameplay.md](Gameplay.md) (раздел 13), [TechPlan.md](TechPlan.md) (разделы 2, 7). ГДД (правило громкости звука в настройках) — у владельца, в репозитории его нет.
   - Закоммичено в `develop` (`1bb649b`) и запушено по просьбе владельца «закоммить всё и запушь».
+
+- **Фоновая музыка геймплея** по указанию владельца (задача 3.5 частично). Владелец положил файл `Assets/_Project/Audio/Music/VehicleRunMusic.ogg` (40 с, моно, 44,1 кГц).
+  - На файле создан `AudioAsset` `Music_Gameplay.asset` (категория Music, группа микшера Music, громкость 1, pitch 1) через `execute_code` (`SerializedObject` + `AssetDatabase.CreateAsset`).
+  - Музыка включается зацикленно встроенным `IAudioService.PlayMusic` в `RunState.Enter()` (момент «геймплей начался», как музыка в состоянии из README, раздел 4.3). Ассет приходит в `RunState` через `WithParameter<AudioAsset>` из нового поля `_gameplayMusic` на префабе `RootLifetimeScope`; поле назначено на префаб. `PlayMusic` идемпотентен и не рестартит уже играющую мелодию.
+  - Громкостью управляет группа микшера Music, то есть слайдер «Музыка» из окна настроек. Это первое использование `AudioService` в игре.
+  - Проверка: Play со сцены `Bootstrap` (сейв владельца сохранён в файл и возвращён) — в `DontDestroyOnLoad` появился объект `AudioService` с источником `VehicleRunMusic`, `isPlaying = true`, `loop = true`, группа Music, громкость 1, время растёт. 308 EditMode-тестов проходят (правки в `Composition`, тесты их не видят). Ошибок в консоли нет.
+  - Документы: [Journal.md](Journal.md), [Audio.md](Audio.md) (разделы 1, 3–4), [TechPlan.md](TechPlan.md) (разделы 3.3, 7).
+  - **Не закоммичено:** жду просьбы владельца.
 
 ### 09.11.2026
 

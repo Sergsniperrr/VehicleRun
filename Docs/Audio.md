@@ -105,6 +105,8 @@ _audio.PlayMusic(_menuMusic);
 | `PlayOneShot(AudioAsset)` | Короткий звук: удар, взрыв, клик | `SFX` |
 | `PlayMusic(AudioAsset)` | Фоновая музыка, играет по кругу | `Music` |
 
+**Фоновая музыка геймплея** уже подключена так (первое использование сервиса в игре): на файле владельца `Assets/_Project/Audio/Music/VehicleRunMusic.ogg` создан `AudioAsset` `Music_Gameplay` (категория Music, группа микшера Music), а `RunState.Enter()` вызывает `_audio.PlayMusic(_gameplayMusic)` — музыка играет зацикленно с начала геймплея. Ассет приходит в состояние через `WithParameter<AudioAsset>` из поля `_gameplayMusic` на префабе `RootLifetimeScope`. Громкость музыки регулирует слайдер «Музыка» в настройках (группа микшера Music, раздел 6).
+
 ---
 
 ## 4. Что происходит внутри
