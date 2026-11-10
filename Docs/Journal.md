@@ -127,6 +127,7 @@ Git:
 - **Каталог с гифт-дорожкой наград** (09.11.2026) закоммичен в `develop` коммитом «Сделать каталог с гифт-дорожкой наград» (`eabf97c`) и запушен. В коммите (37 файлов): новые скрипты `CollectionMilestones`, `MilestoneState`, `CatalogWindow`, `CatalogCardView`, `CatalogMilestoneView` и тесты `CollectionMilestonesTests`; правки `EconomyConfig`, `GameSave`, `FailureReason`, фабрики, проверки, восстановления и расписания сейва, `GameConfigValidator`, `GameLifetimeScope`, `GameConfigFixture`; `EconomyConfig.asset` (награды), `LocalizationConfig.asset` (ключ каталога), сцена `Game` (окно `CatalogWindow`), префаб `Prefabs/UI/CatalogCard`; документы.
 - **Шрифты Kabel владельца** (`.otf`, TMP SDF-ассеты, материал) закоммичены отдельным коммитом «Добавить шрифт Kabel Ult BT Cyrillic Ultra» (`fbd81c6`) и запушены по просьбе владельца «закомить всё» (09.11.2026). Это его файлы, не из задачи каталога; лежали в рабочей копии давно. Риск по лицензии Kabel владельцу назван, он решил закоммитить.
 - **Окно настроек с громкостью звука** (10.11.2026) закоммичено в `develop` коммитом «Подключить окно настроек с громкостью звука» (`1bb649b`) и запушено по просьбе владельца «закоммить всё и запушь». В коммите (33 файла): новые скрипты `IAudioMixerControl`, `AudioMixerControl`, `AudioVolumeSettings`, `ISettingsStorage`, `SettingsSave`, `JTLSettingsStorage`, `SettingsWindow` и тесты `AudioVolumeSettingsTests` с фейками; правки `RootLifetimeScope`, `GameLifetimeScope`; `AudioMixer.mixer` (exposed-параметры), `LocalizationConfig.asset` (два ключа), сцена `Game.unity` (окно `SettingsWindow`); документы.
+- **Фоновая музыка геймплея** (10.11.2026) закоммичена в `develop` коммитом «Подключить фоновую музыку геймплея» (`b0df17c`) и запушена по просьбе владельца. В коммите (12 файлов): файл владельца `VehicleRunMusic.ogg` (через Git LFS) и `Music_Gameplay.asset`, правки `RunState.cs`, `RootLifetimeScope.cs` и префаба `RootLifetimeScope.prefab`, документы. Заодно вошёл посторонний пустой `Audio/VFX.meta` (владелец попросил «закомить всё»).
 - **`main` стоит на `40ec619`** (этап 0).
 - **`develop` и `main`** запушены в `origin` (github.com/Sergsniperrr/VehicleRun).
 
@@ -326,7 +327,7 @@ Git:
   - Громкостью управляет группа микшера Music, то есть слайдер «Музыка» из окна настроек. Это первое использование `AudioService` в игре.
   - Проверка: Play со сцены `Bootstrap` (сейв владельца сохранён в файл и возвращён) — в `DontDestroyOnLoad` появился объект `AudioService` с источником `VehicleRunMusic`, `isPlaying = true`, `loop = true`, группа Music, громкость 1, время растёт. 308 EditMode-тестов проходят (правки в `Composition`, тесты их не видят). Ошибок в консоли нет.
   - Документы: [Journal.md](Journal.md), [Audio.md](Audio.md) (разделы 1, 3–4), [TechPlan.md](TechPlan.md) (разделы 3.3, 7).
-  - **Не закоммичено:** жду просьбы владельца.
+  - Закоммичено в `develop` (`b0df17c`) и запушено по просьбе владельца «закоммить всё и запушь» (`.ogg` через Git LFS).
 
 ### 09.11.2026
 
