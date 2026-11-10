@@ -1,5 +1,6 @@
 using System;
 using _Project.Composition.Startup;
+using _Project.Core.Audio;
 using _Project.Core.Configs;
 using _Project.Features.Boxes;
 using _Project.Features.Economy;
@@ -8,11 +9,14 @@ using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Session;
+using _Project.Features.Settings;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.Infrastructure.Audio;
 using _Project.UI.Boxes;
 using _Project.UI.Windows;
 using UnityEngine;
+using UnityEngine.Audio;
 using VContainer;
 using VContainer.Unity;
 
@@ -21,16 +25,30 @@ namespace _Project.Composition
     public class GameLifetimeScope : LifetimeScope
     {
         [SerializeField] private GameConfig _gameConfig;
+        [SerializeField] private AudioMixer _audioMixer;
         [SerializeField] private RecycleConfirmWindow _recycleConfirmWindow;
         [SerializeField] private VehicleCardWindow _vehicleCardWindow;
 
         protected override void Configure(IContainerBuilder builder)
         {
             RegisterConfigs(builder);
+            RegisterAudio(builder);
             RegisterGameplay(builder);
             RegisterSave(builder);
             RegisterUI(builder);
             RegisterStartup(builder);
+        }
+
+        private void RegisterAudio(IContainerBuilder builder)
+        {
+            if (_audioMixer == null)
+            {
+                throw new InvalidOperationException(nameof(_audioMixer));
+            }
+
+            builder.RegisterInstance(_audioMixer);
+            builder.Register<AudioMixerControl>(Lifetime.Singleton).As<IAudioMixerControl>();
+            builder.RegisterEntryPoint<AudioVolumeSettings>().AsSelf();
         }
 
         private void RegisterConfigs(IContainerBuilder builder)

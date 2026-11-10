@@ -57,7 +57,8 @@ Assets/_Project/Scripts/Runtime/UI/
                    RecycleConfirmWindow: подтверждение переработки; VehicleCardWindow: карточка машины;
                    MessageWindow: сообщение с кнопкой «Хорошо»; SaveRecoveryNotice: сообщение об откате сейва;
                    ShopWindow и ShopRowView: магазин коробок;
-                   CatalogWindow, CatalogCardView, CatalogMilestoneView: каталог и гифт-дорожка наград
+                   CatalogWindow, CatalogCardView, CatalogMilestoneView: каталог и гифт-дорожка наград;
+                   SettingsWindow: настройки звука (громкость музыки и эффектов)
 ```
 
 Класс не называем так же, как его папку. Иначе в соседних namespace (`_Project.Features.*`) имя находится как namespace, и компилятор выдаёт ошибку: `Garage` ссылается на `_Project.Features.Garage`, а не на класс. Поэтому гараж называется `GarageBoard`, прогрессия `RankProgress`, а состав трассы `TrackRoster`.
@@ -490,7 +491,8 @@ Assets/_Project/Scripts/Runtime/UI/
 | `MessageWindow` | `Message` | нет | заголовок, текст и кнопка «Хорошо» (`ui.common.ok`), она же крестик окна. `Show(titleKey, messageKey)` |
 | `ShopWindow` | `ShopWindow` | да | магазин коробок, ниже |
 | `CatalogWindow` | `CatalogWindow` | да | каталог машин и гифт-дорожка наград, ниже |
-| `Window` | `DecorWindow`, `SettingsWindow` | да | заглушки разделов, которых ещё нет: название раздела, «Раздел появится позже» (`popup.section.coming_soon`) и крестик. Их заменят задачи 3.2 и 3.6 |
+| `SettingsWindow` | `SettingsWindow` | да | настройки звука: громкость музыки и эффектов, ниже |
+| `Window` | `DecorWindow` | да | заглушка раздела, которого ещё нет: название раздела, «Раздел появится позже» (`popup.section.coming_soon`) и крестик. Его заменит задача 3.2 |
 
 **Магазин: `ShopWindow`** (08.11.2026, ГДД 1.11, по снимкам референса). Наследник `Window`, поля `Row Prefab` (префаб `Prefabs/UI/ShopRow`), `Rows Root` (`Scroll/Viewport/Content`), `Scroll`, `Failure Message` и `Failure Message Rise` = 110.
 - **Строки.** При первом `Show()` окно создаёт строку на каждый ранг каталога через `IObjectResolver.Instantiate` и подписывается на `ShopRowView.BuyClicked`. Строки не пересоздаются, при каждом показе они обновляются: магазин модальный, пока он открыт, ранги не открываются.
@@ -504,7 +506,12 @@ Assets/_Project/Scripts/Runtime/UI/
 
 **Награды гифт-дорожки: `CollectionMilestones`** (`Features/Progression`). За достижение ранга-порога игрок забирает монеты из `EconomyConfig.MilestoneRewards` ([Configs.md](Configs.md), раздел 2). `GetState(rank)` возвращает `MilestoneState` (`Locked` / `Claimable` / `Claimed`), `GetReward(rank)` — сумму, `Claim(rank)` начисляет монеты через `Wallet.Add` и помечает порог забранным, поднимая событие `MilestoneClaimed`. Забранные пороги лежат в сейве (`GameSave.ClaimedMilestoneRanks`, раздел 14), `SaveScheduler` пишет забор важной записью. Суммы и пороги — данные конфига, не код; ранги вне списка порогов `GetState` считает `Locked`. В доход в секунду, офлайн и симулятор баланса награды не входят.
 
-Гараж живой (раздел 12), турбо работает (раздел 11), магазин коробок и каталог с наградами открыты. Разделы окружения и настроек появятся в задачах 3.2 и 3.6, покупка `workshop_style` в магазине — в задаче 4.2, кнопка «Бесплатно» за рекламу — в задаче 4.1. Шлейф машин и частицы турбо добавит задача 2.6, музыку турбо — 3.5, рекламное турбо — 4.1.
+**Настройки: `SettingsWindow`** (10.11.2026, задача 3.6 частично). Наследник `Window`, полноэкранное окно (заменило заглушку раздела). Поля `Music Slider` и `Sfx Slider`. В окне две строки: «Музыка» (иконка `BGM`, ключ `popup.settings.music`) и «Эффекты» (иконка `Sound`, ключ `popup.settings.sfx`), под каждой слайдер `UnityEngine.UI.Slider` на зелёной полосе `ExpBar`/`ExpBar_bg` с круглой ручкой `PlaceLevelBack`.
+- **Открытие.** При `Show()` окно ставит слайдеры по текущей громкости из `AudioVolumeSettings` (без обратного вызова), затем проигрывает появление. Нажатие на слайдер меняет громкость: `onValueChanged` вызывает `AudioVolumeSettings.SetMusicVolume`/`SetSfxVolume`.
+- **Громкость.** `AudioVolumeSettings` (`Features/Settings`) держит музыку и эффекты в долях 0..1 (по умолчанию 1), клэмпит, применяет к микшеру через `IAudioMixerControl` (перевод в децибелы) и сохраняет при каждом изменении в `settings.audio` (хранилище `ISettingsStorage`/`JTLSettingsStorage`, DTO `SettingsSave`, запись неважная). Как entry point при старте сцены `Game` грузит сохранённое и применяет. Подробно про микшер и exposed-параметры `MusicVolume`/`SFXVolume` — в [Audio.md](Audio.md), раздел 6.
+- **Звука пока нет** (музыка и SFX — задача 3.5): слайдеры двигают громкость групп микшера без слышимого эффекта, инфраструктура готова. Остаток задачи 3.6 — язык, «меньше эффектов», данные и поддержка.
+
+Гараж живой (раздел 12), турбо работает (раздел 11), магазин коробок и каталог с наградами открыты, настройки звука работают. Раздел окружения появится в задаче 3.2, остаток настроек — в задаче 3.6, покупка `workshop_style` в магазине — в задаче 4.2, кнопка «Бесплатно» за рекламу — в задаче 4.1. Шлейф машин и частицы турбо добавит задача 2.6, музыку турбо — 3.5, рекламное турбо — 4.1.
 
 ---
 

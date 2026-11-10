@@ -45,6 +45,7 @@ namespace _Project.Composition
         private void RegisterStorage(IContainerBuilder builder)
         {
             builder.Register<JTLProgressStorage>(Lifetime.Singleton).As<IProgressStorage>();
+            builder.Register<JTLSettingsStorage>(Lifetime.Singleton).As<ISettingsStorage>();
         }
 
         private void RegisterAnalytics(IContainerBuilder builder)

@@ -4,7 +4,7 @@
 
 Звук работает на встроенных средствах Unity (`AudioSource` и `AudioMixer`), никаких внешних плагинов здесь нет.
 
-Микшер `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` уже создан: группы `Music` и `SFX` внутри `Master`. Открытых (exposed) параметров пока нет. Папки `Music` и `Sounds` заводятся вместе с первыми файлами. Звуки и музыка референса лежат отдельно, в `Assets/_Project/Art/Placeholders/Audio/` (см. [TechPlan.md](TechPlan.md), раздел 3.3).
+Микшер `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` уже создан: группы `Music` и `SFX` внутри `Master`. У групп `Music` и `SFX` объявлены exposed-параметры `MusicVolume` и `SFXVolume` — через них окно настроек задаёт громкость (раздел 6). Папки `Music` и `Sounds` заводятся вместе с первыми файлами. Звуки и музыка референса лежат отдельно, в `Assets/_Project/Art/Placeholders/Audio/` (см. [TechPlan.md](TechPlan.md), раздел 3.3).
 
 ---
 
@@ -136,42 +136,33 @@ _audio.PlayMusic(_menuMusic);
 
 Микшер лежит в `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer`, в нём три группы: `Master`, а внутри неё `Music` и `SFX`. Каждый `AudioAsset` указывает свою группу в поле `Output Mixer Group`, поэтому вся музыка и все звуки регулируются двумя ползунками, а `Master` приглушает всё сразу.
 
-Менять громкость из кода можно только через открытые (exposed) параметры микшера. Если нужны настройки звука в меню, порядок такой:
+Громкость музыки и эффектов задаёт окно настроек. Оно сделано так (задача 3.6, частично; окно `SettingsWindow` в [Gameplay.md](Gameplay.md), раздел 13):
 
-1. Откройте микшер, выберите группу `Music`.
-2. В инспекторе нажмите правой кнопкой на параметр `Volume` и выберите **Expose 'Volume' to script**.
-3. В окне микшера сверху справа, в списке `Exposed Parameters`, переименуйте параметр во что-то понятное, например `MusicVolume`.
-4. Повторите для `SFX`.
-
-После этого громкость меняется из кода:
+- **Параметры микшера.** У групп `Music` и `SFX` открыты (exposed) параметры `Volume` под именами `MusicVolume` и `SFXVolume`. Менять громкость из кода можно только через такие параметры.
+- **Запись в микшер.** Интерфейс `IAudioMixerControl` (`Core/Audio`) и его реализация `AudioMixerControl` (`Infrastructure/Audio`) принимают громкость в долях 0..1, переводят её в децибелы и вызывают `AudioMixer.SetFloat`. Микшер держит ссылку в конструкторе. `Core` не знает про `AudioMixer`: тип лежит только в реализации.
 
 ```csharp
-public class VolumeSettings : MonoBehaviour
+public void SetMusicVolume(float linearVolume)
 {
-    private const string MusicVolumeParameter = "MusicVolume";
-    private const float MinLinearVolume = 0.0001f;
-    private const float DecibelsPerDecade = 20f;
+    _mixer.SetFloat(MusicVolumeParameter, ToDecibels(linearVolume));
+}
 
-    [SerializeField] private AudioMixer _mixer;
-
-    public void SetMusicVolume(float linearVolume)
-    {
-        float decibels = ToDecibels(linearVolume);
-        _mixer.SetFloat(MusicVolumeParameter, decibels);
-    }
-
-    private float ToDecibels(float linearVolume)
-    {
-        return Mathf.Log10(Mathf.Max(linearVolume, MinLinearVolume)) * DecibelsPerDecade;
-    }
+private float ToDecibels(float linearVolume)
+{
+    return Mathf.Log10(Mathf.Max(linearVolume, MinLinearVolume)) * DecibelsPerDecade;
 }
 ```
 
-*Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
+*Это фактический код проекта (`AudioMixerControl`), приведён сокращённо.*
 
 Громкость у микшера задаётся в децибелах, а не долями от нуля до единицы, поэтому значение ползунка переводят через логарифм. Если передать напрямую, половина ползунка на слух окажется почти тишиной. Константа `MinLinearVolume` нужна, чтобы не брать логарифм от нуля.
 
-Сохранять выбранную громкость между запусками удобно через `JTLSDK.Data`, как и остальные настройки.
+- **Состояние и сохранение.** `AudioVolumeSettings` (`Features/Settings`) держит две громкости 0..1 (по умолчанию 1), клэмпит их, применяет к микшеру через `IAudioMixerControl` и сохраняет при каждом изменении. Как entry point (`IInitializable`) при старте сцены `Game` он грузит сохранённое и применяет. Сохранение — отдельное хранилище `ISettingsStorage` (`Core/Save`) и `JTLSettingsStorage` (`Infrastructure/JTL`): DTO `SettingsSave` под ключом `settings.audio` в `JTLSDK.Data`, запись неважная (`important: false`), SDK сбрасывает её на площадку при выходе. Это отдельный от `GameSave` ключ с префиксом области `settings.`.
+- **Регистрация.** `JTLSettingsStorage` — в `RootLifetimeScope`, микшер (serialized поле `_audioMixer` у `GameLifetimeScope`), `AudioMixerControl` и `AudioVolumeSettings` — в `GameLifetimeScope.RegisterAudio`.
+
+Звука в игре пока нет (музыка и SFX — задача 3.5), поэтому слайдеры меняют громкость групп микшера без слышимого эффекта: инфраструктура готова к моменту появления звука.
+
+Общую громкость игры и тишину своего меню паузы по-прежнему задавайте через `JTLSDK.Audio.Volume` и `JTLSDK.Audio.Paused` (ниже), а ползунки `Music` и `SFX` оставьте микшеру.
 
 Микшер и `AudioListener` это разные уровни. `AudioListener.volume` и `AudioListener.pause` принадлежат JTL SDK: на время рекламы, оплаты и паузы площадки он глушит звук, а потом возвращает значения игры. Прямая запись в них перезапишется при следующей паузе. Общую громкость игры и тишину своего меню паузы задавайте через `JTLSDK.Audio.Volume` и `JTLSDK.Audio.Paused`, заведя для этого методы в `IAudioService`, а ползунки `Music` и `SFX` оставьте микшеру.
 

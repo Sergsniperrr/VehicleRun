@@ -60,7 +60,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 46 записей:
+Сейчас в ассете 48 записей:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -81,7 +81,8 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - карточка машины: `popup.vehicle.income` — «Доход: {0} в секунду» / «Income: {0} per second»;
 - условие на закрытой карточке каталога: `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles», где `{0}` — ранг машин для слияния (на единицу меньше ранга карточки);
 - сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;
-- заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки».
+- заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки»;
+- окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects».
 
 Остальные тексты добавляются по мере их появления в игре.
 

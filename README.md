@@ -132,6 +132,7 @@ protected override void Configure(IContainerBuilder builder)
 | `IPurchaseService` | `JTLPurchaseService` | EntryPoint | `RegisterPlatform` |
 | `IAdvertisingService` | `JTLAdvertisingService` | EntryPoint | `RegisterPlatform` |
 | `IProgressStorage` | `JTLProgressStorage` | Singleton | `RegisterStorage` |
+| `ISettingsStorage` | `JTLSettingsStorage` | Singleton | `RegisterStorage` |
 | `IStateFactory` | `StateFactory` | Singleton | `RegisterStateMachine` |
 | `IGameStateMachine` | `GameStateMachine` | Singleton | `RegisterStateMachine` |
 | `BootstrapState`, `LoadRunState`, `RunState` | сами классы | Transient | `RegisterStates` |
