@@ -162,7 +162,7 @@ private float ToDecibels(float linearVolume)
 - **Состояние и сохранение.** `AudioVolumeSettings` (`Features/Settings`) держит две громкости 0..1 (по умолчанию 1), клэмпит их, применяет к микшеру через `IAudioMixerControl` и сохраняет при каждом изменении. Как entry point (`IInitializable`) при старте сцены `Game` он грузит сохранённое и применяет. Сохранение — отдельное хранилище `ISettingsStorage` (`Core/Save`) и `JTLSettingsStorage` (`Infrastructure/JTL`): DTO `SettingsSave` под ключом `settings.audio` в `JTLSDK.Data`, запись неважная (`important: false`), SDK сбрасывает её на площадку при выходе. Это отдельный от `GameSave` ключ с префиксом области `settings.`.
 - **Регистрация.** `JTLSettingsStorage` — в `RootLifetimeScope`, микшер (serialized поле `_audioMixer` у `GameLifetimeScope`), `AudioMixerControl` и `AudioVolumeSettings` — в `GameLifetimeScope.RegisterAudio`.
 
-Звука в игре пока нет (музыка и SFX — задача 3.5), поэтому слайдеры меняют громкость групп микшера без слышимого эффекта: инфраструктура готова к моменту появления звука.
+Слайдер «Музыка» регулирует фоновую музыку (раздел 3), слайдер «Эффекты» — звуки игры из раздела 7: все они идут через группу `SFX`.
 
 Общую громкость игры и тишину своего меню паузы по-прежнему задавайте через `JTLSDK.Audio.Volume` и `JTLSDK.Audio.Paused` (ниже), а ползунки `Music` и `SFX` оставьте микшеру.
 
@@ -170,7 +170,35 @@ private float ToDecibels(float linearVolume)
 
 ---
 
-## 7. Как дополнять сервис
+## 7. Звуки игры
+
+Пять звуков владельца лежат в `Assets/_Project/Audio/VFX/` (11.11.2026). На каждом файле создан `AudioAsset` с категорией `SFX` и группой микшера `SFX`, а все пять собраны в один конфиг `GameSoundsConfig.asset` в той же папке. Где играть звук, определено по имени файла:
+
+| Файл | `AudioAsset` | Когда играет | Кто играет |
+|---|---|---|---|
+| `Click.ogg` (0,13 с) | `Sfx_Click` | нажатие любой кнопки интерфейса: HUD, окна, строки магазина, узлы гифт-дорожки | `ButtonClickSound` на объекте кнопки |
+| `Window.ogg` (0,18 с) | `Sfx_Window` | показ любого окна, кроме окна левелапа | `Window.Show()` |
+| `Merge.ogg` (0,65 с) | `Sfx_Merge` | успешное слияние двух машин (`GarageBoard.VehicleMerged`) | `GameplaySounds` |
+| `Money.ogg` (1,0 с) | `Sfx_Money` | выплата на финише (`TrackRoster.FinishCrossed`) и забор награды гифт-дорожки (`CollectionMilestones.MilestoneClaimed`) | `GameplaySounds` |
+| `LevelUp.ogg` (0,93 с) | `Sfx_LevelUp` | показ окна левелапа, то есть открытие нового ранга | `LevelUpWindow` |
+
+Как это устроено:
+
+- **`GameSoundsConfig`** (`Core/Audio`, меню **Create → _Project → Audio → Game Sounds Config**) — ScriptableObject с пятью ссылками на `AudioAsset` и полем `Money Min Interval Seconds` = 0,5. Ассет назначен в поле `Game Sounds` у `GameLifetimeScope`, без него контейнер бросает `InvalidOperationException`.
+- **`GameplaySounds`** (`Features/Sounds`) — entry point (`IStartable`, `IDisposable`) игровой сцены. Подписывается на события логики и вызывает `IAudioService.PlayOneShot`. Звук монет играет не чаще раза в `Money Min Interval Seconds` по `ITimeService.Time`: при восьми машинах на трассе выплаты идут чаще секунды, а звук длится секунду, без ограничения они складывались бы в гул.
+- **`UiSounds`** (`UI/Sounds`) — singleton игровой сцены с методами `PlayClick`, `PlayWindowOpened` и `PlayLevelUp`.
+- **`ButtonClickSound`** (`UI/Sounds`) — компонент рядом с `Button`: подписывается на `onClick` и играет клик. Выключенная кнопка (`interactable` = false) не щёлкает: `onClick` у неё не срабатывает. Компонент стоит на всех кнопках `Canvas` сцены `Game` и на кнопке префаба `ShopRow`. На затемнении карточки машины его нет: это не кнопка в глазах игрока.
+- **Окна.** `Window.Show()` вызывает виртуальный `PlayOpenSound()`, по умолчанию это звук окна. `LevelUpWindow` переопределяет его звуком левелапа, чтобы два звука не накладывались.
+
+**Новой кнопке** добавьте компонент `ButtonClickSound`. Кнопка в префабе, созданном через `IObjectResolver.Instantiate`, получит `UiSounds` сама, кнопка сцены — через `Auto Inject` объекта `Canvas`.
+
+**Новый звук:** файл в `Audio/VFX`, `AudioAsset` на нём, поле в `GameSoundsConfig` и вызов в `GameplaySounds` (событие логики) или `UiSounds` (интерфейс).
+
+Тап по коробке, отправка на трассу, покупка, турбо и переработка пока беззвучны: файлов под них нет. Остаток задачи 3.5 — эти звуки, двигатели и музыка турбо.
+
+---
+
+## 8. Как дополнять сервис
 
 Сервис намеренно маленький, в нём ровно два метода. Ниже частые доработки.
 
@@ -223,7 +251,7 @@ public void PlayOneShot(AudioAsset asset, Vector3 position)
 
 ---
 
-## 8. Как проверить, что всё работает
+## 9. Как проверить, что всё работает
 
 | Что проверяем | Как |
 |---|---|

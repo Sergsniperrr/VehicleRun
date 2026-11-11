@@ -1,8 +1,10 @@
 using System;
 using _Project.Core.Vehicles;
 using _Project.Features.Progression;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 namespace _Project.UI.Hud
@@ -11,20 +13,24 @@ namespace _Project.UI.Hud
     {
         [SerializeField] private TMP_Text _badgeValue;
         [SerializeField] private TMP_Text _label;
-        [SerializeField] private RectTransform _fill;
+        [SerializeField] private Image _fill;
+        [SerializeField] [Min(0f)] private float _fillSeconds = 0.4f;
 
         private RankProgress _progress;
         private VehicleCatalogConfig _catalog;
+        private Tween _fillTween;
 
         private void Start()
         {
             _progress.RankUnlocked += OnRankUnlocked;
-            ShowProgress();
+            ShowRank();
+            _fill.fillAmount = CalculateFilledPart();
         }
 
         private void OnDestroy()
         {
             _progress.RankUnlocked -= OnRankUnlocked;
+            _fillTween?.Kill();
         }
 
         [Inject]
@@ -34,20 +40,34 @@ namespace _Project.UI.Hud
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         }
 
-        private void ShowProgress()
+        private void ShowRank()
         {
             int maxRank = _progress.MaxRank;
             int lastRank = _catalog.MaxRank;
-            float filledPart = (float)maxRank / lastRank;
 
             _badgeValue.text = maxRank.ToString();
             _label.text = $"{maxRank}/{lastRank}";
-            _fill.anchorMax = new Vector2(filledPart, _fill.anchorMax.y);
+        }
+
+        private float CalculateFilledPart()
+        {
+            return (float)_progress.MaxRank / _catalog.MaxRank;
+        }
+
+        private void AnimateFill()
+        {
+            _fillTween?.Kill();
+            _fillTween = DOTween
+                .To(() => _fill.fillAmount, value => _fill.fillAmount = value, CalculateFilledPart(), _fillSeconds)
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true)
+                .SetLink(gameObject);
         }
 
         private void OnRankUnlocked(int rank)
         {
-            ShowProgress();
+            ShowRank();
+            AnimateFill();
         }
     }
 }

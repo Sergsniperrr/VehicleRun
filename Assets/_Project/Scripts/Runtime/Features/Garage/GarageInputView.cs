@@ -195,22 +195,12 @@ namespace _Project.Features.Garage
 
         private void ShowTargets(int slot)
         {
-            for (int target = 0; target < _garageView.SlotCount; target++)
-            {
-                _garageView.GetSlot(target).ShowPairHighlight(_gestures.CanMerge(slot, target));
-            }
-
             _trackHighlight.SetActive(_gestures.CanDropOnTrack(slot));
             _recycleHighlight.SetActive(_gestures.CanRecycle(slot));
         }
 
         private void HideTargets()
         {
-            for (int target = 0; target < _garageView.SlotCount; target++)
-            {
-                _garageView.GetSlot(target).ShowPairHighlight(false);
-            }
-
             _trackHighlight.SetActive(false);
             _recycleHighlight.SetActive(false);
         }

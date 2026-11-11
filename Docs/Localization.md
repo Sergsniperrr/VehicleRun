@@ -33,7 +33,14 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Ассет с переводами лежит в поле `_localizationConfig` на префабе `RootLifetimeScope` и попадает в сервис через конструктор.
 
-**Шрифт.** Используйте `Assets/_Project/Fonts/Nunito/Nunito-ExtraBold SDF.asset`. Стандартный `LiberationSans SDF` кириллицу не содержит, вместо русских букв в нём будут квадраты. Настройки TMP в `Assets/TextMesh Pro/` не меняли, поэтому шрифт назначайте в каждом `TextMeshProUGUI` явно, лучше один раз в префабе.
+**Шрифт.** Все тексты игры набраны шрифтом `Assets/_Project/Fonts/Kabel_1.asset` (решение владельца 11.11.2026): это TMP Font Asset владельца на шрифте Kabel Ult BT Cyrillic Ultra, у его материала тёмная обводка (ширина 0,223, утолщение 0,15). Новому тексту назначайте `Kabel_1` и его материал по умолчанию. Рядом лежит `Kabel_2` — тот же шрифт без обводки, в игре он не используется. Стандартный `LiberationSans SDF` кириллицу не содержит, вместо русских букв в нём будут квадраты. Настройки TMP в `Assets/TextMesh Pro/` не меняли, поэтому шрифт назначайте в каждом `TextMeshProUGUI` явно, лучше один раз в префабе.
+
+Что сделано с `Kabel_1` при замене:
+- **Источник шрифта.** Ассет ссылался на файл шрифта, которого в проекте нет, и не мог добавлять символы. Источником назначен `Kabel Ult BT Cyrillic Ultra.otf` из той же папки.
+- **Добавлены символы**, которых не было, а игре они нужны: `/` («14/20», «6/8»), неразрывный пробел (разделитель разрядов), `«»`, `×`, а также остальной ASCII, `Ёё`, `Ъ`, `—–…•°·’“`. Всего 175 символов. В файле шрифта нет `№`, `₽`, `”` и `„`.
+- Режим Dynamic: символ, которого нет в атласе, добавится сам при первом показе, если он есть в файле шрифта.
+
+До 11.11.2026 шрифтом игры был Nunito ExtraBold. Он остался в проекте: на него как на запасной ссылаются шрифты референса (ниже), а его материал с коричневой обводкой больше не используется.
 
 Что лежит в папке шрифта:
 - `Nunito-ExtraBold.ttf` — статическое начертание 800. Получено из вариативного `Nunito[wght].ttf` из [google/fonts](https://github.com/google/fonts/tree/main/ofl/nunito) командой `fonttools varLib.instancer "Nunito[wght].ttf" wght=800 --update-name-table -o Nunito-ExtraBold.ttf`.
@@ -45,6 +52,18 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - **Набор символов заранее:** латиница, весь русский алфавит, украинские буквы и знаки `«»—–…№₽•×°·’“”„`, неразрывный пробел.
 
 Другая толщина делается той же командой с другим `wght`, от 200 до 1000.
+
+**Шрифты референса** (11.11.2026, указание владельца). Из выгрузки `E:\AndroidGames\Vehicle\Unpacked` взяты два шрифта интерфейса Merge Dinosaurs:
+
+| Шрифт | Где лежит | Что в нём | Лицензия |
+|---|---|---|---|
+| VAG Rundschrift D — основной шрифт интерфейса референса | `Assets/_Project/Fonts/VAG Rundschrift/`: `VAG-Rundschrift-D.ttf` и `VAG-Rundschrift-D SDF.asset` | латиница и цифры, кириллицы нет | коммерческий, URW (риск — [TechPlan.md](TechPlan.md), раздел 8) |
+| Baloo Regular — второй шрифт референса | `Assets/_Project/Fonts/Baloo/`: `Baloo-Regular.ttf`, `Baloo-Regular SDF.asset`, `Baloo - OFL.txt` | латиница, цифры и деванагари, кириллицы нет | SIL OFL 1.1, Ek Type |
+
+- **Кириллицы в обоих нет.** Поэтому у каждого Font Asset в `Fallback Font Assets` стоит `Nunito-ExtraBold SDF`: русские буквы рисуются шрифтом Nunito, латиница и цифры — своим. Цифры, монеты и английский текст выглядят как у референса, русский текст — нет.
+- **Font Asset** создан кодом (`TMP_FontAsset.CreateFontAsset`): режим Dynamic, выборка 90 pt, отступ 9, атлас 1024 × 1024, заранее добавлены ASCII и знаки `«»—–…•×°·’“”„` и неразрывный пробел. Знака `№` в шрифтах нет, он возьмётся из Nunito.
+- **В сцене они пока не назначены**: тексты игры по-прежнему на Nunito. Назначить можно в компоненте `TextMeshProUGUI` или `TextMeshPro`, как Nunito.
+- **Не взяты** три других шрифта выгрузки: `FZHei` (3 МБ, коммерческий), `GenJyuuGothic-P-Bold` (11,7 МБ) и `sjis_sp_setofont` (4,2 МБ). Это запасные шрифты референса для китайского и японского, игре с RU и EN они не нужны и утяжелили бы сборку на 19 МБ.
 
 ---
 
@@ -60,7 +79,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 48 записей:
+Сейчас в ассете 49 записей:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -82,7 +101,8 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - условие на закрытой карточке каталога: `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles», где `{0}` — ранг машин для слияния (на единицу меньше ранга карточки);
 - сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;
 - заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки»;
-- окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects».
+- окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects»;
+- окно левелапа ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`.
 
 Остальные тексты добавляются по мере их появления в игре.
 

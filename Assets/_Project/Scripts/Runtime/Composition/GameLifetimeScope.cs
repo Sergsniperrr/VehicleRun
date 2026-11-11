@@ -10,10 +10,12 @@ using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Session;
 using _Project.Features.Settings;
+using _Project.Features.Sounds;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
 using _Project.Infrastructure.Audio;
 using _Project.UI.Boxes;
+using _Project.UI.Sounds;
 using _Project.UI.Windows;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -26,6 +28,7 @@ namespace _Project.Composition
     {
         [SerializeField] private GameConfig _gameConfig;
         [SerializeField] private AudioMixer _audioMixer;
+        [SerializeField] private GameSoundsConfig _gameSounds;
         [SerializeField] private RecycleConfirmWindow _recycleConfirmWindow;
         [SerializeField] private VehicleCardWindow _vehicleCardWindow;
 
@@ -46,9 +49,16 @@ namespace _Project.Composition
                 throw new InvalidOperationException(nameof(_audioMixer));
             }
 
+            if (_gameSounds == null)
+            {
+                throw new InvalidOperationException(nameof(_gameSounds));
+            }
+
             builder.RegisterInstance(_audioMixer);
+            builder.RegisterInstance(_gameSounds);
             builder.Register<AudioMixerControl>(Lifetime.Singleton).As<IAudioMixerControl>();
             builder.RegisterEntryPoint<AudioVolumeSettings>().AsSelf();
+            builder.RegisterEntryPoint<GameplaySounds>();
         }
 
         private void RegisterConfigs(IContainerBuilder builder)
@@ -113,6 +123,7 @@ namespace _Project.Composition
 
             builder.Register<CoinsFormatter>(Lifetime.Singleton);
             builder.Register<BoxPurchaseFailureText>(Lifetime.Singleton);
+            builder.Register<UiSounds>(Lifetime.Singleton);
             builder.Register<WindowQueue>(Lifetime.Singleton).AsSelf().As<IFieldInputBlocker>();
             builder.RegisterEntryPoint<WindowGameplayReporter>();
             builder.RegisterInstance(_recycleConfirmWindow).As<IRecycleConfirmation>();

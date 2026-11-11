@@ -1,4 +1,5 @@
 using System;
+using _Project.UI.Sounds;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +20,7 @@ namespace _Project.UI.Windows
         [SerializeField] private bool _isFullscreen;
 
         private WindowQueue _windows;
+        private UiSounds _sounds;
         private Sequence _popIn;
 
         public bool IsFullscreen => _isFullscreen;
@@ -36,18 +38,20 @@ namespace _Project.UI.Windows
         }
 
         [Inject]
-        public void Construct(WindowQueue windows)
+        public void Construct(WindowQueue windows, UiSounds sounds)
         {
             _windows = windows ?? throw new ArgumentNullException(nameof(windows));
+            _sounds = sounds ?? throw new ArgumentNullException(nameof(sounds));
         }
 
         public virtual void Show()
         {
             _root.SetActive(true);
             PlayPopIn();
+            PlayOpenSound();
         }
 
-        public void Hide()
+        public virtual void Hide()
         {
             _popIn?.Kill();
             _frame.localScale = Vector3.one;
@@ -67,6 +71,11 @@ namespace _Project.UI.Windows
         protected void Close()
         {
             _windows.Close(this);
+        }
+
+        protected virtual void PlayOpenSound()
+        {
+            _sounds.PlayWindowOpened();
         }
 
         private void PlayPopIn()

@@ -15,8 +15,6 @@ namespace _Project.Features.Garage
         private const float OpaqueAlpha = 1f;
 
         [SerializeField] private SpriteRenderer _place;
-        [SerializeField] private Sprite _placeSprite;
-        [SerializeField] private Sprite _pairPlaceSprite;
         [SerializeField] private Color _openPlaceColor = Color.white;
         [SerializeField] private Color _lockedPlaceColor = Color.white;
         [SerializeField] private GameObject _lock;
@@ -103,11 +101,6 @@ namespace _Project.Features.Garage
             _box.gameObject.SetActive(true);
             ShowRank(box.Content, _boxBadgePosition, OpaqueAlpha);
             _content.gameObject.SetActive(true);
-        }
-
-        public void ShowPairHighlight(bool isVisible)
-        {
-            _place.sprite = isVisible ? _pairPlaceSprite : _placeSprite;
         }
 
         public void Lift()

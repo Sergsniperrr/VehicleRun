@@ -407,7 +407,7 @@ public class TimeService : ITimeService
 | SceneSwitcher Pro | кнопки сцен в тулбаре редактора, список настраивается в `Assets/SceneSwitcherPro/` |
 | Odin Inspector | атрибуты `[Button]`, `[ShowInInspector]`, `[Required]` в любых MonoBehaviour и ScriptableObject |
 | DOTween Pro | настройки в `Assets/Resources/DOTweenSettings.asset`; после обновления пакета откройте `Tools, Demigiant, DOTween Utility Panel` и нажмите Setup |
-| TextMeshPro | шрифт игры `Assets/_Project/Fonts/Nunito/Nunito-ExtraBold SDF.asset` с кириллицей, назначается в компоненте явно; шрифт по умолчанию в настройках TMP остался `LiberationSans SDF` без кириллицы (см. [Docs/Localization.md](Docs/Localization.md), раздел 1) |
+| TextMeshPro | шрифт игры `Assets/_Project/Fonts/Kabel_1.asset` с кириллицей (до 11.11.2026 — `Fonts/Nunito/Nunito-ExtraBold SDF.asset`), назначается в компоненте явно; шрифт по умолчанию в настройках TMP остался `LiberationSans SDF` без кириллицы (см. [Docs/Localization.md](Docs/Localization.md), раздел 1) |
 | MCP for Unity | пакет `com.coplaydev.unity-mcp` подключает открытый редактор к AI-агенту: сцены, объекты, консоль, тесты. Сервер запускается вместе с редактором и слушает `http://127.0.0.1:8080/mcp`. Claude Code подключается к нему локальной настройкой: откройте `Window, MCP for Unity, Toggle MCP Window` (Ctrl+Shift+M), выберите Claude Code и нажмите Configure. Окно выполнит `claude mcp add --scope local` для сервера `UnityMCP` и уберёт его из остальных областей, в том числе из `.mcp.json`, поэтому в репозитории этой настройки нет и каждый делает её у себя. Инструменты появляются в сессии, начатой при открытом редакторе |
 
 ---
