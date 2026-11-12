@@ -8,16 +8,30 @@ namespace _Project.Core.Audio
     [CreateAssetMenu(fileName = "AudioAsset", menuName = "_Project/Audio/Audio Asset", order = 0)]
     public class AudioAsset : ScriptableObject
     {
+        private const float MinPitch = 0.1f;
+        private const float MaxPitch = 3f;
+        private const float MaxPitchVariation = 1f;
+
         [SerializeField] private AudioCategories _category;
         [SerializeField] private AudioMixerGroup _outputMixerGroup;
         [SerializeField] private AudioClip[] _audioClips;
         [SerializeField] [Range(0f, 1f)] private float _volume = 1f;
-        [SerializeField] [Range(0.1f, 3f)] private float _pitch = 1f;
+        [SerializeField] [Range(MinPitch, MaxPitch)] private float _pitch = 1f;
+        [SerializeField] [Range(0f, MaxPitchVariation)] private float _pitchVariation;
 
         public AudioCategories Category => _category;
         public AudioMixerGroup OutputMixerGroup => _outputMixerGroup;
         public float Volume => _volume;
         public float Pitch => _pitch;
+
+        public float GetRandomPitch()
+        {
+            float lowestPitch = _pitch - _pitchVariation;
+            float highestPitch = _pitch + _pitchVariation;
+            float pitch = Random.Range(lowestPitch, highestPitch);
+
+            return Mathf.Clamp(pitch, MinPitch, MaxPitch);
+        }
 
         public AudioClip GetRandomClip()
         {

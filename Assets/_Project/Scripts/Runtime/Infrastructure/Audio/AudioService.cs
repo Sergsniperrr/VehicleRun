@@ -81,7 +81,7 @@ namespace _Project.Infrastructure.Audio
             source.clip = clip;
             source.outputAudioMixerGroup = asset.OutputMixerGroup;
             source.volume = asset.Volume;
-            source.pitch = asset.Pitch;
+            source.pitch = asset.GetRandomPitch();
             source.playOnAwake = false;
 
             return source;

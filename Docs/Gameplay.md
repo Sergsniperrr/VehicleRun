@@ -370,7 +370,7 @@ Assets/_Project/Scripts/Runtime/UI/
 
 | Класс | Где стоит | Что делает |
 |---|---|---|
-| `GarageSlotView` | корень префаба `GarageSlot`, экземпляры `World/Garage/Slot_00` … `Slot_14` | рисует слот: замок закрытого слота, пустую площадку, машину со значком ранга или коробку. Машина на трассе полупрозрачная, `On Track Alpha` = 0,5. Цвет значка — `VehicleDefinition.BadgeColor`. Ловит касания через `EventSystem` и поднимает `Tapped`, `DragStarted`, `Dragged`, `DragEnded` с номером слота. На drag поднимает содержимое над остальными (`Lifted Sorting Order` = 100) и оставляет на месте тень |
+| `GarageSlotView` | корень префаба `GarageSlot`, экземпляры `World/Garage/Slot_00` … `Slot_14` | рисует слот: замок закрытого слота, пустую площадку, машину со значком ранга или коробку без значка (решение владельца 12.11.2026). Машина на трассе полупрозрачная, `On Track Alpha` = 0,5. Цвет значка — `VehicleDefinition.BadgeColor`. Ловит касания через `EventSystem` и поднимает `Tapped`, `DragStarted`, `Dragged`, `DragEnded` с номером слота. На drag поднимает содержимое над остальными (`Lifted Sorting Order` = 100) и оставляет на месте тень |
 | `GarageView` | `World/Garage` | хранит виды слотов по номеру и обновляет слот по событиям `GarageBoard` и по `VehicleSent`, `VehicleReturned`. Видов должно быть столько же, сколько `GarageBoard.SlotCount`, иначе `Start` бросает `InvalidOperationException` |
 | `GarageInputView` | `World/Garage` | ведёт перетаскивание: порог, подсветки, цель отпускания, окно переработки. Открывает карточку машины и не пропускает касания, пока поле закрыто окном |
 | `GarageGestures` | singleton игровой сцены | переводит жест в команду: что можно тянуть, где подсветить цель, что сделают тап и отпускание, для какой машины открыть карточку |

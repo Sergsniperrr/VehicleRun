@@ -274,7 +274,6 @@ MonoBehaviour:
   _rankBadgeBack: {fileID: 7025735207856100793}
   _rankValue: {fileID: 2577392730267563934}
   _vehicleBadgePosition: {x: 0.95, y: 0}
-  _boxBadgePosition: {x: -0.23, y: 0.36}
   _shadow: {fileID: 8059751313820857932}
   _shadowColor: {r: 0.25, g: 0.16, b: 0.05, a: 0.35}
   _onTrackAlpha: 0.5

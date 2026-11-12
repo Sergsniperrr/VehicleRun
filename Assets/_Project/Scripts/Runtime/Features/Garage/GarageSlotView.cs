@@ -26,7 +26,6 @@ namespace _Project.Features.Garage
         [SerializeField] private SpriteRenderer _rankBadgeBack;
         [SerializeField] private TMP_Text _rankValue;
         [SerializeField] private Vector2 _vehicleBadgePosition;
-        [SerializeField] private Vector2 _boxBadgePosition;
         [SerializeField] private SpriteRenderer _shadow;
         [SerializeField] private Color _shadowColor = Color.black;
         [SerializeField] private float _onTrackAlpha = 0.5f;
@@ -85,7 +84,7 @@ namespace _Project.Features.Garage
             _vehicle.color = WithAlpha(Color.white, alpha);
             _vehicle.gameObject.SetActive(true);
             _box.gameObject.SetActive(false);
-            ShowRank(vehicle.Definition, _vehicleBadgePosition, alpha);
+            ShowRank(vehicle.Definition, alpha);
             _content.gameObject.SetActive(true);
         }
 
@@ -99,7 +98,7 @@ namespace _Project.Features.Garage
             ShowPlace(_openPlaceColor, false);
             _vehicle.gameObject.SetActive(false);
             _box.gameObject.SetActive(true);
-            ShowRank(box.Content, _boxBadgePosition, OpaqueAlpha);
+            _rankBadge.gameObject.SetActive(false);
             _content.gameObject.SetActive(true);
         }
 
@@ -162,9 +161,10 @@ namespace _Project.Features.Garage
             _lock.SetActive(isLocked);
         }
 
-        private void ShowRank(VehicleDefinition definition, Vector2 badgePosition, float alpha)
+        private void ShowRank(VehicleDefinition definition, float alpha)
         {
-            _rankBadge.localPosition = badgePosition;
+            _rankBadge.localPosition = _vehicleBadgePosition;
+            _rankBadge.gameObject.SetActive(true);
             _rankBadgeBack.color = WithAlpha(definition.BadgeColor, alpha);
             _rankValue.text = definition.Rank.ToString();
             _rankValue.alpha = alpha;
