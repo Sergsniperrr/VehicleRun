@@ -11,16 +11,14 @@ namespace _Project.Features.Track
     public class FinishPayoutsView : MonoBehaviour
     {
         private const string PayoutPrefix = "+";
-        private const float FinishDistance = 0f;
 
         [SerializeField] private FloatingTextView _popupPrefab;
-        [SerializeField] private Vector2 _offset;
+        [SerializeField] private Transform _spawnAnchor;
 
         private readonly List<FloatingTextView> _popups = new List<FloatingTextView>();
         private readonly Stack<FloatingTextView> _freePopups = new Stack<FloatingTextView>();
 
         private TrackRoster _roster;
-        private TrackPath _path;
         private CoinsFormatter _formatter;
         private IObjectResolver _resolver;
 
@@ -40,10 +38,9 @@ namespace _Project.Features.Track
         }
 
         [Inject]
-        public void Construct(TrackRoster roster, TrackPath path, CoinsFormatter formatter, IObjectResolver resolver)
+        public void Construct(TrackRoster roster, CoinsFormatter formatter, IObjectResolver resolver)
         {
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
-            _path = path ?? throw new ArgumentNullException(nameof(path));
             _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
         }
@@ -65,7 +62,7 @@ namespace _Project.Features.Track
         private void OnFinishCrossed(TrackRunner runner, long payout)
         {
             string text = PayoutPrefix + _formatter.FormatShort(payout);
-            Vector2 position = _path.GetPoint(FinishDistance) + _offset;
+            Vector2 position = transform.InverseTransformPoint(_spawnAnchor.position);
             TakePopup().Show(text, position);
         }
 

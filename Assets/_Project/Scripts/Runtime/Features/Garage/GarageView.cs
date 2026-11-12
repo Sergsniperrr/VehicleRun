@@ -1,4 +1,5 @@
 using System;
+using _Project.Core.Vehicles;
 using _Project.Features.Boxes;
 using _Project.Features.Track;
 using _Project.Features.Vehicles;
@@ -13,8 +14,25 @@ namespace _Project.Features.Garage
 
         private GarageBoard _garage;
         private TrackRoster _roster;
+        private VehicleCatalogConfig _vehicles;
 
         public int SlotCount => _slots.Length;
+
+        public bool IsMergePlaying
+        {
+            get
+            {
+                for (int slot = 0; slot < _slots.Length; slot++)
+                {
+                    if (_slots[slot].IsMerging)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
 
         private void Awake()
         {
@@ -59,10 +77,11 @@ namespace _Project.Features.Garage
         }
 
         [Inject]
-        public void Construct(GarageBoard garage, TrackRoster roster)
+        public void Construct(GarageBoard garage, TrackRoster roster, VehicleCatalogConfig vehicles)
         {
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
+            _vehicles = vehicles ?? throw new ArgumentNullException(nameof(vehicles));
         }
 
         public GarageSlotView GetSlot(int slot)
@@ -124,8 +143,11 @@ namespace _Project.Features.Garage
 
         private void OnVehicleMerged(int fromSlot, int toSlot, Vehicle result)
         {
+            VehicleDefinition merged = _vehicles.GetByRank(result.Rank - 1);
+
             Refresh(fromSlot);
             Refresh(toSlot);
+            _slots[toSlot].PlayMerge(merged);
         }
 
         private void OnVehicleRecycled(int slot, Vehicle vehicle)

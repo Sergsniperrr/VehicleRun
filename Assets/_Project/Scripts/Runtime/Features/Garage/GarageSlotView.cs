@@ -1,4 +1,5 @@
 using System;
+using _Project.Core.Audio;
 using _Project.Core.Vehicles;
 using _Project.Features.Boxes;
 using _Project.Features.Vehicles;
@@ -7,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
+using VContainer;
 using Random = UnityEngine.Random;
 
 namespace _Project.Features.Garage
@@ -39,10 +41,22 @@ namespace _Project.Features.Garage
         [SerializeField] private float _boxShakeMaxIntervalSeconds = 3.5f;
         [SerializeField] private float _boxShakeAngle = 9f;
         [SerializeField] private float _boxShakeSwingSeconds = 0.07f;
+        [SerializeField] private SpriteRenderer _mergeLeft;
+        [SerializeField] private SpriteRenderer _mergeRight;
+        [SerializeField] private ParticleSystem _mergeBurst;
+        [SerializeField] private float _mergeSpread = 0.9f;
+        [SerializeField] private float _mergeSeconds = 0.5f;
+        [SerializeField] private float _mergePopStartScale = 0.6f;
+        [SerializeField] private float _mergePopSeconds = 0.25f;
+        [SerializeField] private float _mergeBurstHoldSeconds = 0.5f;
 
         private BoxCollider2D _collider;
         private int _restingSortingOrder;
+        private IAudioService _audio;
+        private GameSoundsConfig _sounds;
         private Tween _boxShake;
+        private Tween _merge;
+        private bool _isMergeResultShown;
 
         public event Action<int, PointerEventData> Tapped;
         public event Action<int, PointerEventData> DragStarted;
@@ -51,17 +65,29 @@ namespace _Project.Features.Garage
 
         public int Slot { get; private set; }
         public Vector3 ContentPosition => _content.position;
+        public bool IsMerging => _merge != null;
+
+        private bool IsInputLocked => IsMerging && _isMergeResultShown == false;
 
         private void Awake()
         {
             _collider = GetComponent<BoxCollider2D>();
             _restingSortingOrder = _contentSorting.sortingOrder;
             _shadow.gameObject.SetActive(false);
+            HideMergingVehicles();
         }
 
         private void OnDestroy()
         {
             StopBoxShake();
+            StopMerge();
+        }
+
+        [Inject]
+        public void Construct(IAudioService audio, GameSoundsConfig sounds)
+        {
+            _audio = audio ?? throw new ArgumentNullException(nameof(audio));
+            _sounds = sounds ?? throw new ArgumentNullException(nameof(sounds));
         }
 
         public void Bind(int slot)
@@ -78,6 +104,7 @@ namespace _Project.Features.Garage
         {
             ShowPlace(_lockedPlaceColor, true);
             StopBoxShake();
+            StopMerge();
             _content.gameObject.SetActive(false);
         }
 
@@ -85,6 +112,7 @@ namespace _Project.Features.Garage
         {
             ShowPlace(_openPlaceColor, false);
             StopBoxShake();
+            StopMerge();
             _content.gameObject.SetActive(false);
         }
 
@@ -102,6 +130,7 @@ namespace _Project.Features.Garage
             _vehicle.gameObject.SetActive(true);
             _box.gameObject.SetActive(false);
             StopBoxShake();
+            StopMerge();
             ShowRank(vehicle.Definition, alpha);
             _content.gameObject.SetActive(true);
         }
@@ -117,6 +146,7 @@ namespace _Project.Features.Garage
             _vehicle.gameObject.SetActive(false);
             _box.gameObject.SetActive(true);
             _rankBadge.gameObject.SetActive(false);
+            StopMerge();
             _content.gameObject.SetActive(true);
             StartBoxShake();
         }
@@ -124,6 +154,30 @@ namespace _Project.Features.Garage
         public void PlayBoxOpened()
         {
             _boxOpenBurst.Play();
+        }
+
+        public void PlayMerge(VehicleDefinition merged)
+        {
+            if (merged == null)
+            {
+                throw new ArgumentNullException(nameof(merged));
+            }
+
+            StopMerge();
+            _isMergeResultShown = false;
+
+            float centerX = _vehicle.transform.localPosition.x;
+            PlaceMergingVehicle(_mergeLeft, merged, -_mergeSpread);
+            PlaceMergingVehicle(_mergeRight, merged, _mergeSpread);
+            _content.gameObject.SetActive(false);
+
+            _merge = DOTween.Sequence()
+                .Append(_mergeLeft.transform.DOLocalMoveX(centerX, _mergeSeconds).SetEase(Ease.InQuad))
+                .Join(_mergeRight.transform.DOLocalMoveX(centerX, _mergeSeconds).SetEase(Ease.InQuad))
+                .AppendCallback(ShowMergeResult)
+                .Append(_content.DOScale(Vector3.one, _mergePopSeconds).SetEase(Ease.OutBack))
+                .AppendInterval(_mergeBurstHoldSeconds)
+                .OnComplete(FinishMerge);
         }
 
         public void Lift()
@@ -157,7 +211,7 @@ namespace _Project.Features.Garage
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.dragging || eventData.button != PointerEventData.InputButton.Left)
+            if (IsInputLocked || eventData.dragging || eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }
@@ -167,7 +221,7 @@ namespace _Project.Features.Garage
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (eventData.button != PointerEventData.InputButton.Left)
+            if (IsInputLocked || eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }
@@ -212,6 +266,7 @@ namespace _Project.Features.Garage
 
             _boxShake = DOTween.Sequence()
                 .AppendInterval(interval)
+                .AppendCallback(PlayShakeSound)
                 .Append(CreateBoxSwing(_boxShakeAngle))
                 .Append(CreateBoxSwing(-_boxShakeAngle))
                 .Append(CreateBoxSwing(settleAngle))
@@ -232,11 +287,65 @@ namespace _Project.Features.Garage
             _box.transform.localRotation = Quaternion.identity;
         }
 
+        private void PlayShakeSound()
+        {
+            if (_sounds.BoxShake == null)
+            {
+                return;
+            }
+
+            _audio.PlayOneShot(_sounds.BoxShake);
+        }
+
         private Tween CreateBoxSwing(float angle)
         {
             Vector3 rotation = new Vector3(0f, 0f, angle);
 
             return _box.transform.DOLocalRotate(rotation, _boxShakeSwingSeconds).SetEase(Ease.InOutSine);
+        }
+
+        private void PlaceMergingVehicle(SpriteRenderer vehicle, VehicleDefinition definition, float offsetX)
+        {
+            Vector3 position = _vehicle.transform.localPosition;
+            position.x += offsetX;
+
+            vehicle.sprite = definition.GarageSprite;
+            vehicle.transform.localPosition = position;
+            vehicle.transform.localScale = _vehicle.transform.localScale;
+            vehicle.gameObject.SetActive(true);
+        }
+
+        private void ShowMergeResult()
+        {
+            HideMergingVehicles();
+            _isMergeResultShown = true;
+            _content.localScale = Vector3.one * _mergePopStartScale;
+            _content.gameObject.SetActive(true);
+            _mergeBurst.Play();
+        }
+
+        private void FinishMerge()
+        {
+            _merge = null;
+        }
+
+        private void StopMerge()
+        {
+            if (_merge == null)
+            {
+                return;
+            }
+
+            _merge.Kill();
+            _merge = null;
+            HideMergingVehicles();
+            _content.localScale = Vector3.one;
+        }
+
+        private void HideMergingVehicles()
+        {
+            _mergeLeft.gameObject.SetActive(false);
+            _mergeRight.gameObject.SetActive(false);
         }
 
         private Color WithAlpha(Color color, float alpha)

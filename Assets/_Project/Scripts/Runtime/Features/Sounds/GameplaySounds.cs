@@ -40,6 +40,7 @@ namespace _Project.Features.Sounds
         public void Start()
         {
             _garage.VehicleMerged += OnVehicleMerged;
+            _garage.BoxOpened += OnBoxOpened;
             _roster.FinishCrossed += OnFinishCrossed;
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
         }
@@ -47,6 +48,7 @@ namespace _Project.Features.Sounds
         public void Dispose()
         {
             _garage.VehicleMerged -= OnVehicleMerged;
+            _garage.BoxOpened -= OnBoxOpened;
             _roster.FinishCrossed -= OnFinishCrossed;
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
         }
@@ -68,6 +70,11 @@ namespace _Project.Features.Sounds
         private void OnVehicleMerged(int fromSlot, int toSlot, Vehicle result)
         {
             _audio.PlayOneShot(_sounds.Merge);
+        }
+
+        private void OnBoxOpened(int slot, Vehicle vehicle)
+        {
+            _audio.PlayOneShot(_sounds.BoxOpen);
         }
 
         private void OnFinishCrossed(TrackRunner runner, long payout)

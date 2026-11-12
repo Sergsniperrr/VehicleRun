@@ -175,7 +175,7 @@ private float ToDecibels(float linearVolume)
 
 ## 7. Звуки игры
 
-Пять звуков владельца лежат в `Assets/_Project/Audio/VFX/` (11.11.2026). На каждом файле создан `AudioAsset` с категорией `SFX` и группой микшера `SFX`, а все пять собраны в один конфиг `GameSoundsConfig.asset` в той же папке. Где играть звук, определено по имени файла:
+Звуки владельца лежат в `Assets/_Project/Audio/VFX/`. На каждом файле создан `AudioAsset` с категорией `SFX` и группой микшера `SFX`, а все собраны в один конфиг `GameSoundsConfig.asset` в той же папке. Где играть звук, определено по имени файла:
 
 | Файл | `AudioAsset` | Когда играет | Кто играет |
 |---|---|---|---|
@@ -184,20 +184,23 @@ private float ToDecibels(float linearVolume)
 | `Merge.ogg` (0,65 с) | `Sfx_Merge` | успешное слияние двух машин (`GarageBoard.VehicleMerged`) | `GameplaySounds` |
 | `Money.ogg` (1,0 с) | `Sfx_Money` | выплата на финише (`TrackRoster.FinishCrossed`) и забор награды гифт-дорожки (`CollectionMilestones.MilestoneClaimed`) | `GameplaySounds` |
 | `LevelUp.ogg` (0,93 с) | `Sfx_LevelUp` | показ окна левелапа, то есть открытие нового ранга | `LevelUpWindow` |
+| `BoxOpen` | `Sfx_BoxOpen` | открытие коробки в гараже (`GarageBoard.BoxOpened`) | `GameplaySounds` |
+| `BoxShaking` | `Sfx_BoxShake` | каждый цикл тряски коробки в слоте | `GarageSlotView` |
 
 Как это устроено:
 
-- **`GameSoundsConfig`** (`Core/Audio`, меню **Create → _Project → Audio → Game Sounds Config**) — ScriptableObject с пятью ссылками на `AudioAsset` и полем `Money Min Interval Seconds` = 0,5. Ассет назначен в поле `Game Sounds` у `GameLifetimeScope`, без него контейнер бросает `InvalidOperationException`.
+- **`GameSoundsConfig`** (`Core/Audio`, меню **Create → _Project → Audio → Game Sounds Config**) — ScriptableObject со ссылками на `AudioAsset` (`Click`, `Window`, `Merge`, `Money`, `LevelUp`, `BoxOpen`, `BoxShake`) и полем `Money Min Interval Seconds` = 0,5. Ассет назначен в поле `Game Sounds` у `GameLifetimeScope`, без него контейнер бросает `InvalidOperationException`.
 - **`GameplaySounds`** (`Features/Sounds`) — entry point (`IStartable`, `IDisposable`) игровой сцены. Подписывается на события логики и вызывает `IAudioService.PlayOneShot`. Звук монет играет не чаще раза в `Money Min Interval Seconds` по `ITimeService.Time`: при восьми машинах на трассе выплаты идут чаще секунды, а звук длится секунду, без ограничения они складывались бы в гул.
 - **`UiSounds`** (`UI/Sounds`) — singleton игровой сцены с методами `PlayClick`, `PlayWindowOpened` и `PlayLevelUp`.
 - **`ButtonClickSound`** (`UI/Sounds`) — компонент рядом с `Button`: подписывается на `onClick` и играет клик. Выключенная кнопка (`interactable` = false) не щёлкает: `onClick` у неё не срабатывает. Компонент стоит на всех кнопках `Canvas` сцены `Game` и на кнопке префаба `ShopRow`. На затемнении карточки машины его нет: это не кнопка в глазах игрока.
 - **Окна.** `Window.Show()` вызывает виртуальный `PlayOpenSound()`, по умолчанию это звук окна. `LevelUpWindow` переопределяет его звуком левелапа, чтобы два звука не накладывались.
+- **`GarageSlotView`** (`Features/Garage`) получает `IAudioService` и `GameSoundsConfig` через `[Inject] Construct` (слоты внедряются из `Auto Inject` объекта `World`). Он играет `BoxShake` в колбэке DOTween-последовательности тряски — раз за цикл, перед наклонами ([Gameplay.md](Gameplay.md), раздел 12). Каждая коробка трясётся на своём случайном интервале 2,5–3,5 секунды, поэтому звук звучит вразнобой.
 
 **Новой кнопке** добавьте компонент `ButtonClickSound`. Кнопка в префабе, созданном через `IObjectResolver.Instantiate`, получит `UiSounds` сама, кнопка сцены — через `Auto Inject` объекта `Canvas`.
 
 **Новый звук:** файл в `Audio/VFX`, `AudioAsset` на нём, поле в `GameSoundsConfig` и вызов в `GameplaySounds` (событие логики) или `UiSounds` (интерфейс).
 
-Тап по коробке, отправка на трассу, покупка, турбо и переработка пока беззвучны: файлов под них нет. Остаток задачи 3.5 — эти звуки, двигатели и музыка турбо.
+Отправка на трассу, покупка, турбо и переработка пока беззвучны: файлов под них нет. Остаток задачи 3.5 — эти звуки, двигатели и музыка турбо.
 
 ---
 

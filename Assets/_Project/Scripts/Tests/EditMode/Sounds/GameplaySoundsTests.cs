@@ -1,4 +1,5 @@
 using _Project.Core.Audio;
+using _Project.Features.Boxes;
 using _Project.Features.Sounds;
 using _Project.Tests.EditMode.Configs;
 using _Project.Tests.EditMode.Save;
@@ -21,6 +22,7 @@ namespace _Project.Tests.EditMode.Sounds
         private GameSoundsConfig _config;
         private AudioAsset _merge;
         private AudioAsset _money;
+        private AudioAsset _boxOpen;
         private GameplaySounds _sounds;
 
         [SetUp]
@@ -32,11 +34,13 @@ namespace _Project.Tests.EditMode.Sounds
             _time = new FakeTimeService();
             _merge = ScriptableObject.CreateInstance<AudioAsset>();
             _money = ScriptableObject.CreateInstance<AudioAsset>();
+            _boxOpen = ScriptableObject.CreateInstance<AudioAsset>();
             _config = ScriptableObject.CreateInstance<GameSoundsConfig>();
 
             SerializedObject serializedConfig = new SerializedObject(_config);
             serializedConfig.FindProperty("_merge").objectReferenceValue = _merge;
             serializedConfig.FindProperty("_money").objectReferenceValue = _money;
+            serializedConfig.FindProperty("_boxOpen").objectReferenceValue = _boxOpen;
             serializedConfig.FindProperty("_moneyMinIntervalSeconds").floatValue = MoneyMinIntervalSeconds;
             serializedConfig.ApplyModifiedPropertiesWithoutUndo();
 
@@ -53,6 +57,7 @@ namespace _Project.Tests.EditMode.Sounds
             Object.DestroyImmediate(_config);
             Object.DestroyImmediate(_merge);
             Object.DestroyImmediate(_money);
+            Object.DestroyImmediate(_boxOpen);
         }
 
         [Test]
@@ -64,6 +69,16 @@ namespace _Project.Tests.EditMode.Sounds
             _game.Garage.Merge(0, 1);
 
             Assert.That(_audio.Played, Is.EqualTo(new[] { _merge }));
+        }
+
+        [Test]
+        public void OpenBoxPlaysBoxOpenSound()
+        {
+            _game.PlaceBox(0, 1, BoxSource.Free);
+
+            _game.Garage.OpenBox(0);
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _boxOpen }));
         }
 
         [Test]

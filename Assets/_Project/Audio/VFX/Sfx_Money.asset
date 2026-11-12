@@ -16,6 +16,6 @@ MonoBehaviour:
   _outputMixerGroup: {fileID: -4359408932653275290, guid: 77389cd4bc77c6f4dbfd28e40a1e2244, type: 2}
   _audioClips:
   - {fileID: 8300000, guid: 46d019a5703c14f4fb2ec0777127b6e4, type: 3}
-  _volume: 1
+  _volume: 0.5
   _pitch: 1
   _pitchVariation: 0.2
