@@ -113,6 +113,7 @@ namespace _Project.Features.Garage
         private void OnBoxOpened(int slot, Vehicle vehicle)
         {
             Refresh(slot);
+            _slots[slot].PlayBoxOpened();
         }
 
         private void OnVehicleMoved(int fromSlot, int toSlot)

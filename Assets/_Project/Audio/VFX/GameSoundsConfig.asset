@@ -17,4 +17,4 @@ MonoBehaviour:
   _merge: {fileID: 11400000, guid: 21be96bf524c4da4980076279d184490, type: 2}
   _money: {fileID: 11400000, guid: 980e138d50f85f04687c7f197844d700, type: 2}
   _levelUp: {fileID: 11400000, guid: 5fd5ed7443494704c834dfc5f9576789, type: 2}
-  _moneyMinIntervalSeconds: 0.5
+  _moneyMinIntervalSeconds: 0.1

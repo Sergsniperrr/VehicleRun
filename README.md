@@ -75,7 +75,7 @@ Assets/
 |---|---|---|
 | `_Project.Core` | UniTask | интерфейсы сервисов, события аналитики, модели данных, ScriptableObject-конфиги |
 | `_Project.Infrastructure` | Core, VContainer, UniTask, JTLStudio.SDK | реализации интерфейсов Core, обёртки над SDK и Unity API |
-| `_Project.Features` | Core, VContainer, UniTask, Unity.TextMeshPro, UnityEngine.UI | игровые механики и виды мира рядом с ними: гараж, трасса, экономика. `UnityEngine.UI` нужен ради `EventSystem`: через него идёт ввод гаража |
+| `_Project.Features` | Core, VContainer, UniTask, Unity.TextMeshPro, UnityEngine.UI | игровые механики и виды мира рядом с ними: гараж, трасса, экономика. `UnityEngine.UI` нужен ради `EventSystem`: через него идёт ввод гаража. Тряску коробки в слоте анимирует DOTween: его `DOTween.dll` подключается автоматически, отдельной ссылки в asmdef нет |
 | `_Project.UI` | Core, Features, VContainer, UniTask, Unity.TextMeshPro, UnityEngine.UI | экраны, окна, компоненты интерфейса. Появление окон анимирует DOTween: его `DOTween.dll` подключается автоматически, отдельной ссылки в asmdef нет |
 | `_Project.Composition` | Core, Infrastructure, Features, UI, VContainer, UniTask | регистрация в контейнере, состояния запуска |
 | `_Project.Editor` | все сборки выше, только Editor | редакторские скрипты и тулзы |

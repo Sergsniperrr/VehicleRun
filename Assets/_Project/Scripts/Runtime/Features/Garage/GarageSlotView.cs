@@ -2,10 +2,12 @@ using System;
 using _Project.Core.Vehicles;
 using _Project.Features.Boxes;
 using _Project.Features.Vehicles;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 namespace _Project.Features.Garage
 {
@@ -13,6 +15,8 @@ namespace _Project.Features.Garage
     public class GarageSlotView : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         private const float OpaqueAlpha = 1f;
+        private const float BoxShakeSettleFactor = 0.5f;
+        private const int EndlessLoops = -1;
 
         [SerializeField] private SpriteRenderer _place;
         [SerializeField] private Color _openPlaceColor = Color.white;
@@ -22,6 +26,7 @@ namespace _Project.Features.Garage
         [SerializeField] private SortingGroup _contentSorting;
         [SerializeField] private SpriteRenderer _vehicle;
         [SerializeField] private SpriteRenderer _box;
+        [SerializeField] private ParticleSystem _boxOpenBurst;
         [SerializeField] private Transform _rankBadge;
         [SerializeField] private SpriteRenderer _rankBadgeBack;
         [SerializeField] private TMP_Text _rankValue;
@@ -30,9 +35,14 @@ namespace _Project.Features.Garage
         [SerializeField] private Color _shadowColor = Color.black;
         [SerializeField] private float _onTrackAlpha = 0.5f;
         [SerializeField] private int _liftedSortingOrder = 100;
+        [SerializeField] private float _boxShakeMinIntervalSeconds = 2.5f;
+        [SerializeField] private float _boxShakeMaxIntervalSeconds = 3.5f;
+        [SerializeField] private float _boxShakeAngle = 9f;
+        [SerializeField] private float _boxShakeSwingSeconds = 0.07f;
 
         private BoxCollider2D _collider;
         private int _restingSortingOrder;
+        private Tween _boxShake;
 
         public event Action<int, PointerEventData> Tapped;
         public event Action<int, PointerEventData> DragStarted;
@@ -49,6 +59,11 @@ namespace _Project.Features.Garage
             _shadow.gameObject.SetActive(false);
         }
 
+        private void OnDestroy()
+        {
+            StopBoxShake();
+        }
+
         public void Bind(int slot)
         {
             Slot = slot;
@@ -62,12 +77,14 @@ namespace _Project.Features.Garage
         public void ShowLocked()
         {
             ShowPlace(_lockedPlaceColor, true);
+            StopBoxShake();
             _content.gameObject.SetActive(false);
         }
 
         public void ShowEmpty()
         {
             ShowPlace(_openPlaceColor, false);
+            StopBoxShake();
             _content.gameObject.SetActive(false);
         }
 
@@ -84,6 +101,7 @@ namespace _Project.Features.Garage
             _vehicle.color = WithAlpha(Color.white, alpha);
             _vehicle.gameObject.SetActive(true);
             _box.gameObject.SetActive(false);
+            StopBoxShake();
             ShowRank(vehicle.Definition, alpha);
             _content.gameObject.SetActive(true);
         }
@@ -100,6 +118,12 @@ namespace _Project.Features.Garage
             _box.gameObject.SetActive(true);
             _rankBadge.gameObject.SetActive(false);
             _content.gameObject.SetActive(true);
+            StartBoxShake();
+        }
+
+        public void PlayBoxOpened()
+        {
+            _boxOpenBurst.Play();
         }
 
         public void Lift()
@@ -111,6 +135,7 @@ namespace _Project.Features.Garage
             _shadow.transform.localScale = item.transform.localScale;
             _shadow.gameObject.SetActive(true);
             _contentSorting.sortingOrder = _liftedSortingOrder;
+            StopBoxShake();
         }
 
         public void MoveContent(Vector3 worldPosition)
@@ -123,6 +148,11 @@ namespace _Project.Features.Garage
             _content.localPosition = Vector3.zero;
             _contentSorting.sortingOrder = _restingSortingOrder;
             _shadow.gameObject.SetActive(false);
+
+            if (_content.gameObject.activeSelf && _box.gameObject.activeSelf)
+            {
+                StartBoxShake();
+            }
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -168,6 +198,45 @@ namespace _Project.Features.Garage
             _rankBadgeBack.color = WithAlpha(definition.BadgeColor, alpha);
             _rankValue.text = definition.Rank.ToString();
             _rankValue.alpha = alpha;
+        }
+
+        private void StartBoxShake()
+        {
+            if (_boxShake != null)
+            {
+                return;
+            }
+
+            float interval = Random.Range(_boxShakeMinIntervalSeconds, _boxShakeMaxIntervalSeconds);
+            float settleAngle = _boxShakeAngle * BoxShakeSettleFactor;
+
+            _boxShake = DOTween.Sequence()
+                .AppendInterval(interval)
+                .Append(CreateBoxSwing(_boxShakeAngle))
+                .Append(CreateBoxSwing(-_boxShakeAngle))
+                .Append(CreateBoxSwing(settleAngle))
+                .Append(CreateBoxSwing(-settleAngle))
+                .Append(CreateBoxSwing(0f))
+                .SetLoops(EndlessLoops);
+        }
+
+        private void StopBoxShake()
+        {
+            if (_boxShake == null)
+            {
+                return;
+            }
+
+            _boxShake.Kill();
+            _boxShake = null;
+            _box.transform.localRotation = Quaternion.identity;
+        }
+
+        private Tween CreateBoxSwing(float angle)
+        {
+            Vector3 rotation = new Vector3(0f, 0f, angle);
+
+            return _box.transform.DOLocalRotate(rotation, _boxShakeSwingSeconds).SetEase(Ease.InOutSine);
         }
 
         private Color WithAlpha(Color color, float alpha)
