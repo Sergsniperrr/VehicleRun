@@ -1,6 +1,7 @@
 using _Project.Core.Audio;
 using _Project.Features.Boxes;
 using _Project.Features.Sounds;
+using _Project.Features.Track;
 using _Project.Tests.EditMode.Configs;
 using _Project.Tests.EditMode.Save;
 using NUnit.Framework;
@@ -14,6 +15,10 @@ namespace _Project.Tests.EditMode.Sounds
         private const float MoneyMinIntervalSeconds = 0.5f;
         private const int MilestoneRank = 4;
         private const float LapMargin = 1.01f;
+        private const float FirstRankPitch = 1.3f;
+        private const float LastRankPitch = 0.7f;
+        private const float PitchTolerance = 0.0001f;
+        private const int TurboUnlockRank = 3;
 
         private GameConfigFixture _fixture;
         private SaveTestGame _game;
@@ -23,6 +28,8 @@ namespace _Project.Tests.EditMode.Sounds
         private AudioAsset _merge;
         private AudioAsset _money;
         private AudioAsset _boxOpen;
+        private AudioAsset _startMoving;
+        private AudioAsset _boost;
         private GameplaySounds _sounds;
 
         [SetUp]
@@ -35,16 +42,30 @@ namespace _Project.Tests.EditMode.Sounds
             _merge = ScriptableObject.CreateInstance<AudioAsset>();
             _money = ScriptableObject.CreateInstance<AudioAsset>();
             _boxOpen = ScriptableObject.CreateInstance<AudioAsset>();
+            _startMoving = ScriptableObject.CreateInstance<AudioAsset>();
+            _boost = ScriptableObject.CreateInstance<AudioAsset>();
             _config = ScriptableObject.CreateInstance<GameSoundsConfig>();
 
             SerializedObject serializedConfig = new SerializedObject(_config);
             serializedConfig.FindProperty("_merge").objectReferenceValue = _merge;
             serializedConfig.FindProperty("_money").objectReferenceValue = _money;
             serializedConfig.FindProperty("_boxOpen").objectReferenceValue = _boxOpen;
+            serializedConfig.FindProperty("_startMoving").objectReferenceValue = _startMoving;
+            serializedConfig.FindProperty("_boost").objectReferenceValue = _boost;
+            serializedConfig.FindProperty("_startMovingFirstRankPitch").floatValue = FirstRankPitch;
+            serializedConfig.FindProperty("_startMovingLastRankPitch").floatValue = LastRankPitch;
             serializedConfig.FindProperty("_moneyMinIntervalSeconds").floatValue = MoneyMinIntervalSeconds;
             serializedConfig.ApplyModifiedPropertiesWithoutUndo();
 
-            _sounds = new GameplaySounds(_audio, _config, _time, _game.Garage, _game.Roster, _game.Milestones);
+            _sounds = new GameplaySounds(
+                _audio,
+                _config,
+                _time,
+                _game.Garage,
+                _game.Roster,
+                _game.Milestones,
+                _game.Turbo,
+                _fixture.Vehicles);
             _sounds.Start();
         }
 
@@ -58,6 +79,8 @@ namespace _Project.Tests.EditMode.Sounds
             Object.DestroyImmediate(_merge);
             Object.DestroyImmediate(_money);
             Object.DestroyImmediate(_boxOpen);
+            Object.DestroyImmediate(_startMoving);
+            Object.DestroyImmediate(_boost);
         }
 
         [Test]
@@ -137,6 +160,101 @@ namespace _Project.Tests.EditMode.Sounds
         }
 
         [Test]
+        public void SendToTrackPlaysStartMovingSound()
+        {
+            _game.PlaceVehicle(0, 1);
+
+            _game.Roster.SendToTrack(0);
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _startMoving }));
+        }
+
+        [Test]
+        public void FirstRankStartsWithFirstRankPitch()
+        {
+            _game.PlaceVehicle(0, 1);
+
+            _game.Roster.SendToTrack(0);
+
+            Assert.That(_audio.PitchScales[0], Is.EqualTo(FirstRankPitch).Within(PitchTolerance));
+        }
+
+        [Test]
+        public void LastRankStartsWithLastRankPitch()
+        {
+            _game.PlaceVehicle(0, _fixture.Vehicles.MaxRank);
+
+            _game.Roster.SendToTrack(0);
+
+            Assert.That(_audio.PitchScales[0], Is.EqualTo(LastRankPitch).Within(PitchTolerance));
+        }
+
+        [Test]
+        public void StartPitchFallsWithRank()
+        {
+            int lastRank = _fixture.Vehicles.MaxRank;
+            int middleRank = (1 + lastRank) / 2;
+            float rankShare = (middleRank - 1) / (float)(lastRank - 1);
+            float expectedPitch = FirstRankPitch + (LastRankPitch - FirstRankPitch) * rankShare;
+            _game.PlaceVehicle(0, middleRank);
+
+            _game.Roster.SendToTrack(0);
+
+            Assert.That(_audio.PitchScales[0], Is.EqualTo(expectedPitch).Within(PitchTolerance));
+        }
+
+        [Test]
+        public void FailedSendIsSilent()
+        {
+            _game.Roster.SendToTrack(0);
+
+            Assert.That(_audio.Played, Is.Empty);
+        }
+
+        [Test]
+        public void TapBoostPlaysBoostSound()
+        {
+            SendVehicleToTrack();
+
+            _game.Turbo.BoostRunner(_game.Roster.Runners[0]);
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _boost }));
+        }
+
+        [Test]
+        public void TapBoostOfReturnedVehicleIsSilent()
+        {
+            SendVehicleToTrack();
+            TrackRunner runner = _game.Roster.Runners[0];
+            _game.Roster.ReturnFromTrack(0);
+
+            _game.Turbo.BoostRunner(runner);
+
+            Assert.That(_audio.Played, Is.Empty);
+        }
+
+        [Test]
+        public void TurboStartPlaysBoostSound()
+        {
+            _game.PlaceVehicle(1, TurboUnlockRank);
+            SendVehicleToTrack();
+
+            _game.Turbo.StartTurbo();
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _boost }));
+        }
+
+        [Test]
+        public void FailedTurboStartIsSilent()
+        {
+            SendVehicleToTrack();
+
+            _game.Turbo.StartTurbo();
+
+            Assert.That(_audio.Played, Is.Empty);
+        }
+
+        [Test]
         public void DisposedSoundsAreSilent()
         {
             _game.PlaceVehicle(0, 1);
@@ -152,6 +270,7 @@ namespace _Project.Tests.EditMode.Sounds
         {
             _game.PlaceVehicle(0, 1);
             _game.Roster.SendToTrack(0);
+            _audio.Clear();
         }
 
         private void CrossFinish()

@@ -26,9 +26,14 @@ namespace _Project.Core.Audio
 
         public float GetRandomPitch()
         {
+            return GetRandomPitch(1f);
+        }
+
+        public float GetRandomPitch(float pitchScale)
+        {
             float lowestPitch = _pitch - _pitchVariation;
             float highestPitch = _pitch + _pitchVariation;
-            float pitch = Random.Range(lowestPitch, highestPitch);
+            float pitch = Random.Range(lowestPitch, highestPitch) * pitchScale;
 
             return Mathf.Clamp(pitch, MinPitch, MaxPitch);
         }

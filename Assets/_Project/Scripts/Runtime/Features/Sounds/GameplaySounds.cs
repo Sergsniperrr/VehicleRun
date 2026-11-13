@@ -1,9 +1,11 @@
 using System;
 using _Project.Core.Audio;
 using _Project.Core.Time;
+using _Project.Core.Vehicles;
 using _Project.Features.Garage;
 using _Project.Features.Progression;
 using _Project.Features.Track;
+using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
 using VContainer.Unity;
 
@@ -17,6 +19,8 @@ namespace _Project.Features.Sounds
         private readonly GarageBoard _garage;
         private readonly TrackRoster _roster;
         private readonly CollectionMilestones _milestones;
+        private readonly TurboService _turbo;
+        private readonly VehicleCatalogConfig _catalog;
 
         private bool _hasMoneyPlayed;
         private float _lastMoneyTime;
@@ -27,7 +31,9 @@ namespace _Project.Features.Sounds
             ITimeService time,
             GarageBoard garage,
             TrackRoster roster,
-            CollectionMilestones milestones)
+            CollectionMilestones milestones,
+            TurboService turbo,
+            VehicleCatalogConfig catalog)
         {
             _audio = audio ?? throw new ArgumentNullException(nameof(audio));
             _sounds = sounds ?? throw new ArgumentNullException(nameof(sounds));
@@ -35,6 +41,8 @@ namespace _Project.Features.Sounds
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
+            _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
+            _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         }
 
         public void Start()
@@ -42,7 +50,10 @@ namespace _Project.Features.Sounds
             _garage.VehicleMerged += OnVehicleMerged;
             _garage.BoxOpened += OnBoxOpened;
             _roster.FinishCrossed += OnFinishCrossed;
+            _roster.VehicleSent += OnVehicleSent;
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
+            _turbo.TurboStarted += OnTurboStarted;
+            _turbo.RunnerBoosted += OnRunnerBoosted;
         }
 
         public void Dispose()
@@ -50,7 +61,10 @@ namespace _Project.Features.Sounds
             _garage.VehicleMerged -= OnVehicleMerged;
             _garage.BoxOpened -= OnBoxOpened;
             _roster.FinishCrossed -= OnFinishCrossed;
+            _roster.VehicleSent -= OnVehicleSent;
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
+            _turbo.TurboStarted -= OnTurboStarted;
+            _turbo.RunnerBoosted -= OnRunnerBoosted;
         }
 
         private void PlayMoney()
@@ -65,6 +79,21 @@ namespace _Project.Features.Sounds
             _hasMoneyPlayed = true;
             _lastMoneyTime = now;
             _audio.PlayOneShot(_sounds.Money);
+        }
+
+        private float CalculateStartMovingPitch(int rank)
+        {
+            int lastRank = _catalog.MaxRank;
+
+            if (lastRank <= 1)
+            {
+                return _sounds.StartMovingFirstRankPitch;
+            }
+
+            float rankShare = (rank - 1) / (float)(lastRank - 1);
+            float pitchRange = _sounds.StartMovingLastRankPitch - _sounds.StartMovingFirstRankPitch;
+
+            return _sounds.StartMovingFirstRankPitch + pitchRange * rankShare;
         }
 
         private void OnVehicleMerged(int fromSlot, int toSlot, Vehicle result)
@@ -85,6 +114,22 @@ namespace _Project.Features.Sounds
         private void OnMilestoneClaimed(int rank)
         {
             PlayMoney();
+        }
+
+        private void OnVehicleSent(TrackRunner runner)
+        {
+            float pitch = CalculateStartMovingPitch(runner.Vehicle.Rank);
+            _audio.PlayOneShot(_sounds.StartMoving, pitch);
+        }
+
+        private void OnTurboStarted()
+        {
+            _audio.PlayOneShot(_sounds.Boost);
+        }
+
+        private void OnRunnerBoosted(TrackRunner runner)
+        {
+            _audio.PlayOneShot(_sounds.Boost);
         }
     }
 }

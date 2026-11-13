@@ -54,7 +54,7 @@ builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
 | `Pitch` | Скорость и высота звучания от 0.1 до 3, обычное значение 1 |
 | `Pitch Variation` | Случайный разброс высоты от 0 до 1. При каждом воспроизведении высота берётся случайно от `Pitch − Pitch Variation` до `Pitch + Pitch Variation` и остаётся в пределах 0.1–3. При 0 высота всегда равна `Pitch` |
 
-Разброс высоты нужен для того же, что и несколько клипов: частый звук (клик, слияние, монеты) с `Pitch Variation` 0,05–0,15 перестаёт звучать одинаково. Музыке разброс оставляйте 0: иначе при каждом запуске мелодия шла бы с другой скоростью. Высоту выбирает `AudioAsset.GetRandomPitch()`. У всех ассетов игры разброс сейчас 0, звучание прежнее.
+Разброс высоты нужен для того же, что и несколько клипов: частый звук (клик, слияние, монеты) с `Pitch Variation` 0,05–0,15 перестаёт звучать одинаково. Музыке разброс оставляйте 0: иначе при каждом запуске мелодия шла бы с другой скоростью. Высоту выбирает `AudioAsset.GetRandomPitch()`, а `GetRandomPitch(pitchScale)` ещё и умножает её на множитель вызова; итог остаётся в пределах 0.1–3.
 
 Массив клипов нужен для разнообразия: положите в один ассет 3-4 варианта удара, и одинаковый звук перестанет надоедать. Если вариант всего один, просто оставьте в массиве одну строку.
 
@@ -101,11 +101,12 @@ _audio.PlayMusic(_menuMusic);
 
 *Пример условный: в вашем проекте имена, параметры и логика могут отличаться.*
 
-Всего два метода:
+Методов три:
 
 | Метод | Для чего | Требует категорию |
 |---|---|---|
 | `PlayOneShot(AudioAsset)` | Короткий звук: удар, взрыв, клик | `SFX` |
+| `PlayOneShot(AudioAsset, float pitchScale)` | Тот же короткий звук, но высота умножена на `pitchScale`: так один клип звучит выше или ниже по ситуации (звук старта машины по рангу, раздел 7). Множитель должен быть больше 0, иначе `ArgumentOutOfRangeException` | `SFX` |
 | `PlayMusic(AudioAsset)` | Фоновая музыка, играет по кругу | `Music` |
 
 **Фоновая музыка геймплея** уже подключена так (первое использование сервиса в игре): на файле владельца `Assets/_Project/Audio/Music/VehicleRunMusic.ogg` создан `AudioAsset` `Music_Gameplay` (категория Music, группа микшера Music), а `RunState.Enter()` вызывает `_audio.PlayMusic(_gameplayMusic)` — музыка играет зацикленно с начала геймплея. Ассет приходит в состояние через `WithParameter<AudioAsset>` из поля `_gameplayMusic` на префабе `RootLifetimeScope`. Громкость музыки регулирует слайдер «Музыка» в настройках (группа микшера Music, раздел 6).
@@ -186,11 +187,15 @@ private float ToDecibels(float linearVolume)
 | `LevelUp.ogg` (0,93 с) | `Sfx_LevelUp` | показ окна левелапа, то есть открытие нового ранга | `LevelUpWindow` |
 | `BoxOpen` | `Sfx_BoxOpen` | открытие коробки в гараже (`GarageBoard.BoxOpened`) | `GameplaySounds` |
 | `BoxShaking` | `Sfx_BoxShake` | каждый цикл тряски коробки в слоте | `GarageSlotView` |
+| `StartMoving.ogg` | `Sfx_StartMoving` | машина выезжает на трассу (`TrackRoster.VehicleSent`). Высота зависит от ранга машины: 1,3 у ранга 1, 0,7 у последнего ранга каталога, между ними линейно | `GameplaySounds` |
+| `Boost.ogg` | `Sfx_Boost` | ускорение машины тапом (`TurboService.RunnerBoosted`) и включение турбо кнопкой `TurboButton` (`TurboService.TurboStarted`) | `GameplaySounds` |
 
 Как это устроено:
 
-- **`GameSoundsConfig`** (`Core/Audio`, меню **Create → _Project → Audio → Game Sounds Config**) — ScriptableObject со ссылками на `AudioAsset` (`Click`, `Window`, `Merge`, `Money`, `LevelUp`, `BoxOpen`, `BoxShake`) и полем `Money Min Interval Seconds` = 0,5. Ассет назначен в поле `Game Sounds` у `GameLifetimeScope`, без него контейнер бросает `InvalidOperationException`.
+- **`GameSoundsConfig`** (`Core/Audio`, меню **Create → _Project → Audio → Game Sounds Config**) — ScriptableObject со ссылками на `AudioAsset` (`Click`, `Window`, `Merge`, `Money`, `LevelUp`, `BoxOpen`, `BoxShake`, `StartMoving`, `Boost`), полем `Money Min Interval Seconds` и высотой звука старта `Start Moving First Rank Pitch` = 1,3 и `Start Moving Last Rank Pitch` = 0,7. Ассет назначен в поле `Game Sounds` у `GameLifetimeScope`, без него контейнер бросает `InvalidOperationException`.
 - **`GameplaySounds`** (`Features/Sounds`) — entry point (`IStartable`, `IDisposable`) игровой сцены. Подписывается на события логики и вызывает `IAudioService.PlayOneShot`. Звук монет играет не чаще раза в `Money Min Interval Seconds` по `ITimeService.Time`: при восьми машинах на трассе выплаты идут чаще секунды, а звук длится секунду, без ограничения они складывались бы в гул.
+- **Звук старта по рангу** (задача VEH-8, 13.11.2026). На `VehicleSent` `GameplaySounds` считает множитель высоты: `первый + (последний − первый) × (ранг − 1) / (число рангов − 1)` и вызывает `PlayOneShot(StartMoving, множитель)`. Лёгкий мотороллер звучит выше, тяжёлая техника ниже. Множитель умножается на `Pitch` ассета, поэтому при `Pitch` = 1 высота равна числам задачи. «Лучший состав» отправляет несколько машин одной командой, и каждая играет свой звук. Машины, восстановленные из сейва, звука не дают: восстановление событий не поднимает.
+- **Звук ускорения** играет на каждый успешный тап по машине трассы (повторный тап — ещё раз) и на включение турбо. Ограничения по частоте нет.
 - **`UiSounds`** (`UI/Sounds`) — singleton игровой сцены с методами `PlayClick`, `PlayWindowOpened` и `PlayLevelUp`.
 - **`ButtonClickSound`** (`UI/Sounds`) — компонент рядом с `Button`: подписывается на `onClick` и играет клик. Выключенная кнопка (`interactable` = false) не щёлкает: `onClick` у неё не срабатывает. Компонент стоит на всех кнопках `Canvas` сцены `Game` и на кнопке префаба `ShopRow`. На затемнении карточки машины его нет: это не кнопка в глазах игрока.
 - **Окна.** `Window.Show()` вызывает виртуальный `PlayOpenSound()`, по умолчанию это звук окна. `LevelUpWindow` переопределяет его звуком левелапа, чтобы два звука не накладывались.
@@ -200,7 +205,7 @@ private float ToDecibels(float linearVolume)
 
 **Новый звук:** файл в `Audio/VFX`, `AudioAsset` на нём, поле в `GameSoundsConfig` и вызов в `GameplaySounds` (событие логики) или `UiSounds` (интерфейс).
 
-Отправка на трассу, покупка, турбо и переработка пока беззвучны: файлов под них нет. Остаток задачи 3.5 — эти звуки, двигатели и музыка турбо.
+Покупка и переработка пока беззвучны: файлов под них нет. Остаток задачи 3.5 — эти звуки, двигатели и музыка турбо.
 
 ---
 

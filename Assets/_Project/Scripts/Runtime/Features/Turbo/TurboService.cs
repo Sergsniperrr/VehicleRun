@@ -22,6 +22,7 @@ namespace _Project.Features.Turbo
 
         public event Action TurboStarted;
         public event Action TurboEnded;
+        public event Action<TrackRunner> RunnerBoosted;
 
         public float RemainingSeconds { get; private set; }
         public float CooldownRemainingSeconds { get; private set; }
@@ -65,6 +66,7 @@ namespace _Project.Features.Turbo
             }
 
             runner.StartTapBoost(_config.TapBoostSeconds);
+            RunnerBoosted?.Invoke(runner);
 
             return new CommandResult(FailureReason.None);
         }

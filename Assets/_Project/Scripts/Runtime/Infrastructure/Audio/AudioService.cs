@@ -22,12 +22,22 @@ namespace _Project.Infrastructure.Audio
 
         public void PlayOneShot(AudioAsset asset)
         {
+            PlayOneShot(asset, 1f);
+        }
+
+        public void PlayOneShot(AudioAsset asset, float pitchScale)
+        {
             if (asset.Category != AudioCategories.SFX)
             {
                 throw new InvalidOperationException(nameof(asset));
             }
 
-            AudioSource source = CreateSource(asset);
+            if (float.IsNaN(pitchScale) || pitchScale <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pitchScale));
+            }
+
+            AudioSource source = CreateSource(asset, pitchScale);
             source.Play();
 
             Object.Destroy(source.gameObject, GetDestroyDelay(source));
@@ -47,7 +57,7 @@ namespace _Project.Infrastructure.Audio
 
             StopMusic();
 
-            _musicSource = CreateSource(asset);
+            _musicSource = CreateSource(asset, 1f);
             _musicSource.loop = true;
 
             _currentMusicAsset = asset;
@@ -70,7 +80,7 @@ namespace _Project.Infrastructure.Audio
             _currentMusicAsset = null;
         }
 
-        private AudioSource CreateSource(AudioAsset asset)
+        private AudioSource CreateSource(AudioAsset asset, float pitchScale)
         {
             AudioClip clip = asset.GetRandomClip();
 
@@ -81,7 +91,7 @@ namespace _Project.Infrastructure.Audio
             source.clip = clip;
             source.outputAudioMixerGroup = asset.OutputMixerGroup;
             source.volume = asset.Volume;
-            source.pitch = asset.GetRandomPitch();
+            source.pitch = asset.GetRandomPitch(pitchScale);
             source.playOnAwake = false;
 
             return source;

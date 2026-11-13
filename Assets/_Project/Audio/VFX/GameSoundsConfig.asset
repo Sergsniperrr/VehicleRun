@@ -19,4 +19,8 @@ MonoBehaviour:
   _levelUp: {fileID: 11400000, guid: 5fd5ed7443494704c834dfc5f9576789, type: 2}
   _boxOpen: {fileID: 11400000, guid: e49007a2f05bf0241b06d2115b9ad701, type: 2}
   _boxShake: {fileID: 11400000, guid: 798ee83acd6f0ed47b32761e4ebe8bb0, type: 2}
+  _startMoving: {fileID: 11400000, guid: c931a4f2468053a4e9f21abdbdc58575, type: 2}
+  _boost: {fileID: 11400000, guid: bbbc4b0701cd64b498a46c34ed4f5244, type: 2}
+  _startMovingFirstRankPitch: 1.3
+  _startMovingLastRankPitch: 0.7
   _moneyMinIntervalSeconds: 0.1
