@@ -41,12 +41,12 @@ Unity 2022.3.62f2 (LTS), цель сборки WebGL, 2D-проект на Built
 Assets/
 ├── _Project/                          весь код и данные игры
 │   ├── Art/Placeholders/              ассеты из выгрузки референса, большая часть остаётся в игре (Docs/TechPlan.md, 3.3)
-│   ├── Audio/AudioMixers/             AudioMixer.mixer: Master, Music, SFX
+│   ├── Audio/                         AudioMixers/AudioMixer.mixer (Master, Music, SFX), Music/ (музыка геймплея), VFX/ (звуки игры и GameSoundsConfig)
 │   ├── Configs/Game/                  GameConfig и конфиги машин, экономики, гаража, трассы, турбо и уровня игрока (Docs/Configs.md)
 │   ├── Configs/Localization/          LocalizationConfig.asset, таблица переводов
-│   ├── Fonts/Nunito/                  Nunito ExtraBold (OFL), его TMP Font Asset с кириллицей и материал с обводкой
+│   ├── Fonts/                         Kabel_1.asset — шрифт игры; Nunito/, VAG Rundschrift/, Baloo/ — прежний шрифт и шрифты референса (Docs/Localization.md, раздел 1)
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib
-│   ├── Prefabs/                       RootLifetimeScope.prefab (корневой контейнер); Game/: GarageSlot, TrackVehicle
+│   ├── Prefabs/                       RootLifetimeScope.prefab (корневой контейнер); Game/: GarageSlot, TrackVehicle, PayoutPopup; UI/: ShopRow, CatalogCard
 │   ├── Scenes/                        Bootstrap.unity, Game.unity
 │   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView (спрайты Vehicle_NN_Garage и Vehicle_NN_Track), коробка Box_Closed и Box_Open
 │   └── Scripts/
@@ -54,9 +54,9 @@ Assets/
 │       ├── Tests/EditMode/            сборка _Project.Tests.EditMode
 │       └── Runtime/
 │           ├── Core/                  интерфейсы и модели, не знает про SDK
-│           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, FSM
-│           ├── Features/              игровые механики: гараж, прогрессия, монеты, поставка коробок, трасса и доход, экземпляры, команды, сохранение прогресса; виды гаража и трассы, всплывающая надпись (Docs/Gameplay.md)
-│           ├── UI/                    интерфейс: LocalizedText; HUD: монеты, доход, K/20, кнопка коробки, таймер поставки; окно переработки
+│           ├── Infrastructure/        реализации: JTL SDK, аудио, сцены, время, случайные числа, FSM
+│           ├── Features/              игровые механики: гараж и раскладка полок, ранги и уровень игрока, монеты, поставка коробок, трасса и доход, турбо, звуки игры, настройки громкости, экземпляры, команды, сохранение прогресса; виды гаража и трассы, всплывающая надпись (Docs/Gameplay.md)
+│           ├── UI/                    интерфейс: LocalizedText; HUD: монеты, доход, уровень игрока, кнопка коробки, таймер поставки, турбо; очередь окон и окна: переработка, карточка машины, магазин, каталог, настройки, левелап, новая машина; звуки интерфейса
 │           └── Composition/           LifetimeScope, стартовые состояния, старт сцены Game
 ├── FlatKit/                           шейдеры и демо, unitypackage-файлы в git не попадают
 ├── Plugins/                           DOTween Pro, Odin Inspector, UniTask
@@ -98,7 +98,7 @@ Assets/
 |---|---|---|
 | `RootLifetimeScope` | префаб `Assets/_Project/Prefabs/RootLifetimeScope.prefab` | все сервисы, автомат состояний и состояния |
 | `BootstrapLifetimeScope` | сцена `Bootstrap` | точку входа `Bootstrapper` |
-| `GameLifetimeScope` | сцена `Game` | `GameConfig` и его части, логику гаража, прогрессии, экономики и трассы, правила жестов гаража, тик экономики, загрузку и запись сейва, новую игру, форматирование монет, окно подтверждения переработки и старт сцены `GameStartup` → `GameSession` ([Docs/Gameplay.md](Docs/Gameplay.md), разделы 13 и 14) |
+| `GameLifetimeScope` | сцена `Game` | `GameConfig` и его части, логику гаража, рангов, уровня игрока, экономики, трассы и турбо, правила жестов гаража, тик экономики, звуки игры и громкость, загрузку и запись сейва, новую игру, форматирование монет, очередь окон, окно подтверждения переработки и карточку машины, старт сцены `GameStartup` → `GameSession` ([Docs/Gameplay.md](Docs/Gameplay.md), разделы 13 и 14) |
 
 Корневой контейнер указан в `Assets/Settings/VContainerSettings.asset`. VContainer создаёт его один раз при старте, помечает `DontDestroyOnLoad` и делает родителем каждого `LifetimeScope` на сценах. Поле `Parent` у сценовых контейнеров оставляйте пустым: родитель приходит из настроек.
 
@@ -125,6 +125,7 @@ protected override void Configure(IContainerBuilder builder)
 | `ISceneLoader` | `SceneLoader` | Singleton | `RegisterServices` |
 | `IAudioService` | `AudioService` | Singleton | `RegisterServices` |
 | `ITimeService` | `TimeService` | Singleton | `RegisterServices` |
+| `IRandomSource` | `UnityRandomSource` | Singleton | `RegisterServices` |
 | `YandexMetrica` (сам класс) | `YandexMetrica`, номер счётчика из поля `_yandexMetricaCounterId` | EntryPoint | `RegisterAnalytics` |
 | `IPlatformInitializer` | `JTLSDKInitializer` | Singleton | `RegisterPlatform` |
 | `IAnalyticsService` | `JTLAnalyticsService` | Singleton | `RegisterPlatform` |

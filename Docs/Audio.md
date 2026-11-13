@@ -4,7 +4,7 @@
 
 Звук работает на встроенных средствах Unity (`AudioSource` и `AudioMixer`), никаких внешних плагинов здесь нет.
 
-Микшер `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` уже создан: группы `Music` и `SFX` внутри `Master`. У групп `Music` и `SFX` объявлены exposed-параметры `MusicVolume` и `SFXVolume` — через них окно настроек задаёт громкость (раздел 6). Папки `Music` и `Sounds` заводятся вместе с первыми файлами. Звуки и музыка референса лежат отдельно, в `Assets/_Project/Art/Placeholders/Audio/` (см. [TechPlan.md](TechPlan.md), раздел 3.3).
+Микшер `Assets/_Project/Audio/AudioMixers/AudioMixer.mixer` уже создан: группы `Music` и `SFX` внутри `Master`. У групп `Music` и `SFX` объявлены exposed-параметры `MusicVolume` и `SFXVolume` — через них окно настроек задаёт громкость (раздел 6). Музыка геймплея лежит в `Audio/Music`, звуки игры и их общий конфиг — в `Audio/VFX` (раздел 7). Звуки и музыка референса лежат отдельно, в `Assets/_Project/Art/Placeholders/Audio/` (см. [TechPlan.md](TechPlan.md), раздел 3.3).
 
 ---
 
@@ -16,15 +16,18 @@
 Assets/_Project/
 ├── Audio/
 │   ├── AudioMixers/AudioMixer.mixer    группы Master, Music, SFX
-│   ├── Music/                          сюда кладём музыкальные файлы
-│   └── Sounds/                         сюда кладём звуки
+│   ├── Music/                          музыка: VehicleRunMusic.ogg и AudioAsset Music_Gameplay
+│   └── VFX/                            звуки игры, их AudioAsset Sfx_* и GameSoundsConfig.asset
 └── Scripts/Runtime/
     ├── Core/Audio/
     │   ├── IAudioService.cs            интерфейс, который видит игровой код
     │   ├── AudioAsset.cs               настройка одного звука (ScriptableObject)
-    │   └── AudioCategories.cs          SFX или Music
+    │   ├── AudioCategories.cs          SFX или Music
+    │   ├── GameSoundsConfig.cs         какие звуки играет игра (раздел 7)
+    │   └── IAudioMixerControl.cs       громкость групп микшера (раздел 6)
     └── Infrastructure/Audio/
-        └── AudioService.cs             реализация
+        ├── AudioService.cs             реализация
+        └── AudioMixerControl.cs        запись громкости в микшер
 ```
 
 Регистрация в `RootLifetimeScope.RegisterServices`:
@@ -58,7 +61,7 @@ builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
 
 Массив клипов нужен для разнообразия: положите в один ассет 3-4 варианта удара, и одинаковый звук перестанет надоедать. Если вариант всего один, просто оставьте в массиве одну строку.
 
-Папки `Audio/Music` и `Audio/Sounds` создаёте вы под свои звуки. Разумно держать ассет рядом с самими файлами и называть по смыслу, например `Sfx_Hit_Body`, `Music_Menu`.
+Ассет лежит рядом со своим файлом и называется по смыслу: `Sfx_Merge`, `Music_Gameplay`.
 
 ---
 
@@ -211,7 +214,7 @@ private float ToDecibels(float linearVolume)
 
 ## 8. Как дополнять сервис
 
-Сервис намеренно маленький, в нём ровно два метода. Ниже частые доработки.
+Сервис намеренно маленький, в нём три метода. Ниже частые доработки.
 
 **Остановить или приглушить музыку.** Внутри уже есть приватный `StopMusic`, наружу он не выведен. Добавьте метод в интерфейс `Core/Audio/IAudioService.cs`, а в `AudioService` сделайте существующий метод публичным:
 
