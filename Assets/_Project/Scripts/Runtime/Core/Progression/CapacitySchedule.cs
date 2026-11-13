@@ -11,25 +11,38 @@ namespace _Project.Core.Progression
 
         public int Initial => _initial;
         public int StepCount => _steps.Length;
+        public int LastLevel => CalculateLastLevel();
 
         public CapacityStep GetStepAt(int index)
         {
             return _steps[index];
         }
 
-        public int GetCapacity(int maxRank)
+        public int GetCapacity(int level)
         {
             int capacity = _initial;
 
             foreach (CapacityStep step in _steps)
             {
-                if (step.Rank <= maxRank)
+                if (step.Level <= level)
                 {
                     capacity = Math.Max(capacity, step.Capacity);
                 }
             }
 
             return capacity;
+        }
+
+        private int CalculateLastLevel()
+        {
+            int lastLevel = PlayerLevelConfig.FirstLevel;
+
+            foreach (CapacityStep step in _steps)
+            {
+                lastLevel = Math.Max(lastLevel, step.Level);
+            }
+
+            return lastLevel;
         }
     }
 }

@@ -3,6 +3,7 @@ using _Project.Features.Boxes;
 using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Track;
+using _Project.Features.Vehicles;
 using _Project.Tests.EditMode.Configs;
 using NUnit.Framework;
 using UnityEngine;
@@ -11,6 +12,10 @@ namespace _Project.Tests.EditMode.Save
 {
     public class GameSaveRoundTripTests
     {
+        private const int SourceLevel = 5;
+        private const long SourceExperience = 7;
+        private const int LegacyLevel = 0;
+        private const int LegacyFittingLevel = 4;
         private const float DrivingSeconds = 13.7f;
         private const double BonusCoins = 2000.1;
         private const float PartialDeliverySeconds = 7.5f;
@@ -108,7 +113,7 @@ namespace _Project.Tests.EditMode.Save
             save.CoinsRemainder = AlmostWholeRemainder;
 
             GameSave restored = PassThroughJson(save);
-            GameSaveValidator validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track);
+            GameSaveValidator validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track, new SaveLevelResolver(_fixture.Garage, _fixture.Track));
 
             Assert.That(validator.IsValid(restored), Is.True);
 
@@ -126,7 +131,9 @@ namespace _Project.Tests.EditMode.Save
             _target.Garage.VehiclePlaced += (slot, vehicle) => eventCount++;
             _target.Garage.BoxPlaced += (slot, box) => eventCount++;
             _target.Progress.RankUnlocked += rank => eventCount++;
-            _target.Progress.TrackPlacesUnlocked += capacity => eventCount++;
+            _target.Level.TrackPlacesUnlocked += capacity => eventCount++;
+            _target.Level.LevelReached += level => eventCount++;
+            _target.Level.ExperienceChanged += () => eventCount++;
             _target.Roster.VehicleSent += runner => eventCount++;
             _target.Wallet.CoinsChanged += coins => eventCount++;
 
@@ -147,7 +154,7 @@ namespace _Project.Tests.EditMode.Save
             Assert.That(_target.Progress.IsRankUnlocked(2), Is.False);
             Assert.That(_target.Garage.OpenSlotCount, Is.EqualTo(_source.Garage.OpenSlotCount));
             Assert.That(_target.Roster.Capacity, Is.EqualTo(_source.Roster.Capacity));
-            Assert.That(_target.Progress.BoxRank, Is.EqualTo(_source.Progress.BoxRank));
+            Assert.That(_target.Progress.ShopMaxRank, Is.EqualTo(_source.Progress.ShopMaxRank));
         }
 
         [Test]
@@ -261,6 +268,55 @@ namespace _Project.Tests.EditMode.Save
             Assert.That(_target.Turbo.CooldownRemainingSeconds, Is.EqualTo(_fixture.Turbo.FreeCooldownSeconds));
         }
 
+        [Test]
+        public void PlayerLevelSurvivesJson()
+        {
+            PlaySourceGame();
+            _source.Level.AddExperience(_source.Level.ExperienceToNextLevel + SourceExperience);
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.Level.Level, Is.EqualTo(SourceLevel + 1));
+            Assert.That(_target.Level.Experience, Is.EqualTo(SourceExperience));
+            Assert.That(_target.Level.HasPendingReward, Is.True);
+            Assert.That(_target.Level.PendingRewardLevel, Is.EqualTo(SourceLevel + 1));
+        }
+
+        [Test]
+        public void ClaimedRewardIsNotOfferedAfterRestore()
+        {
+            PlaySourceGame();
+            _source.Level.AddExperience(_source.Level.ExperienceToNextLevel);
+            _source.Level.ClaimReward();
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.Level.HasPendingReward, Is.False);
+        }
+
+        [Test]
+        public void SaveWithoutLevelGetsLevelThatFitsItsSlotsAndRunners()
+        {
+            PlaySourceGame();
+            GameSave save = _source.Factory.Create();
+            save.PlayerLevel = LegacyLevel;
+            save.PlayerExperience = 0;
+            save.ClaimedRewardLevel = 0;
+
+            GameSave restored = PassThroughJson(save);
+            GameSaveValidator validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track, _target.Levels);
+
+            Assert.That(validator.IsValid(restored), Is.True);
+
+            _target.Restorer.Restore(restored);
+
+            Assert.That(_target.Level.Level, Is.EqualTo(LegacyFittingLevel));
+            Assert.That(_target.Level.Experience, Is.EqualTo(0));
+            Assert.That(_target.Level.HasPendingReward, Is.False);
+            Assert.That(_target.Garage.TryGetVehicle(6, out Vehicle lastVehicle), Is.True);
+            Assert.That(_target.Roster.Count, Is.EqualTo(_source.Roster.Count));
+        }
+
         private GameSave PassThroughJson(GameSave save)
         {
             return JsonUtility.FromJson<GameSave>(JsonUtility.ToJson(save));
@@ -268,6 +324,7 @@ namespace _Project.Tests.EditMode.Save
 
         private void PlaySourceGame()
         {
+            _source.ReachLevel(SourceLevel);
             _source.PlaceVehicle(0, 5);
             _source.PlaceVehicle(1, 4);
             _source.PlaceVehicle(2, 4);

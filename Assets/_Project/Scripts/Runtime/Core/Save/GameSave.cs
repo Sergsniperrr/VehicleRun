@@ -22,5 +22,8 @@ namespace _Project.Core.Save
         public BoxSave[] Boxes;
         public TrackRunnerSave[] TrackRunners;
         public int[] ClaimedMilestoneRanks = Array.Empty<int>();
+        public int PlayerLevel;
+        public long PlayerExperience;
+        public int ClaimedRewardLevel;
     }
 }

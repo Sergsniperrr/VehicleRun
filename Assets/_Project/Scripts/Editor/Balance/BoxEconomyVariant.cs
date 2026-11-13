@@ -9,7 +9,6 @@ namespace _Project.Editor.Balance
     [Serializable]
     public class BoxEconomyVariant
     {
-        private const string BoxRankLagProperty = "_boxRankLag";
         private const string FreeBoxIntervalProperty = "_freeBoxIntervalSeconds";
         private const string BasePricesProperty = "_boxBasePrices";
         private const long MinBasePrice = 1;
@@ -19,7 +18,6 @@ namespace _Project.Editor.Balance
         private const string GrowthPurchaseLimitProperty = "_boxPriceGrowthPurchaseLimit";
 
         [SerializeField] private string _name;
-        [SerializeField] private int _boxRankLag;
         [SerializeField] private float _freeBoxIntervalSeconds;
         [SerializeField] private double _boxBasePriceScale;
         [SerializeField] private double _boxPriceGrowth;
@@ -38,7 +36,6 @@ namespace _Project.Editor.Balance
 
             EconomyConfig economy = Object.Instantiate(source);
             SerializedObject serializedEconomy = new SerializedObject(economy);
-            serializedEconomy.FindProperty(BoxRankLagProperty).intValue = _boxRankLag;
             serializedEconomy.FindProperty(FreeBoxIntervalProperty).floatValue = _freeBoxIntervalSeconds;
             ScaleBasePrices(serializedEconomy.FindProperty(BasePricesProperty));
             serializedEconomy.FindProperty(GrowthProperty).doubleValue = _boxPriceGrowth;

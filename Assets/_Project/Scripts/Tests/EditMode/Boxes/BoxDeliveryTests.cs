@@ -13,12 +13,15 @@ namespace _Project.Tests.EditMode.Boxes
 {
     public class BoxDeliveryTests
     {
+        private const int SlotsUnlockLevel = 3;
+
         private GameConfigFixture _fixture;
         private InstanceIdGenerator _instanceIds;
         private GarageBoard _garage;
         private RankProgress _progress;
         private Wallet _wallet;
         private BoxPricing _pricing;
+        private FakeRandomSource _random;
         private BoxDelivery _delivery;
 
         private float FreeBoxInterval => _fixture.Economy.FreeBoxIntervalSeconds;
@@ -29,10 +32,11 @@ namespace _Project.Tests.EditMode.Boxes
             _fixture = new GameConfigFixture();
             _instanceIds = new InstanceIdGenerator();
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
-            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
+            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _garage);
             _wallet = new Wallet(_fixture.Economy);
             _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles);
-            _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds);
+            _random = new FakeRandomSource();
+            _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds, _random);
         }
 
         [TearDown]
@@ -56,7 +60,7 @@ namespace _Project.Tests.EditMode.Boxes
 
             Assert.That(_garage.TryGetBox(2, out Box box), Is.True);
             Assert.That(box.Source, Is.EqualTo(BoxSource.Free));
-            Assert.That(box.Rank, Is.EqualTo(_progress.BoxRank));
+            Assert.That(box.Rank, Is.EqualTo(_progress.FreeBoxLowestRank));
             Assert.That(_delivery.FreeBoxRemainingSeconds, Is.EqualTo(FreeBoxInterval));
         }
 
@@ -101,7 +105,8 @@ namespace _Project.Tests.EditMode.Boxes
             int firstUnlockedSlot = _fixture.Garage.OpenSlots.Initial;
             FillGarage(1);
             _delivery.Advance(FreeBoxInterval);
-            UnlockRanksUpTo(7);
+            UnlockRanksUpTo(12);
+            _garage.UnlockSlots(SlotsUnlockLevel);
 
             _delivery.Advance(0);
 
@@ -213,7 +218,7 @@ namespace _Project.Tests.EditMode.Boxes
         }
 
         [Test]
-        public void BoxAtMaxRankTenIsRankFiveForFortyThreeThousandCoins()
+        public void QuickBuyAtMaxRankTenIsRankTwoForItsPrice()
         {
             UnlockRanksUpTo(10);
             _wallet.Add(50000);
@@ -222,9 +227,51 @@ namespace _Project.Tests.EditMode.Boxes
             CommandResult result = _delivery.BuyBox();
 
             Assert.That(result.IsSuccess, Is.True);
-            Assert.That(_wallet.Coins, Is.EqualTo(coins - 43000));
+            Assert.That(_wallet.Coins, Is.EqualTo(coins - 1200));
             Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
-            Assert.That(box.Rank, Is.EqualTo(5));
+            Assert.That(box.Rank, Is.EqualTo(2));
+        }
+
+        [TestCase(0, 1)]
+        [TestCase(1, 2)]
+        [TestCase(2, 3)]
+        [TestCase(3, 4)]
+        [TestCase(9, 4)]
+        public void FreeBoxRankIsPickedBetweenLowestAndHighestRank(int randomOffset, int boxRank)
+        {
+            UnlockRanksUpTo(11);
+            _random.Offset = randomOffset;
+
+            _delivery.Advance(FreeBoxInterval);
+
+            Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
+            Assert.That(box.Rank, Is.EqualTo(boxRank));
+            Assert.That(_random.LastMin, Is.EqualTo(1));
+            Assert.That(_random.LastMax, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void FreeBoxRankNeverGoesBelowFirstRank()
+        {
+            UnlockRanksUpTo(5);
+
+            _delivery.Advance(FreeBoxInterval);
+
+            Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
+            Assert.That(box.Rank, Is.EqualTo(1));
+            Assert.That(_random.LastMin, Is.EqualTo(1));
+            Assert.That(_random.LastMax, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void PurchasedBoxDoesNotUseRandom()
+        {
+            UnlockRanksUpTo(10);
+            _wallet.Add(50000);
+
+            _delivery.BuyBox();
+
+            Assert.That(_random.CallCount, Is.EqualTo(0));
         }
 
         [Test]
@@ -242,7 +289,7 @@ namespace _Project.Tests.EditMode.Boxes
             Assert.That(box.Rank, Is.EqualTo(3));
             Assert.That(box.Source, Is.EqualTo(BoxSource.Purchased));
             Assert.That(_delivery.GetPrice(3), Is.EqualTo(6698));
-            Assert.That(_delivery.BoxPrice, Is.EqualTo(43000));
+            Assert.That(_delivery.BoxPrice, Is.EqualTo(1200));
         }
 
         [Test]
@@ -252,22 +299,22 @@ namespace _Project.Tests.EditMode.Boxes
             _wallet.Add(1000000);
             long coins = _wallet.Coins;
 
-            CommandResult result = _delivery.BuyBox(6);
+            CommandResult result = _delivery.BuyBox(7);
 
             Assert.That(result.FailureReason, Is.EqualTo(FailureReason.BoxRankLocked));
             Assert.That(_wallet.Coins, Is.EqualTo(coins));
             Assert.That(CountBoxes(), Is.EqualTo(0));
-            Assert.That(_pricing.GetPurchaseCount(6), Is.EqualTo(0));
+            Assert.That(_pricing.GetPurchaseCount(7), Is.EqualTo(0));
         }
 
         [Test]
-        public void RanksUpToBoxRankAreForSale()
+        public void RanksUpToShopMaxRankAreForSale()
         {
             UnlockRanksUpTo(10);
 
             Assert.That(_delivery.IsRankForSale(1), Is.True);
-            Assert.That(_delivery.IsRankForSale(5), Is.True);
-            Assert.That(_delivery.IsRankForSale(6), Is.False);
+            Assert.That(_delivery.IsRankForSale(6), Is.True);
+            Assert.That(_delivery.IsRankForSale(7), Is.False);
             Assert.That(_delivery.IsRankForSale(_fixture.Vehicles.MaxRank), Is.False);
         }
 

@@ -24,6 +24,7 @@ namespace _Project.Tests.EditMode.Track
         private InstanceIdGenerator _instanceIds;
         private GarageBoard _garage;
         private RankProgress _progress;
+        private PlayerLevel _playerLevel;
         private Wallet _wallet;
         private TrackRoster _roster;
         private long _startCoins;
@@ -34,15 +35,17 @@ namespace _Project.Tests.EditMode.Track
             _fixture = new GameConfigFixture();
             _instanceIds = new InstanceIdGenerator();
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
-            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
+            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _garage);
             _wallet = new Wallet(_fixture.Economy);
-            _roster = new TrackRoster(_garage, _progress, _fixture.Track, _wallet);
+            _playerLevel = new PlayerLevel(_fixture.PlayerLevel, _fixture.Track, _garage, _wallet);
+            _roster = new TrackRoster(_garage, _playerLevel, _fixture.Track, _wallet);
             _startCoins = _wallet.Coins;
         }
 
         [TearDown]
         public void TearDown()
         {
+            _playerLevel.Dispose();
             _progress.Dispose();
             _fixture.Dispose();
         }
@@ -80,15 +83,23 @@ namespace _Project.Tests.EditMode.Track
         }
 
         [Test]
-        public void CapacityGrowsWithMaxRank()
+        public void CapacityGrowsWithLevel()
         {
-            PlaceVehicle(0, 3);
+            _playerLevel.Restore(3, 0, 3);
 
             Assert.That(_roster.Capacity, Is.EqualTo(2));
 
-            PlaceVehicle(1, 4);
+            _playerLevel.Restore(4, 0, 4);
 
             Assert.That(_roster.Capacity, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void NewRankDoesNotAddTrackPlaces()
+        {
+            PlaceVehicle(0, _fixture.Vehicles.MaxRank);
+
+            Assert.That(_roster.Capacity, Is.EqualTo(2));
         }
 
         [Test]

@@ -12,6 +12,9 @@ namespace _Project.Tests.EditMode.Save
         private const string UnknownVehicleId = "unknown";
         private const int UnknownBoxSource = 99;
         private const int ClosedSlot = 14;
+        private const int GameLevel = 5;
+        private const int TwoTrackPlacesLevel = 3;
+        private const int LegacyLevel = 0;
 
         private GameConfigFixture _fixture;
         private SaveTestGame _game;
@@ -23,8 +26,9 @@ namespace _Project.Tests.EditMode.Save
         {
             _fixture = new GameConfigFixture();
             _game = new SaveTestGame(_fixture);
-            _validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track);
+            _validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track, new SaveLevelResolver(_fixture.Garage, _fixture.Track));
 
+            _game.ReachLevel(GameLevel);
             _game.PlaceVehicle(0, 5);
             _game.PlaceVehicle(1, 4);
             _game.PlaceVehicle(2, 4);
@@ -191,10 +195,52 @@ namespace _Project.Tests.EditMode.Save
             save.Vehicles[0].VehicleId = thirdRankId;
             save.Vehicles[1].VehicleId = thirdRankId;
             save.Vehicles[2].VehicleId = thirdRankId;
+            save.PlayerLevel = TwoTrackPlacesLevel;
+            save.ClaimedRewardLevel = TwoTrackPlacesLevel;
 
             Assert.That(_validator.IsValid(save), Is.False);
 
             save.TrackRunners = new[] { save.TrackRunners[0], save.TrackRunners[1] };
+
+            Assert.That(_validator.IsValid(save), Is.True);
+        }
+
+        [Test]
+        public void BrokenPlayerLevelIsInvalid()
+        {
+            AssertInvalid(save => save.PlayerLevel = -1);
+            AssertInvalid(save => save.PlayerExperience = -1);
+            AssertInvalid(save => save.ClaimedRewardLevel = 0);
+            AssertInvalid(save => save.ClaimedRewardLevel = save.PlayerLevel + 1);
+        }
+
+        [Test]
+        public void LevelWithTooFewSlotsIsInvalid()
+        {
+            AssertInvalid(save =>
+            {
+                save.PlayerLevel = 1;
+                save.ClaimedRewardLevel = 1;
+                save.Vehicles[0].Slot = _fixture.Garage.OpenSlots.Initial;
+            });
+        }
+
+        [Test]
+        public void SaveWithoutLevelIsValid()
+        {
+            GameSave save = _game.Factory.Create();
+            save.PlayerLevel = LegacyLevel;
+            save.PlayerExperience = 0;
+            save.ClaimedRewardLevel = 0;
+
+            Assert.That(_validator.IsValid(save), Is.True);
+        }
+
+        [Test]
+        public void UnclaimedRewardIsValid()
+        {
+            GameSave save = _game.Factory.Create();
+            save.ClaimedRewardLevel = save.PlayerLevel - 1;
 
             Assert.That(_validator.IsValid(save), Is.True);
         }

@@ -21,6 +21,7 @@ namespace _Project.Features.Save
         private readonly TrackRoster _roster;
         private readonly TurboService _turbo;
         private readonly CollectionMilestones _milestones;
+        private readonly PlayerLevel _playerLevel;
         private readonly ITimeService _time;
 
         private bool _isWriting;
@@ -34,6 +35,7 @@ namespace _Project.Features.Save
             TrackRoster roster,
             TurboService turbo,
             CollectionMilestones milestones,
+            PlayerLevel playerLevel,
             ITimeService time)
         {
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -42,6 +44,7 @@ namespace _Project.Features.Save
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _time = time ?? throw new ArgumentNullException(nameof(time));
         }
 
@@ -64,6 +67,7 @@ namespace _Project.Features.Save
             _roster.VehicleReturned += OnVehicleReturned;
             _turbo.TurboStarted += OnTurboStarted;
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
+            _playerLevel.RewardClaimed += OnRewardClaimed;
         }
 
         public void LateTick()
@@ -104,6 +108,7 @@ namespace _Project.Features.Save
             _roster.VehicleReturned -= OnVehicleReturned;
             _turbo.TurboStarted -= OnTurboStarted;
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
+            _playerLevel.RewardClaimed -= OnRewardClaimed;
         }
 
         private void Write(bool isImportant)
@@ -169,6 +174,11 @@ namespace _Project.Features.Save
         }
 
         private void OnMilestoneClaimed(int rank)
+        {
+            MarkImportantChange();
+        }
+
+        private void OnRewardClaimed(int level, long coins)
         {
             MarkImportantChange();
         }

@@ -7,6 +7,7 @@ using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Track;
 using _Project.Features.Vehicles;
+using _Project.Tests.EditMode.Boxes;
 using _Project.Tests.EditMode.Configs;
 using NUnit.Framework;
 
@@ -21,6 +22,7 @@ namespace _Project.Tests.EditMode.Garage
         private InstanceIdGenerator _instanceIds;
         private GarageBoard _garage;
         private RankProgress _progress;
+        private PlayerLevel _playerLevel;
         private Wallet _wallet;
         private BoxPricing _pricing;
         private BoxDelivery _delivery;
@@ -32,16 +34,18 @@ namespace _Project.Tests.EditMode.Garage
             _fixture = new GameConfigFixture();
             _instanceIds = new InstanceIdGenerator();
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
-            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
+            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _garage);
             _wallet = new Wallet(_fixture.Economy);
             _pricing = new BoxPricing(_fixture.Economy, _fixture.Vehicles);
-            _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds);
-            _roster = new TrackRoster(_garage, _progress, _fixture.Track, _wallet);
+            _delivery = new BoxDelivery(_fixture.Economy, _fixture.Vehicles, _garage, _progress, _wallet, _pricing, _instanceIds, new FakeRandomSource());
+            _playerLevel = new PlayerLevel(_fixture.PlayerLevel, _fixture.Track, _garage, _wallet);
+            _roster = new TrackRoster(_garage, _playerLevel, _fixture.Track, _wallet);
         }
 
         [TearDown]
         public void TearDown()
         {
+            _playerLevel.Dispose();
             _progress.Dispose();
             _fixture.Dispose();
         }
@@ -164,12 +168,12 @@ namespace _Project.Tests.EditMode.Garage
             const int maxRank = 10;
             UnlockRanksUpTo(maxRank);
             PlaceVehicle(0, maxRank);
-            int boxRank = _progress.BoxRank;
+            int boxRank = _progress.QuickBuyRank;
             long boxPrice = _delivery.BoxPrice;
 
             _garage.Recycle(0);
 
-            Assert.That(_progress.BoxRank, Is.EqualTo(boxRank));
+            Assert.That(_progress.QuickBuyRank, Is.EqualTo(boxRank));
             Assert.That(_delivery.BoxPrice, Is.EqualTo(boxPrice));
             Assert.That(_pricing.GetPurchaseCount(EmergencyBoxRank), Is.EqualTo(0));
             Assert.That(_pricing.GetPurchaseCount(boxRank), Is.EqualTo(0));

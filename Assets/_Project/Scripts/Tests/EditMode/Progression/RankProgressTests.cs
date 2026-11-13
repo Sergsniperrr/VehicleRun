@@ -23,7 +23,7 @@ namespace _Project.Tests.EditMode.Progression
             _fixture = new GameConfigFixture();
             _instanceIds = new InstanceIdGenerator();
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
-            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
+            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _garage);
         }
 
         [TearDown]
@@ -33,52 +33,49 @@ namespace _Project.Tests.EditMode.Progression
             _fixture.Dispose();
         }
 
-        [TestCase(2, 6)]
-        [TestCase(3, 9)]
-        [TestCase(4, 9)]
-        [TestCase(5, 12)]
-        [TestCase(6, 12)]
-        [TestCase(7, 15)]
-        public void GarageSlotsOpenAtRanksThreeFiveSeven(int maxRank, int openSlotCount)
-        {
-            UnlockRanksUpTo(maxRank);
-
-            Assert.That(_garage.OpenSlotCount, Is.EqualTo(openSlotCount));
-        }
-
-        [TestCase(3, 2)]
-        [TestCase(4, 4)]
-        [TestCase(7, 4)]
-        [TestCase(8, 6)]
-        [TestCase(11, 6)]
+        [TestCase(1, 1)]
+        [TestCase(5, 1)]
+        [TestCase(6, 2)]
         [TestCase(12, 8)]
-        public void TrackPlacesOpenAtRanksFourEightTwelve(int maxRank, int trackCapacity)
+        public void ShopSellsRanksFourBelowMaxRank(int maxRank, int shopMaxRank)
         {
             UnlockRanksUpTo(maxRank);
 
-            Assert.That(_progress.TrackCapacity, Is.EqualTo(trackCapacity));
+            Assert.That(_progress.ShopMaxRank, Is.EqualTo(shopMaxRank));
         }
 
         [TestCase(1, 1)]
-        [TestCase(6, 1)]
-        [TestCase(7, 2)]
-        [TestCase(12, 7)]
-        public void BoxRankLagsBehindMaxRank(int maxRank, int boxRank)
+        [TestCase(9, 1)]
+        [TestCase(10, 2)]
+        [TestCase(12, 4)]
+        public void QuickBuyRankIsEightBelowMaxRank(int maxRank, int quickBuyRank)
         {
             UnlockRanksUpTo(maxRank);
 
-            Assert.That(_progress.BoxRank, Is.EqualTo(boxRank));
+            Assert.That(_progress.QuickBuyRank, Is.EqualTo(quickBuyRank));
+        }
+
+        [TestCase(1, 1, 1)]
+        [TestCase(8, 1, 1)]
+        [TestCase(9, 1, 2)]
+        [TestCase(11, 1, 4)]
+        [TestCase(12, 2, 5)]
+        public void FreeBoxRanksAreTenToSevenBelowMaxRank(int maxRank, int lowestRank, int highestRank)
+        {
+            UnlockRanksUpTo(maxRank);
+
+            Assert.That(_progress.FreeBoxLowestRank, Is.EqualTo(lowestRank));
+            Assert.That(_progress.FreeBoxHighestRank, Is.EqualTo(highestRank));
         }
 
         [Test]
-        public void TrackPlacesUnlockOnlyWhenCapacityGrows()
+        public void NewRankDoesNotOpenGarageSlots()
         {
-            List<int> capacities = new List<int>();
-            _progress.TrackPlacesUnlocked += capacity => capacities.Add(capacity);
+            int openSlotCount = _garage.OpenSlotCount;
 
             UnlockRanksUpTo(_fixture.Vehicles.MaxRank);
 
-            Assert.That(capacities, Is.EqualTo(new[] { 4, 6, 8 }));
+            Assert.That(_garage.OpenSlotCount, Is.EqualTo(openSlotCount));
         }
 
         [Test]
@@ -91,7 +88,7 @@ namespace _Project.Tests.EditMode.Progression
         }
 
         [Test]
-        public void MergeIntoNewRankRaisesMaxRankAndOpensSlots()
+        public void MergeIntoNewRankRaisesMaxRank()
         {
             PlaceVehicle(0, 2);
             PlaceVehicle(1, 2);
@@ -102,7 +99,6 @@ namespace _Project.Tests.EditMode.Progression
 
             Assert.That(_progress.MaxRank, Is.EqualTo(3));
             Assert.That(unlockedRanks, Is.EqualTo(new[] { 3 }));
-            Assert.That(_garage.OpenSlotCount, Is.EqualTo(9));
         }
 
         [Test]
@@ -113,24 +109,17 @@ namespace _Project.Tests.EditMode.Progression
             _garage.OpenBox(0);
 
             Assert.That(_progress.MaxRank, Is.EqualTo(4));
-            Assert.That(_progress.TrackCapacity, Is.EqualTo(4));
         }
 
         [Test]
         public void RankUnlockedIsRaisedAfterProgressUpdates()
         {
             int maxRankOnEvent = 0;
-            int openSlotCountOnEvent = 0;
-            _progress.RankUnlocked += rank =>
-            {
-                maxRankOnEvent = _progress.MaxRank;
-                openSlotCountOnEvent = _garage.OpenSlotCount;
-            };
+            _progress.RankUnlocked += rank => maxRankOnEvent = _progress.MaxRank;
 
             _progress.UnlockRank(5);
 
             Assert.That(maxRankOnEvent, Is.EqualTo(5));
-            Assert.That(openSlotCountOnEvent, Is.EqualTo(12));
         }
 
         [Test]
@@ -172,7 +161,6 @@ namespace _Project.Tests.EditMode.Progression
             PlaceVehicle(0, 3);
 
             Assert.That(_progress.MaxRank, Is.EqualTo(0));
-            Assert.That(_garage.OpenSlotCount, Is.EqualTo(6));
         }
 
         private void UnlockRanksUpTo(int maxRank)

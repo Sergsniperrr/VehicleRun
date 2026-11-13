@@ -15,6 +15,8 @@ namespace _Project.Editor.Balance
 {
     public class SimulatedGame : IDisposable
     {
+        private const int RandomSeed = 20261113;
+
         private readonly EconomyConfig _economy;
         private readonly BalanceSimulationSettings _settings;
 
@@ -32,16 +34,26 @@ namespace _Project.Editor.Balance
 
             InstanceIdGenerator instanceIds = new InstanceIdGenerator();
             Garage = new GarageBoard(config.Garage, config.Vehicles, instanceIds);
-            Progress = new RankProgress(config.Vehicles, economy, config.Track, Garage);
+            Progress = new RankProgress(config.Vehicles, economy, Garage);
             BoxPricing pricing = new BoxPricing(economy, config.Vehicles);
             Wallet = new Wallet(economy);
-            Delivery = new BoxDelivery(economy, config.Vehicles, Garage, Progress, Wallet, pricing, instanceIds);
-            Roster = new TrackRoster(Garage, Progress, config.Track, Wallet);
+            PlayerLevel = new PlayerLevel(config.PlayerLevel, config.Track, Garage, Wallet);
+            Delivery = new BoxDelivery(
+                economy,
+                config.Vehicles,
+                Garage,
+                Progress,
+                Wallet,
+                pricing,
+                instanceIds,
+                new SeededRandomSource(RandomSeed));
+            Roster = new TrackRoster(Garage, PlayerLevel, config.Track, Wallet);
             Turbo = new TurboService(config.Turbo, Progress, Roster);
             Gestures = new GarageGestures(Garage, Roster);
             Income = new IncomeService(Roster, config.Track, Turbo);
 
             Roster.FinishCrossed += OnFinishCrossed;
+            PlayerLevel.LevelReached += OnLevelReached;
             new NewGameSetup(economy, config.Vehicles, Garage, Progress, instanceIds).Apply();
         }
 
@@ -50,6 +62,7 @@ namespace _Project.Editor.Balance
         public GarageBoard Garage { get; }
         public RankProgress Progress { get; }
         public Wallet Wallet { get; }
+        public PlayerLevel PlayerLevel { get; }
         public BoxDelivery Delivery { get; }
         public TrackRoster Roster { get; }
         public TurboService Turbo { get; }
@@ -89,12 +102,19 @@ namespace _Project.Editor.Balance
         public void Dispose()
         {
             Roster.FinishCrossed -= OnFinishCrossed;
+            PlayerLevel.LevelReached -= OnLevelReached;
+            PlayerLevel.Dispose();
             Progress.Dispose();
         }
 
         private int CountDecorObjects()
         {
             return Progress.MaxRank / _settings.DecorRankStep;
+        }
+
+        private void OnLevelReached(int level)
+        {
+            PlayerLevel.ClaimReward();
         }
 
         private void OnFinishCrossed(TrackRunner runner, long payout)

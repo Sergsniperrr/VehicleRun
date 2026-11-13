@@ -134,7 +134,7 @@ namespace _Project.UI.Windows
         private void ScrollToBoxRank()
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(_rowsRoot);
-            RectTransform boxRankRow = (RectTransform)_rows[_progress.BoxRank - FirstRank].transform;
+            RectTransform boxRankRow = (RectTransform)_rows[_progress.ShopMaxRank - FirstRank].transform;
             float viewportHeight = _scroll.viewport.rect.height;
             float hiddenHeight = Mathf.Max(0f, _rowsRoot.rect.height - viewportHeight);
             float rowDepth = -(boxRankRow.localPosition.y + boxRankRow.rect.center.y);

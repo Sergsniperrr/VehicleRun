@@ -24,6 +24,8 @@ namespace _Project.Features.Save
         private readonly TrackRoster _roster;
         private readonly TurboService _turbo;
         private readonly CollectionMilestones _milestones;
+        private readonly PlayerLevel _playerLevel;
+        private readonly SaveLevelResolver _levels;
 
         public GameStateRestorer(
             VehicleCatalogConfig catalog,
@@ -35,7 +37,9 @@ namespace _Project.Features.Save
             BoxDelivery delivery,
             TrackRoster roster,
             TurboService turbo,
-            CollectionMilestones milestones)
+            CollectionMilestones milestones,
+            PlayerLevel playerLevel,
+            SaveLevelResolver levels)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -47,6 +51,8 @@ namespace _Project.Features.Save
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
+            _levels = levels ?? throw new ArgumentNullException(nameof(levels));
         }
 
         public void Restore(GameSave save)
@@ -58,6 +64,10 @@ namespace _Project.Features.Save
 
             _instanceIds.Restore(save.NextInstanceId);
             _progress.RestoreUnlockedRanks(save.UnlockedRanks);
+            _playerLevel.Restore(
+                _levels.ResolveLevel(save),
+                _levels.ResolveExperience(save),
+                _levels.ResolveClaimedRewardLevel(save));
 
             foreach (VehicleSave vehicle in save.Vehicles)
             {

@@ -79,7 +79,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 49 записей:
+Сейчас в ассете 51 запись:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -88,6 +88,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
   - `popup.recycle.no_reward` — «Монет за это не будет»;
 - общие тексты:
   - `ui.common.yes`, `ui.common.no`, `ui.common.ok` — «Да», «Нет», «Хорошо» / «Yes», «No», «OK»;
+  - `ui.common.claim` — «Забрать» / «Claim»: кнопка награды в окне левелапа;
   - `ui.common.rank` — «Ранг {0}» / «Rank {0}»: строка ранга в карточке машины и порог на замке турбо;
 - HUD ([Gameplay.md](Gameplay.md), раздел 13):
   - `ui.hud.no_free_slot` — «Освободите место»;
@@ -102,7 +103,8 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;
 - заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки»;
 - окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects»;
-- окно левелапа ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`.
+- окно левелапа игрока ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!», кнопка — `ui.common.claim`;
+- окно новой машины: `popup.newvehicle.title` — «Новая машина!» / «New vehicle!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`.
 
 Остальные тексты добавляются по мере их появления в игре.
 

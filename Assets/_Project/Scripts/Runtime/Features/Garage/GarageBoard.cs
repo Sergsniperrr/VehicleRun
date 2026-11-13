@@ -139,9 +139,9 @@ namespace _Project.Features.Garage
             _onTrack[slot] = false;
         }
 
-        public void UnlockSlots(int maxRank)
+        public void UnlockSlots(int level)
         {
-            int openSlotCount = Math.Min(_config.OpenSlots.GetCapacity(maxRank), SlotCount);
+            int openSlotCount = Math.Min(_config.OpenSlots.GetCapacity(level), SlotCount);
 
             if (openSlotCount <= OpenSlotCount)
             {

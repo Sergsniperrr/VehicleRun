@@ -20,7 +20,10 @@ namespace _Project.Core.Economy
         [SerializeField] private long _startCoins;
         [SerializeField] private int _startVehicleRank;
         [SerializeField] private int _startVehicleCount;
-        [SerializeField] private int _boxRankLag;
+        [SerializeField] private int _shopRankLag = 4;
+        [SerializeField] private int _quickBuyRankLag = 8;
+        [SerializeField] private int _freeBoxLowestRankLag = 10;
+        [SerializeField] private int _freeBoxHighestRankLag = 7;
         [SerializeField] private List<long> _boxBasePrices = new List<long>();
         [SerializeField] private double _boxPriceGrowth;
         [SerializeField] private double _firstRankBoxPriceGrowth;
@@ -35,7 +38,10 @@ namespace _Project.Core.Economy
         public long StartCoins => _startCoins;
         public int StartVehicleRank => _startVehicleRank;
         public int StartVehicleCount => _startVehicleCount;
-        public int BoxRankLag => _boxRankLag;
+        public int ShopRankLag => _shopRankLag;
+        public int QuickBuyRankLag => _quickBuyRankLag;
+        public int FreeBoxLowestRankLag => _freeBoxLowestRankLag;
+        public int FreeBoxHighestRankLag => _freeBoxHighestRankLag;
         public IReadOnlyList<long> BoxBasePrices => _boxBasePrices;
         public double BoxPriceGrowth => _boxPriceGrowth;
         public double FirstRankBoxPriceGrowth => _firstRankBoxPriceGrowth;

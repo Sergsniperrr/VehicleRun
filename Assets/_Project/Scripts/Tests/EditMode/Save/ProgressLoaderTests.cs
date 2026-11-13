@@ -22,7 +22,7 @@ namespace _Project.Tests.EditMode.Save
             _source = new SaveTestGame(_fixture);
             _target = new SaveTestGame(_fixture);
             _storage = new FakeProgressStorage();
-            GameSaveValidator validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track);
+            GameSaveValidator validator = new GameSaveValidator(_fixture.Vehicles, _fixture.Garage, _fixture.Track, new SaveLevelResolver(_fixture.Garage, _fixture.Track));
             _loader = new ProgressLoader(_storage, validator, _target.Restorer);
         }
 

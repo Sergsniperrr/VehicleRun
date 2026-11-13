@@ -42,7 +42,7 @@ Assets/
 ├── _Project/                          весь код и данные игры
 │   ├── Art/Placeholders/              ассеты из выгрузки референса, большая часть остаётся в игре (Docs/TechPlan.md, 3.3)
 │   ├── Audio/AudioMixers/             AudioMixer.mixer: Master, Music, SFX
-│   ├── Configs/Game/                  GameConfig и конфиги машин, экономики, гаража и трассы (Docs/Configs.md)
+│   ├── Configs/Game/                  GameConfig и конфиги машин, экономики, гаража, трассы, турбо и уровня игрока (Docs/Configs.md)
 │   ├── Configs/Localization/          LocalizationConfig.asset, таблица переводов
 │   ├── Fonts/Nunito/                  Nunito ExtraBold (OFL), его TMP Font Asset с кириллицей и материал с обводкой
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib

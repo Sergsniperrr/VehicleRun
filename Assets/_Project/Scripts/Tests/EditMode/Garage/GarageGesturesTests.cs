@@ -20,6 +20,7 @@ namespace _Project.Tests.EditMode.Garage
         private InstanceIdGenerator _instanceIds;
         private GarageBoard _garage;
         private RankProgress _progress;
+        private PlayerLevel _playerLevel;
         private TrackRoster _roster;
         private GarageGestures _gestures;
 
@@ -29,14 +30,17 @@ namespace _Project.Tests.EditMode.Garage
             _fixture = new GameConfigFixture();
             _instanceIds = new InstanceIdGenerator();
             _garage = new GarageBoard(_fixture.Garage, _fixture.Vehicles, _instanceIds);
-            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _fixture.Track, _garage);
-            _roster = new TrackRoster(_garage, _progress, _fixture.Track, new Wallet(_fixture.Economy));
+            _progress = new RankProgress(_fixture.Vehicles, _fixture.Economy, _garage);
+            Wallet wallet = new Wallet(_fixture.Economy);
+            _playerLevel = new PlayerLevel(_fixture.PlayerLevel, _fixture.Track, _garage, wallet);
+            _roster = new TrackRoster(_garage, _playerLevel, _fixture.Track, wallet);
             _gestures = new GarageGestures(_garage, _roster);
         }
 
         [TearDown]
         public void TearDown()
         {
+            _playerLevel.Dispose();
             _progress.Dispose();
             _fixture.Dispose();
         }

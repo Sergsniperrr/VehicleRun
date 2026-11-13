@@ -1,5 +1,6 @@
 using System;
 using _Project.Core.Economy;
+using _Project.Core.Randomness;
 using _Project.Core.Vehicles;
 using _Project.Features.Commands;
 using _Project.Features.Economy;
@@ -20,6 +21,7 @@ namespace _Project.Features.Boxes
         private readonly Wallet _wallet;
         private readonly BoxPricing _pricing;
         private readonly InstanceIdGenerator _instanceIds;
+        private readonly IRandomSource _random;
 
         public BoxDelivery(
             EconomyConfig economy,
@@ -28,7 +30,8 @@ namespace _Project.Features.Boxes
             RankProgress progress,
             Wallet wallet,
             BoxPricing pricing,
-            InstanceIdGenerator instanceIds)
+            InstanceIdGenerator instanceIds,
+            IRandomSource random)
         {
             _economy = economy ?? throw new ArgumentNullException(nameof(economy));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
@@ -37,14 +40,15 @@ namespace _Project.Features.Boxes
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
             _pricing = pricing ?? throw new ArgumentNullException(nameof(pricing));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
+            _random = random ?? throw new ArgumentNullException(nameof(random));
             FreeBoxRemainingSeconds = economy.FreeBoxIntervalSeconds;
         }
 
         public float FreeBoxRemainingSeconds { get; private set; }
         public float FreeBoxProgress => 1f - FreeBoxRemainingSeconds / _economy.FreeBoxIntervalSeconds;
         public bool HasReadyDelivery { get; private set; }
-        public long BoxPrice => _pricing.GetPrice(_progress.BoxRank);
-        public long MissingCoins => GetMissingCoins(_progress.BoxRank);
+        public long BoxPrice => _pricing.GetPrice(_progress.QuickBuyRank);
+        public long MissingCoins => GetMissingCoins(_progress.QuickBuyRank);
 
         public void Advance(float deltaTime)
         {
@@ -88,12 +92,12 @@ namespace _Project.Features.Boxes
                 throw new ArgumentOutOfRangeException(nameof(rank));
             }
 
-            return rank <= _progress.BoxRank;
+            return rank <= _progress.ShopMaxRank;
         }
 
         public CommandResult BuyBox()
         {
-            return BuyBox(_progress.BoxRank);
+            return BuyBox(_progress.QuickBuyRank);
         }
 
         public CommandResult BuyBox(int rank)
@@ -144,7 +148,12 @@ namespace _Project.Features.Boxes
 
             HasReadyDelivery = false;
             FreeBoxRemainingSeconds = _economy.FreeBoxIntervalSeconds;
-            PlaceBox(slot, BoxSource.Free, _progress.BoxRank);
+            PlaceBox(slot, BoxSource.Free, PickFreeBoxRank());
+        }
+
+        private int PickFreeBoxRank()
+        {
+            return _random.Range(_progress.FreeBoxLowestRank, _progress.FreeBoxHighestRank);
         }
 
         private void PlaceBox(int slot, BoxSource source, int rank)

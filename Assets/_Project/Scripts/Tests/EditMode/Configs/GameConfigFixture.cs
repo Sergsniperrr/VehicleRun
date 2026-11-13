@@ -4,6 +4,7 @@ using _Project.Core.Configs;
 using _Project.Core.Economy;
 using _Project.Core.Garage;
 using _Project.Core.Localization;
+using _Project.Core.Progression;
 using _Project.Core.Track;
 using _Project.Core.Turbo;
 using _Project.Core.Vehicles;
@@ -20,14 +21,17 @@ namespace _Project.Tests.EditMode.Configs
         private static readonly int[] MilestoneRanks = { 4, 8 };
         private static readonly long[] MilestoneCoins = { 1000, 50000 };
         private static readonly float[] TrackSpeeds = { 3.965f, 4.361f, 4.515f, 4.564f, 4.825f, 5.014f, 5.197f, 5.397f, 5.6f, 5.8f, 6f, 6.2f };
-        private static readonly (int Rank, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
-        private static readonly (int Rank, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
+        private static readonly (int Level, int Capacity)[] GarageSteps = { (3, 9), (5, 12), (7, 15) };
+        private static readonly (int Level, int Capacity)[] TrackSteps = { (4, 4), (8, 6), (12, 8) };
 
         private const int Version = 1;
         private const long StartCoins = 60;
         private const int StartVehicleRank = 1;
         private const int StartVehicleCount = 2;
-        private const int BoxRankLag = 5;
+        private const int ShopRankLag = 4;
+        private const int QuickBuyRankLag = 8;
+        private const int FreeBoxLowestRankLag = 10;
+        private const int FreeBoxHighestRankLag = 7;
         private const double BoxPriceGrowth = 1.175;
         private const double FirstRankBoxPriceGrowth = 1.07;
         private const bool IsBoxPriceGrowthLimited = false;
@@ -48,6 +52,10 @@ namespace _Project.Tests.EditMode.Configs
         private const float TurboFreeDurationSeconds = 30f;
         private const float TurboFreeCooldownSeconds = 180f;
         private const float TurboTapBoostSeconds = 2f;
+        private const long FirstLevelExperience = 4;
+        private const long ExperienceStepPerLevel = 8;
+        private const long FirstRewardCoins = 100;
+        private const double RewardGrowth = 1.7;
         private const float SpritePixelsPerUnit = 100f;
 
         private readonly List<Object> _createdObjects = new List<Object>();
@@ -60,6 +68,7 @@ namespace _Project.Tests.EditMode.Configs
             Garage = Create<GarageConfig>();
             Track = Create<TrackConfig>();
             Turbo = Create<TurboConfig>();
+            PlayerLevel = Create<PlayerLevelConfig>();
             Config = Create<GameConfig>();
 
             FillLocalization();
@@ -68,6 +77,7 @@ namespace _Project.Tests.EditMode.Configs
             FillGarage();
             FillTrack();
             FillTurbo();
+            FillPlayerLevel();
             FillConfig();
         }
 
@@ -77,6 +87,7 @@ namespace _Project.Tests.EditMode.Configs
         public GarageConfig Garage { get; }
         public TrackConfig Track { get; }
         public TurboConfig Turbo { get; }
+        public PlayerLevelConfig PlayerLevel { get; }
         public GameConfig Config { get; }
 
         public void Change(Object target, string propertyPath, Action<SerializedProperty> change)
@@ -170,7 +181,10 @@ namespace _Project.Tests.EditMode.Configs
             economy.FindProperty("_startCoins").longValue = StartCoins;
             economy.FindProperty("_startVehicleRank").intValue = StartVehicleRank;
             economy.FindProperty("_startVehicleCount").intValue = StartVehicleCount;
-            economy.FindProperty("_boxRankLag").intValue = BoxRankLag;
+            economy.FindProperty("_shopRankLag").intValue = ShopRankLag;
+            economy.FindProperty("_quickBuyRankLag").intValue = QuickBuyRankLag;
+            economy.FindProperty("_freeBoxLowestRankLag").intValue = FreeBoxLowestRankLag;
+            economy.FindProperty("_freeBoxHighestRankLag").intValue = FreeBoxHighestRankLag;
             FillBoxBasePrices(economy.FindProperty("_boxBasePrices"));
             economy.FindProperty("_boxPriceGrowth").doubleValue = BoxPriceGrowth;
             economy.FindProperty("_firstRankBoxPriceGrowth").doubleValue = FirstRankBoxPriceGrowth;
@@ -236,7 +250,25 @@ namespace _Project.Tests.EditMode.Configs
             turbo.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private void FillSchedule(SerializedProperty schedule, int initial, (int Rank, int Capacity)[] steps)
+        private void FillPlayerLevel()
+        {
+            SerializedObject playerLevel = new SerializedObject(PlayerLevel);
+            SerializedProperty mergeExperience = playerLevel.FindProperty("_mergeExperience");
+            mergeExperience.arraySize = CoinsPerLap.Length - 1;
+
+            for (int i = 0; i < mergeExperience.arraySize; i++)
+            {
+                mergeExperience.GetArrayElementAtIndex(i).longValue = i + 1;
+            }
+
+            playerLevel.FindProperty("_firstLevelExperience").longValue = FirstLevelExperience;
+            playerLevel.FindProperty("_experienceStepPerLevel").longValue = ExperienceStepPerLevel;
+            playerLevel.FindProperty("_firstRewardCoins").longValue = FirstRewardCoins;
+            playerLevel.FindProperty("_rewardGrowth").doubleValue = RewardGrowth;
+            playerLevel.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private void FillSchedule(SerializedProperty schedule, int initial, (int Level, int Capacity)[] steps)
         {
             schedule.FindPropertyRelative("_initial").intValue = initial;
 
@@ -246,7 +278,7 @@ namespace _Project.Tests.EditMode.Configs
             for (int i = 0; i < steps.Length; i++)
             {
                 SerializedProperty step = stepsProperty.GetArrayElementAtIndex(i);
-                step.FindPropertyRelative("_rank").intValue = steps[i].Rank;
+                step.FindPropertyRelative("_level").intValue = steps[i].Level;
                 step.FindPropertyRelative("_capacity").intValue = steps[i].Capacity;
             }
         }
@@ -260,6 +292,7 @@ namespace _Project.Tests.EditMode.Configs
             config.FindProperty("_garage").objectReferenceValue = Garage;
             config.FindProperty("_track").objectReferenceValue = Track;
             config.FindProperty("_turbo").objectReferenceValue = Turbo;
+            config.FindProperty("_playerLevel").objectReferenceValue = PlayerLevel;
             config.ApplyModifiedPropertiesWithoutUndo();
         }
     }

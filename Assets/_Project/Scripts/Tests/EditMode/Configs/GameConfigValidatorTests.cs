@@ -146,10 +146,20 @@ namespace _Project.Tests.EditMode.Configs
             AssertReportedBy(_fixture.Vehicles);
         }
 
-        [Test]
-        public void NegativeBoxRankLagIsReported()
+        [TestCase("_shopRankLag")]
+        [TestCase("_quickBuyRankLag")]
+        [TestCase("_freeBoxHighestRankLag")]
+        public void NegativeBoxRankLagIsReported(string propertyPath)
         {
-            _fixture.Change(_fixture.Economy, "_boxRankLag", property => property.intValue = -1);
+            _fixture.Change(_fixture.Economy, propertyPath, property => property.intValue = -1);
+
+            AssertReportedBy(_fixture.Economy);
+        }
+
+        [Test]
+        public void FreeBoxLowestRankAboveHighestIsReported()
+        {
+            _fixture.Change(_fixture.Economy, "_freeBoxLowestRankLag", property => property.intValue = 6);
 
             AssertReportedBy(_fixture.Economy);
         }
@@ -196,14 +206,6 @@ namespace _Project.Tests.EditMode.Configs
         }
 
         [Test]
-        public void GarageExpansionAboveLastRankIsReported()
-        {
-            _fixture.Change(_fixture.Garage, "_openSlots._steps.Array.data[2]._rank", property => property.intValue = _fixture.Vehicles.MaxRank + 1);
-
-            AssertReportedBy(_fixture.Garage);
-        }
-
-        [Test]
         public void GarageOpenSlotsBeyondGridAreReported()
         {
             _fixture.Change(_fixture.Garage, "_rows", property => property.intValue = 4);
@@ -212,9 +214,73 @@ namespace _Project.Tests.EditMode.Configs
         }
 
         [Test]
+        public void MissingPlayerLevelConfigIsReported()
+        {
+            _fixture.Change(_fixture.Config, "_playerLevel", property => property.objectReferenceValue = null);
+
+            AssertReportedBy(_fixture.Config);
+        }
+
+        [Test]
+        public void MergeExperienceForWrongRankCountIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_mergeExperience", property => property.arraySize--);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
+        public void MergeExperienceNotAboveZeroIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_mergeExperience.Array.data[0]", property => property.longValue = 0);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
+        public void FallingMergeExperienceIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_mergeExperience.Array.data[3]", property => property.longValue = 1);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
+        public void FirstLevelExperienceBelowOneIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_firstLevelExperience", property => property.longValue = 0);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
+        public void NegativeExperienceStepIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_experienceStepPerLevel", property => property.longValue = -1);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
+        public void LevelRewardBelowOneIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_firstRewardCoins", property => property.longValue = 0);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
+        public void LevelRewardGrowthBelowOneIsReported()
+        {
+            _fixture.Change(_fixture.PlayerLevel, "_rewardGrowth", property => property.doubleValue = 0.9);
+
+            AssertReportedBy(_fixture.PlayerLevel);
+        }
+
+        [Test]
         public void UnorderedTrackExpansionsAreReported()
         {
-            _fixture.Change(_fixture.Track, "_capacity._steps.Array.data[1]._rank", property => property.intValue = 3);
+            _fixture.Change(_fixture.Track, "_capacity._steps.Array.data[1]._level", property => property.intValue = 3);
 
             AssertReportedBy(_fixture.Track);
         }

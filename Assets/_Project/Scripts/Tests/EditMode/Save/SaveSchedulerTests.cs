@@ -25,7 +25,7 @@ namespace _Project.Tests.EditMode.Save
             _game = new SaveTestGame(_fixture);
             _storage = new FakeProgressStorage();
             _time = new FakeTimeService { DeltaTime = FrameSeconds };
-            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, _game.Milestones, _time);
+            _scheduler = new SaveScheduler(_storage, _game.Factory, _game.Garage, _game.Roster, _game.Turbo, _game.Milestones, _game.Level, _time);
         }
 
         [TearDown]
@@ -92,6 +92,18 @@ namespace _Project.Tests.EditMode.Save
 
             _game.Garage.Recycle(3);
             AssertWrittenAfterTick(9);
+        }
+
+        [Test]
+        public void ClaimedLevelRewardIsWrittenAsImportant()
+        {
+            _scheduler.StartWriting();
+            _game.Level.AddExperience(_game.Level.ExperienceToNextLevel);
+
+            _game.Level.ClaimReward();
+
+            AssertWrittenAfterTick(1);
+            Assert.That(_storage.State.ClaimedRewardLevel, Is.EqualTo(_game.Level.Level));
         }
 
         [Test]

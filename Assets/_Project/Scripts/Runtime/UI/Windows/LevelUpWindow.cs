@@ -1,37 +1,27 @@
 using System;
-using _Project.Core.Localization;
-using _Project.Core.Track;
-using _Project.Core.Vehicles;
 using _Project.Features.Economy;
+using _Project.Features.Progression;
 using _Project.UI.Sounds;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using VContainer;
 
 namespace _Project.UI.Windows
 {
     public class LevelUpWindow : Window
     {
-        private const string RankKey = "ui.common.rank";
-        private const string IncomeKey = "popup.vehicle.income";
         private const float MinVisibleSeconds = 0.4f;
         private const float RaysTurnSeconds = 12f;
         private const float FullTurnDegrees = 360f;
         private const int InfiniteLoops = -1;
 
-        [SerializeField] private Image _icon;
-        [SerializeField] private Image _rankBadge;
-        [SerializeField] private TMP_Text _rankValue;
-        [SerializeField] private TMP_Text _name;
-        [SerializeField] private TMP_Text _rank;
-        [SerializeField] private TMP_Text _income;
+        [SerializeField] private TMP_Text _levelValue;
+        [SerializeField] private TMP_Text _rewardValue;
         [SerializeField] private RectTransform _rays;
 
-        private ILocalizationService _localization;
+        private PlayerLevel _playerLevel;
         private CoinsFormatter _formatter;
-        private TrackConfig _track;
         private UiSounds _sounds;
         private Tween _raysSpin;
         private float _shownTime;
@@ -43,33 +33,26 @@ namespace _Project.UI.Windows
         }
 
         [Inject]
-        public void Construct(
-            ILocalizationService localization,
-            CoinsFormatter formatter,
-            TrackConfig track,
-            UiSounds sounds)
+        public void Construct(PlayerLevel playerLevel, CoinsFormatter formatter, UiSounds sounds)
         {
-            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
-            _track = track ?? throw new ArgumentNullException(nameof(track));
             _sounds = sounds ?? throw new ArgumentNullException(nameof(sounds));
         }
 
-        public void Show(VehicleDefinition definition)
+        public void ShowPendingReward()
         {
-            if (definition == null)
+            if (_playerLevel.HasPendingReward == false)
             {
-                throw new ArgumentNullException(nameof(definition));
+                throw new InvalidOperationException(nameof(_playerLevel));
             }
 
-            string income = _formatter.FormatIncome(definition.CalculateAverageIncome(_track.LapLength));
+            int level = _playerLevel.PendingRewardLevel;
+            long reward = _playerLevel.GetReward(level);
+            string rewardText = _formatter.FormatShort(reward);
 
-            _icon.sprite = definition.GarageSprite;
-            _rankBadge.color = definition.BadgeColor;
-            _rankValue.text = definition.Rank.ToString();
-            _name.text = _localization.Get(definition.NameKey);
-            _rank.text = string.Format(_localization.Get(RankKey), definition.Rank);
-            _income.text = string.Format(_localization.Get(IncomeKey), income);
+            _levelValue.text = level.ToString();
+            _rewardValue.text = $"+{rewardText}";
             Open();
         }
 
@@ -93,6 +76,7 @@ namespace _Project.UI.Windows
                 return;
             }
 
+            _playerLevel.ClaimReward();
             base.Dismiss();
         }
 

@@ -11,13 +11,13 @@ namespace _Project.Features.Track
         [SerializeField] private TMP_Text _value;
 
         private TrackRoster _roster;
-        private RankProgress _progress;
+        private PlayerLevel _playerLevel;
 
         private void Start()
         {
             _roster.VehicleSent += OnVehicleSent;
             _roster.VehicleReturned += OnVehicleReturned;
-            _progress.TrackPlacesUnlocked += OnTrackPlacesUnlocked;
+            _playerLevel.TrackPlacesUnlocked += OnTrackPlacesUnlocked;
             ShowOccupancy();
         }
 
@@ -25,14 +25,14 @@ namespace _Project.Features.Track
         {
             _roster.VehicleSent -= OnVehicleSent;
             _roster.VehicleReturned -= OnVehicleReturned;
-            _progress.TrackPlacesUnlocked -= OnTrackPlacesUnlocked;
+            _playerLevel.TrackPlacesUnlocked -= OnTrackPlacesUnlocked;
         }
 
         [Inject]
-        public void Construct(TrackRoster roster, RankProgress progress)
+        public void Construct(TrackRoster roster, PlayerLevel playerLevel)
         {
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
         }
 
         private void ShowOccupancy()

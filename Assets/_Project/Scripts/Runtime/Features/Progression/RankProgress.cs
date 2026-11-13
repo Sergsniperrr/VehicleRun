@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using _Project.Core.Economy;
-using _Project.Core.Track;
 using _Project.Core.Vehicles;
 using _Project.Features.Garage;
 using _Project.Features.Vehicles;
@@ -10,17 +9,17 @@ namespace _Project.Features.Progression
 {
     public class RankProgress : IDisposable
     {
+        private const int FirstRank = 1;
+
         private readonly VehicleCatalogConfig _catalog;
         private readonly EconomyConfig _economy;
-        private readonly TrackConfig _track;
         private readonly GarageBoard _garage;
         private readonly bool[] _unlockedRanks;
 
-        public RankProgress(VehicleCatalogConfig catalog, EconomyConfig economy, TrackConfig track, GarageBoard garage)
+        public RankProgress(VehicleCatalogConfig catalog, EconomyConfig economy, GarageBoard garage)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _economy = economy ?? throw new ArgumentNullException(nameof(economy));
-            _track = track ?? throw new ArgumentNullException(nameof(track));
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _unlockedRanks = new bool[catalog.MaxRank];
 
@@ -30,11 +29,12 @@ namespace _Project.Features.Progression
         }
 
         public event Action<int> RankUnlocked;
-        public event Action<int> TrackPlacesUnlocked;
 
         public int MaxRank { get; private set; }
-        public int BoxRank => Math.Max(1, MaxRank - _economy.BoxRankLag);
-        public int TrackCapacity => _track.Capacity.GetCapacity(MaxRank);
+        public int ShopMaxRank => CalculateLaggingRank(_economy.ShopRankLag);
+        public int QuickBuyRank => CalculateLaggingRank(_economy.QuickBuyRankLag);
+        public int FreeBoxLowestRank => CalculateLaggingRank(_economy.FreeBoxLowestRankLag);
+        public int FreeBoxHighestRank => CalculateLaggingRank(_economy.FreeBoxHighestRankLag);
 
         public bool IsRankUnlocked(int rank)
         {
@@ -52,10 +52,7 @@ namespace _Project.Features.Progression
 
             _unlockedRanks[rank - 1] = true;
 
-            if (rank > MaxRank)
-            {
-                IncreaseMaxRank(rank);
-            }
+            MaxRank = Math.Max(MaxRank, rank);
 
             RankUnlocked?.Invoke(rank);
         }
@@ -82,7 +79,6 @@ namespace _Project.Features.Progression
             }
 
             MaxRank = maxRank;
-            _garage.UnlockSlots(maxRank);
         }
 
         public void Dispose()
@@ -92,16 +88,9 @@ namespace _Project.Features.Progression
             _garage.VehicleMerged -= OnVehicleMerged;
         }
 
-        private void IncreaseMaxRank(int maxRank)
+        private int CalculateLaggingRank(int rankLag)
         {
-            int previousTrackCapacity = TrackCapacity;
-            MaxRank = maxRank;
-            _garage.UnlockSlots(maxRank);
-
-            if (TrackCapacity > previousTrackCapacity)
-            {
-                TrackPlacesUnlocked?.Invoke(TrackCapacity);
-            }
+            return Math.Max(FirstRank, MaxRank - rankLag);
         }
 
         private void CheckRank(int rank)

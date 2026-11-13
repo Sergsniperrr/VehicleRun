@@ -16,11 +16,17 @@ MonoBehaviour:
   _turnRadius: 4.4
   _startDistance: 5.59
   _capacity:
-    _initial: 2
+    _initial: 4
     _steps:
-    - _rank: 4
-      _capacity: 4
-    - _rank: 8
+    - _level: 3
+      _capacity: 5
+    - _level: 5
       _capacity: 6
-    - _rank: 12
+    - _level: 7
+      _capacity: 7
+    - _level: 9
       _capacity: 8
+    - _level: 11
+      _capacity: 9
+    - _level: 12
+      _capacity: 10

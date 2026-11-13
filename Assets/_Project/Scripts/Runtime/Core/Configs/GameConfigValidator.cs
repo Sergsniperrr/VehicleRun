@@ -14,6 +14,7 @@ namespace _Project.Core.Configs
     public class GameConfigValidator
     {
         private const int FirstRank = 1;
+        private const int MergeRanksPerVehicleRank = 1;
         private const string GarageScheduleName = "Открытые места гаража";
         private const string TrackScheduleName = "Места трассы";
 
@@ -47,9 +48,10 @@ namespace _Project.Core.Configs
 
             ValidateEconomy(config.Economy, maxRank, config.Garage.OpenSlots.Initial, errors);
             ValidateMilestones(config.Economy, maxRank, errors);
-            ValidateGarage(config.Garage, maxRank, errors);
-            ValidateTrack(config.Track, maxRank, errors);
+            ValidateGarage(config.Garage, errors);
+            ValidateTrack(config.Track, errors);
             ValidateTurbo(config.Turbo, maxRank, errors);
+            ValidatePlayerLevel(config.PlayerLevel, maxRank, errors);
 
             return errors;
         }
@@ -81,6 +83,11 @@ namespace _Project.Core.Configs
             if (config.Turbo == null)
             {
                 errors.Add(new ConfigError(config, "Не назначен конфиг турбо"));
+            }
+
+            if (config.PlayerLevel == null)
+            {
+                errors.Add(new ConfigError(config, "Не назначен конфиг уровня игрока"));
             }
 
             return errors.Count == errorCount;
@@ -179,10 +186,7 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(economy, $"Стартовых машин {economy.StartVehicleCount}, а открытых мест гаража в начале {initialOpenSlots}"));
             }
 
-            if (economy.BoxRankLag < 0)
-            {
-                errors.Add(new ConfigError(economy, $"Отставание ранга коробки {economy.BoxRankLag} отрицательное: ранг коробки b = max(1, K − отставание) выйдет за K"));
-            }
+            ValidateBoxRankLags(economy, errors);
 
             ValidateBoxBasePrices(economy, maxRank, errors);
 
@@ -274,14 +278,14 @@ namespace _Project.Core.Configs
             }
         }
 
-        private void ValidateGarage(GarageConfig garage, int maxRank, List<ConfigError> errors)
+        private void ValidateGarage(GarageConfig garage, List<ConfigError> errors)
         {
             if (garage.Columns < 1 || garage.Rows < 1)
             {
                 errors.Add(new ConfigError(garage, $"Сетка гаража {garage.Columns} × {garage.Rows}, в ней должен быть хотя бы один слот"));
             }
 
-            int maxOpenSlots = ValidateSchedule(garage, garage.OpenSlots, GarageScheduleName, maxRank, errors);
+            int maxOpenSlots = ValidateSchedule(garage, garage.OpenSlots, GarageScheduleName, errors);
 
             if (maxOpenSlots > garage.SlotCount)
             {
@@ -289,7 +293,7 @@ namespace _Project.Core.Configs
             }
         }
 
-        private void ValidateTrack(TrackConfig track, int maxRank, List<ConfigError> errors)
+        private void ValidateTrack(TrackConfig track, List<ConfigError> errors)
         {
             if (track.StraightHalfLength < 0)
             {
@@ -305,7 +309,7 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(track, $"Точка старта {track.StartDistance} должна быть на круге: от 0 до длины круга {track.LapLength:0.###}"));
             }
 
-            ValidateSchedule(track, track.Capacity, TrackScheduleName, maxRank, errors);
+            ValidateSchedule(track, track.Capacity, TrackScheduleName, errors);
         }
 
         private void ValidateTurbo(TurboConfig turbo, int maxRank, List<ConfigError> errors)
@@ -336,14 +340,86 @@ namespace _Project.Core.Configs
             }
         }
 
-        private int ValidateSchedule(Object source, CapacitySchedule schedule, string scheduleName, int maxRank, List<ConfigError> errors)
+        private void ValidateBoxRankLags(EconomyConfig economy, List<ConfigError> errors)
+        {
+            if (economy.ShopRankLag < 0)
+            {
+                errors.Add(new ConfigError(economy, $"Отставание ранга магазина {economy.ShopRankLag} отрицательное: ранг коробки выйдет за K"));
+            }
+
+            if (economy.QuickBuyRankLag < 0)
+            {
+                errors.Add(new ConfigError(economy, $"Отставание ранга кнопки коробки {economy.QuickBuyRankLag} отрицательное: ранг коробки выйдет за K"));
+            }
+
+            if (economy.FreeBoxHighestRankLag < 0)
+            {
+                errors.Add(new ConfigError(economy, $"Отставание старшего ранга бесплатной коробки {economy.FreeBoxHighestRankLag} отрицательное: ранг коробки выйдет за K"));
+            }
+
+            if (economy.FreeBoxLowestRankLag < economy.FreeBoxHighestRankLag)
+            {
+                errors.Add(new ConfigError(economy, $"Отставание младшего ранга бесплатной коробки {economy.FreeBoxLowestRankLag} меньше отставания старшего {economy.FreeBoxHighestRankLag}"));
+            }
+        }
+
+        private void ValidatePlayerLevel(PlayerLevelConfig playerLevel, int maxRank, List<ConfigError> errors)
+        {
+            int mergeRankCount = maxRank - MergeRanksPerVehicleRank;
+
+            if (playerLevel.MergeExperienceCount != mergeRankCount)
+            {
+                errors.Add(new ConfigError(playerLevel, $"Опыт за слияние задан для {playerLevel.MergeExperienceCount} рангов, а сливаются ранги 1..{mergeRankCount}"));
+            }
+
+            long previousExperience = 0;
+
+            for (int rank = FirstRank; rank <= playerLevel.MergeExperienceCount; rank++)
+            {
+                long experience = playerLevel.GetMergeExperience(rank);
+
+                if (experience <= 0)
+                {
+                    errors.Add(new ConfigError(playerLevel, $"Опыт за слияние машин ранга {rank} равен {experience}, должен быть больше 0"));
+                }
+
+                if (experience < previousExperience)
+                {
+                    errors.Add(new ConfigError(playerLevel, $"Опыт за слияние машин ранга {rank} {experience} меньше опыта предыдущего ранга {previousExperience}"));
+                }
+
+                previousExperience = experience;
+            }
+
+            if (playerLevel.FirstLevelExperience < 1)
+            {
+                errors.Add(new ConfigError(playerLevel, $"Опыт первого уровня {playerLevel.FirstLevelExperience}, должен быть не меньше 1"));
+            }
+
+            if (playerLevel.ExperienceStepPerLevel < 0)
+            {
+                errors.Add(new ConfigError(playerLevel, $"Прибавка опыта за уровень {playerLevel.ExperienceStepPerLevel}, не может быть отрицательной"));
+            }
+
+            if (playerLevel.FirstRewardCoins < 1)
+            {
+                errors.Add(new ConfigError(playerLevel, $"Первая награда за уровень {playerLevel.FirstRewardCoins}, должна быть не меньше 1"));
+            }
+
+            if (double.IsNaN(playerLevel.RewardGrowth) || playerLevel.RewardGrowth < 1)
+            {
+                errors.Add(new ConfigError(playerLevel, $"Рост награды за уровень {playerLevel.RewardGrowth}, должен быть не меньше 1"));
+            }
+        }
+
+        private int ValidateSchedule(Object source, CapacitySchedule schedule, string scheduleName, List<ConfigError> errors)
         {
             if (schedule.Initial < 1)
             {
                 errors.Add(new ConfigError(source, $"{scheduleName}: в начале {schedule.Initial}, нужно хотя бы одно"));
             }
 
-            int previousRank = FirstRank;
+            int previousLevel = PlayerLevelConfig.FirstLevel;
             int previousCapacity = schedule.Initial;
 
             for (int i = 0; i < schedule.StepCount; i++)
@@ -351,14 +427,9 @@ namespace _Project.Core.Configs
                 CapacityStep step = schedule.GetStepAt(i);
                 string label = $"{scheduleName}, шаг {i}";
 
-                if (step.Rank <= previousRank)
+                if (step.Level <= previousLevel)
                 {
-                    errors.Add(new ConfigError(source, $"{label}: ранг {step.Rank} должен быть больше {previousRank}"));
-                }
-
-                if (step.Rank > maxRank)
-                {
-                    errors.Add(new ConfigError(source, $"{label}: ранг {step.Rank} больше последнего ранга каталога {maxRank}"));
+                    errors.Add(new ConfigError(source, $"{label}: уровень {step.Level} должен быть больше {previousLevel}"));
                 }
 
                 if (step.Capacity <= previousCapacity)
@@ -366,7 +437,7 @@ namespace _Project.Core.Configs
                     errors.Add(new ConfigError(source, $"{label}: мест {step.Capacity}, должно быть больше {previousCapacity}"));
                 }
 
-                previousRank = Math.Max(previousRank, step.Rank);
+                previousLevel = Math.Max(previousLevel, step.Level);
                 previousCapacity = Math.Max(previousCapacity, step.Capacity);
             }
 

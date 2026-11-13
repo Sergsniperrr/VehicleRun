@@ -70,7 +70,7 @@ namespace _Project.UI.Hud
 
         private void ShowOffer()
         {
-            int boxRank = _progress.BoxRank;
+            int boxRank = _progress.QuickBuyRank;
             VehicleDefinition content = _catalog.GetByRank(boxRank);
 
             _icon.sprite = content.GarageSprite;

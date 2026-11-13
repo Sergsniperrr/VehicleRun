@@ -183,8 +183,8 @@ private float ToDecibels(float linearVolume)
 | `Click.ogg` (0,13 с) | `Sfx_Click` | нажатие любой кнопки интерфейса: HUD, окна, строки магазина, узлы гифт-дорожки | `ButtonClickSound` на объекте кнопки |
 | `Window.ogg` (0,18 с) | `Sfx_Window` | показ любого окна, кроме окна левелапа | `Window.Show()` |
 | `Merge.ogg` (0,65 с) | `Sfx_Merge` | успешное слияние двух машин (`GarageBoard.VehicleMerged`) | `GameplaySounds` |
-| `Money.ogg` (1,0 с) | `Sfx_Money` | выплата на финише (`TrackRoster.FinishCrossed`) и забор награды гифт-дорожки (`CollectionMilestones.MilestoneClaimed`) | `GameplaySounds` |
-| `LevelUp.ogg` (0,93 с) | `Sfx_LevelUp` | показ окна левелапа, то есть открытие нового ранга | `LevelUpWindow` |
+| `Money.ogg` (1,0 с) | `Sfx_Money` | выплата на финише (`TrackRoster.FinishCrossed`), забор награды гифт-дорожки (`CollectionMilestones.MilestoneClaimed`) и награды за уровень игрока (`PlayerLevel.RewardClaimed`) | `GameplaySounds` |
+| `LevelUp.ogg` (0,93 с) | `Sfx_LevelUp` | показ окна левелапа игрока, то есть новый уровень (до 13.11.2026 — открытие нового ранга; окно новой машины теперь играет обычный звук окна) | `LevelUpWindow` |
 | `BoxOpen` | `Sfx_BoxOpen` | открытие коробки в гараже (`GarageBoard.BoxOpened`) | `GameplaySounds` |
 | `BoxShaking` | `Sfx_BoxShake` | каждый цикл тряски коробки в слоте | `GarageSlotView` |
 | `StartMoving.ogg` | `Sfx_StartMoving` | машина выезжает на трассу (`TrackRoster.VehicleSent`). Высота зависит от ранга машины: 1,3 у ранга 1, 0,7 у последнего ранга каталога, между ними линейно | `GameplaySounds` |

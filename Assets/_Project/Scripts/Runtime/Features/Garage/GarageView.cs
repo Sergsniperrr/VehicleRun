@@ -11,10 +11,17 @@ namespace _Project.Features.Garage
     public class GarageView : MonoBehaviour
     {
         [SerializeField] private GarageSlotView[] _slots = Array.Empty<GarageSlotView>();
+        [SerializeField] private Vector2 _layoutAreaCenter = new Vector2(0f, 0.95f);
+        [SerializeField] private Vector2 _layoutAreaSize = new Vector2(6.3f, 10.25f);
+        [SerializeField] private Vector2 _layoutBaseCellSize = new Vector2(2.1f, 2.05f);
+        [SerializeField] private Vector2 _slotCenterOffset = new Vector2(0f, 0.45f);
+        [SerializeField] [Min(0.1f)] private float _layoutMaxScale = 1.5f;
+        [SerializeField] [Min(1)] private int _layoutMaxColumns = 3;
 
         private GarageBoard _garage;
         private TrackRoster _roster;
         private VehicleCatalogConfig _vehicles;
+        private GarageSlotLayout _layout;
 
         public int SlotCount => _slots.Length;
 
@@ -40,6 +47,14 @@ namespace _Project.Features.Garage
             {
                 _slots[slot].Bind(slot);
             }
+
+            _layout = new GarageSlotLayout(
+                _layoutAreaCenter,
+                _layoutAreaSize,
+                _layoutBaseCellSize,
+                _slotCenterOffset,
+                _layoutMaxScale,
+                _layoutMaxColumns);
         }
 
         private void Start()
@@ -59,6 +74,7 @@ namespace _Project.Features.Garage
             _garage.SlotsUnlocked += OnSlotsUnlocked;
             _roster.VehicleSent += OnVehicleSent;
             _roster.VehicleReturned += OnVehicleReturned;
+            ArrangeSlots();
             RefreshAll();
         }
 
@@ -87,6 +103,26 @@ namespace _Project.Features.Garage
         public GarageSlotView GetSlot(int slot)
         {
             return _slots[slot];
+        }
+
+        private void ArrangeSlots()
+        {
+            int openSlotCount = _garage.OpenSlotCount;
+
+            for (int slot = 0; slot < _slots.Length; slot++)
+            {
+                GarageSlotView view = _slots[slot];
+                bool isOpen = slot < openSlotCount;
+
+                view.gameObject.SetActive(isOpen);
+
+                if (isOpen)
+                {
+                    GarageSlotPlacement placement = _layout.Calculate(slot, openSlotCount);
+                    view.transform.localPosition = placement.Position;
+                    view.transform.localScale = Vector3.one * placement.Scale;
+                }
+            }
         }
 
         private void RefreshAll()
@@ -162,6 +198,7 @@ namespace _Project.Features.Garage
 
         private void OnSlotsUnlocked(int openSlotCount)
         {
+            ArrangeSlots();
             RefreshAll();
         }
 

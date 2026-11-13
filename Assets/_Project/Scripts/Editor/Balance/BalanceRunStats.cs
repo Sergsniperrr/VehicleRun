@@ -25,10 +25,12 @@ namespace _Project.Editor.Balance
             _game.Garage.VehicleRecycled += OnVehicleRecycled;
             _game.Roster.FinishCrossed += OnFinishCrossed;
             _game.Progress.RankUnlocked += OnRankUnlocked;
+            _game.Garage.SlotsUnlocked += OnSlotsUnlocked;
         }
 
         public double? FirstMergeSeconds { get; private set; }
         public double? FirstIncomeSeconds { get; private set; }
+        public double? AllSlotsSeconds { get; private set; }
         public int FreeBoxCount { get; private set; }
         public int BoughtBoxCount { get; private set; }
         public int RecycledVehicleCount { get; private set; }
@@ -40,6 +42,7 @@ namespace _Project.Editor.Balance
         public double ActiveSeconds { get; private set; }
         public long FinalCoins { get; private set; }
         public int FinalMaxRank { get; private set; }
+        public int FinalLevel { get; private set; }
 
         public bool TryGetRankSeconds(int rank, out double seconds)
         {
@@ -70,6 +73,7 @@ namespace _Project.Editor.Balance
             ActiveSeconds = _game.ActiveSeconds;
             FinalCoins = _game.Wallet.Coins;
             FinalMaxRank = _game.Progress.MaxRank;
+            FinalLevel = _game.PlayerLevel.Level;
         }
 
         public void Dispose()
@@ -79,6 +83,7 @@ namespace _Project.Editor.Balance
             _game.Garage.VehicleRecycled -= OnVehicleRecycled;
             _game.Roster.FinishCrossed -= OnFinishCrossed;
             _game.Progress.RankUnlocked -= OnRankUnlocked;
+            _game.Garage.SlotsUnlocked -= OnSlotsUnlocked;
         }
 
         private void OnVehicleMerged(int fromSlot, int toSlot, Vehicle result)
@@ -106,6 +111,14 @@ namespace _Project.Editor.Balance
         private void OnFinishCrossed(TrackRunner runner, long payout)
         {
             FirstIncomeSeconds = FirstIncomeSeconds ?? _game.ActiveSeconds;
+        }
+
+        private void OnSlotsUnlocked(int openSlotCount)
+        {
+            if (openSlotCount == _game.Garage.SlotCount)
+            {
+                AllSlotsSeconds = AllSlotsSeconds ?? _game.ActiveSeconds;
+            }
         }
 
         private void OnRankUnlocked(int rank)

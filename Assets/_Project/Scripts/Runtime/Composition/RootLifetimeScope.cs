@@ -4,6 +4,7 @@ using _Project.Core.Audio;
 using _Project.Core.Localization;
 using _Project.Core.Platform;
 using _Project.Core.Purchasing;
+using _Project.Core.Randomness;
 using _Project.Composition.Startup;
 using _Project.Core.Save;
 using _Project.Core.SceneManagement;
@@ -12,6 +13,7 @@ using _Project.Core.Time;
 using _Project.Infrastructure.Analytics;
 using _Project.Infrastructure.Audio;
 using _Project.Infrastructure.JTL;
+using _Project.Infrastructure.Randomness;
 using _Project.Infrastructure.SceneManagement;
 using _Project.Infrastructure.StateMachine;
 using _Project.Infrastructure.Time;
@@ -67,6 +69,7 @@ namespace _Project.Composition
         {
             builder.Register<SceneLoader>(Lifetime.Singleton).As<ISceneLoader>();
             builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
+            builder.Register<UnityRandomSource>(Lifetime.Singleton).As<IRandomSource>();
             builder.Register<TimeService>(Lifetime.Singleton).As<ITimeService>();
         }
 

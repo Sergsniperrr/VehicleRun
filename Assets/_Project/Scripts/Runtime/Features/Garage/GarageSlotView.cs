@@ -97,7 +97,7 @@ namespace _Project.Features.Garage
 
         public bool Contains(Vector2 worldPoint)
         {
-            return _collider.OverlapPoint(worldPoint);
+            return gameObject.activeSelf && _collider.OverlapPoint(worldPoint);
         }
 
         public void ShowLocked()

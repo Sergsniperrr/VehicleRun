@@ -24,5 +24,6 @@ namespace _Project.Features.Commands
         TrackEmpty,
         BoxRankLocked,
         MilestoneUnavailable,
+        NoLevelReward,
     }
 }

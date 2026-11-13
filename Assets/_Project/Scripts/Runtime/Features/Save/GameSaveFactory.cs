@@ -25,6 +25,7 @@ namespace _Project.Features.Save
         private readonly TrackRoster _roster;
         private readonly TurboService _turbo;
         private readonly CollectionMilestones _milestones;
+        private readonly PlayerLevel _playerLevel;
 
         public GameSaveFactory(
             GameConfig config,
@@ -36,7 +37,8 @@ namespace _Project.Features.Save
             BoxDelivery delivery,
             TrackRoster roster,
             TurboService turbo,
-            CollectionMilestones milestones)
+            CollectionMilestones milestones,
+            PlayerLevel playerLevel)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -48,6 +50,7 @@ namespace _Project.Features.Save
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
         }
 
         public GameSave Create()
@@ -69,6 +72,9 @@ namespace _Project.Features.Save
                 Boxes = CollectBoxes(),
                 TrackRunners = CollectTrackRunners(),
                 ClaimedMilestoneRanks = CollectClaimedMilestones(),
+                PlayerLevel = _playerLevel.Level,
+                PlayerExperience = _playerLevel.Experience,
+                ClaimedRewardLevel = _playerLevel.ClaimedRewardLevel,
             };
         }
 

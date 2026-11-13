@@ -1,5 +1,4 @@
 using System;
-using _Project.Core.Vehicles;
 using _Project.Features.Garage;
 using _Project.Features.Progression;
 using UnityEngine;
@@ -12,42 +11,31 @@ namespace _Project.UI.Windows
         [SerializeField] private LevelUpWindow _levelUpWindow;
         [SerializeField] private GarageView _garageView;
 
-        private RankProgress _progress;
-        private VehicleCatalogConfig _vehicles;
-        private VehicleDefinition _pendingVehicle;
-
-        private void Start()
-        {
-            _progress.RankUnlocked += OnRankUnlocked;
-        }
+        private PlayerLevel _playerLevel;
+        private int _shownRewardLevel;
 
         private void Update()
         {
-            if (_pendingVehicle == null || _garageView.IsMergePlaying)
+            if (_playerLevel.HasPendingReward == false || _garageView.IsMergePlaying)
             {
                 return;
             }
 
-            VehicleDefinition vehicle = _pendingVehicle;
-            _pendingVehicle = null;
-            _levelUpWindow.Show(vehicle);
-        }
+            int level = _playerLevel.PendingRewardLevel;
 
-        private void OnDestroy()
-        {
-            _progress.RankUnlocked -= OnRankUnlocked;
+            if (level == _shownRewardLevel)
+            {
+                return;
+            }
+
+            _shownRewardLevel = level;
+            _levelUpWindow.ShowPendingReward();
         }
 
         [Inject]
-        public void Construct(RankProgress progress, VehicleCatalogConfig vehicles)
+        public void Construct(PlayerLevel playerLevel)
         {
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            _vehicles = vehicles ?? throw new ArgumentNullException(nameof(vehicles));
-        }
-
-        private void OnRankUnlocked(int rank)
-        {
-            _pendingVehicle = _vehicles.GetByRank(rank);
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
         }
     }
 }

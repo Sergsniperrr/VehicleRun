@@ -8,6 +8,7 @@ using _Project.Features.Save;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
+using _Project.Tests.EditMode.Boxes;
 using _Project.Tests.EditMode.Configs;
 
 namespace _Project.Tests.EditMode.Save
@@ -21,22 +22,40 @@ namespace _Project.Tests.EditMode.Save
             _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
             InstanceIds = new InstanceIdGenerator();
             Garage = new GarageBoard(fixture.Garage, fixture.Vehicles, InstanceIds);
-            Progress = new RankProgress(fixture.Vehicles, fixture.Economy, fixture.Track, Garage);
+            Progress = new RankProgress(fixture.Vehicles, fixture.Economy, Garage);
             Wallet = new Wallet(fixture.Economy);
+            Level = new PlayerLevel(fixture.PlayerLevel, fixture.Track, Garage, Wallet);
+            Levels = new SaveLevelResolver(fixture.Garage, fixture.Track);
             Pricing = new BoxPricing(fixture.Economy, fixture.Vehicles);
-            Delivery = new BoxDelivery(fixture.Economy, fixture.Vehicles, Garage, Progress, Wallet, Pricing, InstanceIds);
-            Roster = new TrackRoster(Garage, Progress, fixture.Track, Wallet);
+            Random = new FakeRandomSource();
+            Delivery = new BoxDelivery(fixture.Economy, fixture.Vehicles, Garage, Progress, Wallet, Pricing, InstanceIds, Random);
+            Roster = new TrackRoster(Garage, Level, fixture.Track, Wallet);
             Turbo = new TurboService(fixture.Turbo, Progress, Roster);
             Milestones = new CollectionMilestones(Progress, Wallet, fixture.Economy);
-            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones);
-            Restorer = new GameStateRestorer(fixture.Vehicles, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones);
+            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level);
+            Restorer = new GameStateRestorer(
+                fixture.Vehicles,
+                InstanceIds,
+                Garage,
+                Progress,
+                Wallet,
+                Pricing,
+                Delivery,
+                Roster,
+                Turbo,
+                Milestones,
+                Level,
+                Levels);
         }
 
         public InstanceIdGenerator InstanceIds { get; }
         public GarageBoard Garage { get; }
         public RankProgress Progress { get; }
         public Wallet Wallet { get; }
+        public PlayerLevel Level { get; }
+        public SaveLevelResolver Levels { get; }
         public BoxPricing Pricing { get; }
+        public FakeRandomSource Random { get; }
         public BoxDelivery Delivery { get; }
         public TrackRoster Roster { get; }
         public TurboService Turbo { get; }
@@ -60,8 +79,14 @@ namespace _Project.Tests.EditMode.Save
             return box;
         }
 
+        public void ReachLevel(int level)
+        {
+            Level.Restore(level, 0, level);
+        }
+
         public void Dispose()
         {
+            Level.Dispose();
             Progress.Dispose();
         }
     }

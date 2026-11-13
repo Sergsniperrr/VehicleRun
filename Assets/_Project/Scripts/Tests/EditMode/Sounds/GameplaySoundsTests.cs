@@ -65,7 +65,8 @@ namespace _Project.Tests.EditMode.Sounds
                 _game.Roster,
                 _game.Milestones,
                 _game.Turbo,
-                _fixture.Vehicles);
+                _fixture.Vehicles,
+                _game.Level);
             _sounds.Start();
         }
 
@@ -147,6 +148,16 @@ namespace _Project.Tests.EditMode.Sounds
             CrossFinish();
 
             Assert.That(_audio.Played, Is.EqualTo(new[] { _money, _money }));
+        }
+
+        [Test]
+        public void LevelRewardClaimPlaysMoneySound()
+        {
+            _game.Level.AddExperience(_game.Level.ExperienceToNextLevel);
+
+            _game.Level.ClaimReward();
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _money }));
         }
 
         [Test]

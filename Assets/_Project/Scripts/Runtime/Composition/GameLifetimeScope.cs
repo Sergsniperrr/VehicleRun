@@ -74,6 +74,7 @@ namespace _Project.Composition
             builder.RegisterInstance(_gameConfig.Garage);
             builder.RegisterInstance(_gameConfig.Track);
             builder.RegisterInstance(_gameConfig.Turbo);
+            builder.RegisterInstance(_gameConfig.PlayerLevel);
         }
 
         private void RegisterGameplay(IContainerBuilder builder)
@@ -82,6 +83,7 @@ namespace _Project.Composition
             builder.Register<GarageBoard>(Lifetime.Singleton);
             builder.Register<RankProgress>(Lifetime.Singleton);
             builder.Register<Wallet>(Lifetime.Singleton);
+            builder.Register<PlayerLevel>(Lifetime.Singleton);
             builder.Register<CollectionMilestones>(Lifetime.Singleton);
             builder.Register<BoxPricing>(Lifetime.Singleton);
             builder.Register<BoxDelivery>(Lifetime.Singleton);
@@ -96,6 +98,7 @@ namespace _Project.Composition
         private void RegisterSave(IContainerBuilder builder)
         {
             builder.Register<GameSaveFactory>(Lifetime.Singleton);
+            builder.Register<SaveLevelResolver>(Lifetime.Singleton);
             builder.Register<GameSaveValidator>(Lifetime.Singleton);
             builder.Register<GameStateRestorer>(Lifetime.Singleton);
             builder.Register<ProgressLoader>(Lifetime.Singleton);

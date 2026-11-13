@@ -154,17 +154,16 @@ namespace _Project.Editor.Balance
 
         private int ChooseBoxRank()
         {
-            int boxRank = _game.Progress.BoxRank;
-
             if (_scenario.BuysCheapestRank == false)
             {
-                return boxRank;
+                return _game.Progress.QuickBuyRank;
             }
 
-            int cheapestRank = boxRank;
-            double cheapestUnitPrice = CalculateUnitPrice(boxRank);
+            int shopMaxRank = _game.Progress.ShopMaxRank;
+            int cheapestRank = shopMaxRank;
+            double cheapestUnitPrice = CalculateUnitPrice(shopMaxRank);
 
-            for (int rank = FirstRank; rank < boxRank; rank++)
+            for (int rank = FirstRank; rank < shopMaxRank; rank++)
             {
                 double unitPrice = CalculateUnitPrice(rank);
 

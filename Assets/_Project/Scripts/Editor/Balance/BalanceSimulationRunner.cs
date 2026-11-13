@@ -69,7 +69,9 @@ namespace _Project.Editor.Balance
                 ? $"потолок {economy.BoxPriceGrowthPurchaseLimit} покупок"
                 : "без потолка";
 
-            return $"отставание ранга коробки {economy.BoxRankLag}, бесплатная коробка раз в {interval} с, базовые цены: {basePrices}, рост {growth}, ранг 1 — {firstRankGrowth}, {limit}";
+            string rankLags = $"магазин до K − {economy.ShopRankLag}, кнопка K − {economy.QuickBuyRankLag}, бесплатная коробка от K − {economy.FreeBoxLowestRankLag} до K − {economy.FreeBoxHighestRankLag}";
+
+            return $"{rankLags}, бесплатная коробка раз в {interval} с, базовые цены: {basePrices}, рост {growth}, ранг 1 — {firstRankGrowth}, {limit}";
         }
 
         private string DescribeBasePrices(EconomyConfig economy)

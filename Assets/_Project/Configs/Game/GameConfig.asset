@@ -18,3 +18,4 @@ MonoBehaviour:
   _garage: {fileID: 11400000, guid: d7e7a423514f87545bebe7aed28330f2, type: 2}
   _track: {fileID: 11400000, guid: d776b4420a2418e468d16bbc1d210f34, type: 2}
   _turbo: {fileID: 11400000, guid: a5c89bb99a19b164882828b633af0998, type: 2}
+  _playerLevel: {fileID: 11400000, guid: 3e30056bdf192d04f8976a93e9295d3f, type: 2}

@@ -93,8 +93,8 @@ namespace _Project.Editor.Balance
                 separator.Append("---|");
             }
 
-            header.Append(" Коробки бесплатные / купленные | Переработано машин | Ожидание монет | Монет в конце | Сессий и офлайн-монет |");
-            separator.Append("---|---|---|---|---|");
+            header.Append(" Все полки открыты | Уровень в конце | Коробки бесплатные / купленные | Переработано машин | Ожидание монет | Монет в конце | Сессий и офлайн-монет |");
+            separator.Append("---|---|---|---|---|---|---|");
             report.AppendLine(header.ToString());
             report.AppendLine(separator.ToString());
         }
@@ -112,6 +112,7 @@ namespace _Project.Editor.Balance
                 row.Append($" {FormatRankTime(stats, target)} |");
             }
 
+            row.Append($" {FormatAllSlotsTime(stats)} | {stats.FinalLevel} |");
             row.Append($" {stats.FreeBoxCount} / {stats.BoughtBoxCount} | {stats.RecycledVehicleCount} | {FormatTime(stats.CoinsWaitSeconds)} | {FormatCoins(stats.FinalCoins)} | {FormatSessions(stats)} |");
             report.AppendLine(row.ToString());
         }
@@ -147,6 +148,16 @@ namespace _Project.Editor.Balance
             }
 
             return $"{FormatTime(seconds)} {mark}";
+        }
+
+        private string FormatAllSlotsTime(BalanceRunStats stats)
+        {
+            if (stats.AllSlotsSeconds.HasValue == false)
+            {
+                return NotReached;
+            }
+
+            return FormatTime(stats.AllSlotsSeconds.Value);
         }
 
         private string FormatSessions(BalanceRunStats stats)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using _Project.Core.Garage;
+using _Project.Core.Progression;
 using _Project.Core.Save;
 using _Project.Core.Track;
 using _Project.Core.Vehicles;
@@ -14,12 +15,14 @@ namespace _Project.Features.Save
         private readonly VehicleCatalogConfig _catalog;
         private readonly GarageConfig _garage;
         private readonly TrackConfig _track;
+        private readonly SaveLevelResolver _levels;
 
-        public GameSaveValidator(VehicleCatalogConfig catalog, GarageConfig garage, TrackConfig track)
+        public GameSaveValidator(VehicleCatalogConfig catalog, GarageConfig garage, TrackConfig track, SaveLevelResolver levels)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _track = track ?? throw new ArgumentNullException(nameof(track));
+            _levels = levels ?? throw new ArgumentNullException(nameof(levels));
         }
 
         public bool IsValid(GameSave save)
@@ -34,14 +37,15 @@ namespace _Project.Features.Save
                 return false;
             }
 
-            if (AreMilestonesValid(save.ClaimedMilestoneRanks) == false)
+            if (AreMilestonesValid(save.ClaimedMilestoneRanks) == false || IsPlayerLevelValid(save) == false)
             {
                 return false;
             }
 
             HashSet<int> unlockedRanks = new HashSet<int>(save.UnlockedRanks);
             int maxRank = FindMaxRank(save.UnlockedRanks);
-            int openSlotCount = Math.Min(_garage.OpenSlots.GetCapacity(maxRank), _garage.SlotCount);
+            int level = _levels.ResolveLevel(save);
+            int openSlotCount = Math.Min(_garage.OpenSlots.GetCapacity(level), _garage.SlotCount);
             HashSet<long> instanceIds = new HashSet<long>();
             HashSet<int> occupiedSlots = new HashSet<int>();
 
@@ -71,7 +75,7 @@ namespace _Project.Features.Save
                 }
             }
 
-            return AreTrackRunnersValid(save, _track.Capacity.GetCapacity(maxRank));
+            return AreTrackRunnersValid(save, _track.Capacity.GetCapacity(level));
         }
 
         private bool HasAllCollections(GameSave save)
@@ -82,6 +86,21 @@ namespace _Project.Features.Save
                 && save.Boxes != null
                 && save.TrackRunners != null
                 && save.ClaimedMilestoneRanks != null;
+        }
+
+        private bool IsPlayerLevelValid(GameSave save)
+        {
+            if (_levels.IsLegacy(save))
+            {
+                return true;
+            }
+
+            if (save.PlayerLevel < PlayerLevelConfig.FirstLevel || save.PlayerExperience < 0)
+            {
+                return false;
+            }
+
+            return save.ClaimedRewardLevel >= PlayerLevelConfig.FirstLevel && save.ClaimedRewardLevel <= save.PlayerLevel;
         }
 
         private bool AreMilestonesValid(int[] ranks)

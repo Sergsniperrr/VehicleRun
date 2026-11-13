@@ -21,6 +21,7 @@ namespace _Project.Features.Sounds
         private readonly CollectionMilestones _milestones;
         private readonly TurboService _turbo;
         private readonly VehicleCatalogConfig _catalog;
+        private readonly PlayerLevel _playerLevel;
 
         private bool _hasMoneyPlayed;
         private float _lastMoneyTime;
@@ -33,7 +34,8 @@ namespace _Project.Features.Sounds
             TrackRoster roster,
             CollectionMilestones milestones,
             TurboService turbo,
-            VehicleCatalogConfig catalog)
+            VehicleCatalogConfig catalog,
+            PlayerLevel playerLevel)
         {
             _audio = audio ?? throw new ArgumentNullException(nameof(audio));
             _sounds = sounds ?? throw new ArgumentNullException(nameof(sounds));
@@ -43,6 +45,7 @@ namespace _Project.Features.Sounds
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
         }
 
         public void Start()
@@ -54,6 +57,7 @@ namespace _Project.Features.Sounds
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
             _turbo.TurboStarted += OnTurboStarted;
             _turbo.RunnerBoosted += OnRunnerBoosted;
+            _playerLevel.RewardClaimed += OnRewardClaimed;
         }
 
         public void Dispose()
@@ -65,6 +69,7 @@ namespace _Project.Features.Sounds
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
             _turbo.TurboStarted -= OnTurboStarted;
             _turbo.RunnerBoosted -= OnRunnerBoosted;
+            _playerLevel.RewardClaimed -= OnRewardClaimed;
         }
 
         private void PlayMoney()
@@ -130,6 +135,11 @@ namespace _Project.Features.Sounds
         private void OnRunnerBoosted(TrackRunner runner)
         {
             _audio.PlayOneShot(_sounds.Boost);
+        }
+
+        private void OnRewardClaimed(int level, long coins)
+        {
+            PlayMoney();
         }
     }
 }

@@ -12,15 +12,15 @@ namespace _Project.Features.Track
     public class TrackRoster
     {
         private readonly GarageBoard _garage;
-        private readonly RankProgress _progress;
+        private readonly PlayerLevel _playerLevel;
         private readonly TrackConfig _track;
         private readonly Wallet _wallet;
         private readonly List<TrackRunner> _runners = new List<TrackRunner>();
 
-        public TrackRoster(GarageBoard garage, RankProgress progress, TrackConfig track, Wallet wallet)
+        public TrackRoster(GarageBoard garage, PlayerLevel playerLevel, TrackConfig track, Wallet wallet)
         {
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _track = track ?? throw new ArgumentNullException(nameof(track));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
         }
@@ -31,7 +31,7 @@ namespace _Project.Features.Track
 
         public IReadOnlyList<TrackRunner> Runners => _runners;
         public int Count => _runners.Count;
-        public int Capacity => _progress.TrackCapacity;
+        public int Capacity => _playerLevel.TrackCapacity;
 
         public bool CanSendToTrack(int slot)
         {

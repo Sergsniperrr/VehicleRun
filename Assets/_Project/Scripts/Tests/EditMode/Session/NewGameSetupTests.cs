@@ -77,7 +77,7 @@ namespace _Project.Tests.EditMode.Session
 
             Assert.That(_game.Garage.TryGetVehicle(0, out Vehicle vehicle) && vehicle.Rank == ChangedStartRank, Is.True);
             Assert.That(_game.Progress.MaxRank, Is.EqualTo(ChangedStartRank));
-            Assert.That(_game.Garage.OpenSlotCount, Is.EqualTo(_fixture.Garage.OpenSlots.GetCapacity(ChangedStartRank)));
+            Assert.That(_game.Garage.OpenSlotCount, Is.EqualTo(_fixture.Garage.OpenSlots.Initial));
         }
 
         [Test]
