@@ -437,4 +437,5 @@ public class TimeService : ITimeService
 | `[JTL SDK] Settings were not found at Resources/JTLSDK/JTLSDKSettings` | не создана конфигурация площадки | окно JTL SDK, Configurations, New configuration |
 | Покупка сразу уходит в ошибку | товара нет в каталоге JTL SDK | объявите его в окне JTL SDK, раздел Purchases |
 | Play со сцены `Game` ничего не запускает | `Bootstrapper` живёт на сцене `Bootstrap` | стартуйте с `Bootstrap` |
+| В WebGL-сборке `VContainerException: Type does not found injectable constructor`, в Play Mode всё работает | IL2CPP вырезал конструктор: его вызывает только контейнер через рефлексию. Сборки проекта защищает `Assets/_Project/link.xml` | новую сборку (asmdef) с классами для контейнера добавьте в `link.xml` строкой `<assembly fullname="..." preserve="all" />` |
 | Ошибки компиляции после добавления папки в `Features` | скрипт ссылается на сборку, которой нет в asmdef | добавьте ссылку в `_Project.Features.asmdef` или вынесите интерфейс в `Core` |

@@ -1,0 +1,7 @@
+<linker>
+  <assembly fullname="_Project.Core" preserve="all" />
+  <assembly fullname="_Project.Infrastructure" preserve="all" />
+  <assembly fullname="_Project.Features" preserve="all" />
+  <assembly fullname="_Project.UI" preserve="all" />
+  <assembly fullname="_Project.Composition" preserve="all" />
+</linker>

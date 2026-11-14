@@ -24,6 +24,29 @@
       "dependencies": {},
       "hash": "1921e7103a23c90cf1ddc9a3500eb5cbeaa3b037"
     },
+    "com.jtlstudio.sdk.analytics": {
+      "version": "https://github.com/meepifiev/com.jtlstudio.sdk.analytics.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "20901378f40e968f88eb25ffab12fe0a3c632d31"
+    },
+    "com.jtlstudio.sdk.capture": {
+      "version": "https://github.com/meepifiev/com.jtlstudio.sdk.capture.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "3fd787bfdf66e46100bfc360e2bc823dd3760bdd"
+    },
+    "com.jtlstudio.sdk.localization": {
+      "version": "https://github.com/meepifiev/com.jtlstudio.sdk.localization.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0"
+      },
+      "hash": "d20123ac3a9575ba848f47c1cc6f13dea4cc13be"
+    },
     "com.unity.2d.animation": {
       "version": "9.2.0",
       "depth": 1,

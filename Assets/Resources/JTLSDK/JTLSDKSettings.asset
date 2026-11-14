@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24bf2c7f17d2d413f80ceea92c37cc9c, type: 3}
   m_Name: JTLSDKSettings
   m_EditorClassIdentifier: 
-  _activeConfiguration: {fileID: 0}
+  _activeConfiguration: {fileID: 11400000, guid: bccc385b5249c3a459c147c22c310623, type: 2}
   _initializationTimeoutSeconds: 15
   _autosaveDelaySeconds: 2
   _logLevel: 3
   _defaultLanguage: 0
-  _supportedLanguages: 00000000
+  _supportedLanguages: 0000000001000000
   _languageReplacements: []
   _products: []
   _leaderboards: []
