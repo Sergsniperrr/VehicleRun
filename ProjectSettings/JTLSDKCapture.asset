@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 53
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18ec4fe8232fc48c7b07a76b77cd925f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _outputPath: Captures
+  _takeScreenshots: 1
+  _recordVideo: 0
+  _source: 0
+  _cameraName: 
+  _includeOverlayUi: 1
+  _resolutionIndex: 2
+  _customSize: {x: 1920, y: 1080}
+  _everyLanguageOfConfiguration: 1
+  _languages: 
+  _frameRate: 30
+  _recordMode: 0
+  _videoSeconds: 15
+  _exitPlayMode: 0
+  _recordAudio: 1
+  _hiddenLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  _hiddenObjects: []
+  _captureKey: 290

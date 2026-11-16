@@ -12,7 +12,7 @@ namespace _Project.UI.Hud
     {
         [SerializeField] private TMP_Text _badgeValue;
         [SerializeField] private TMP_Text _label;
-        [SerializeField] private Image _fill;
+        [SerializeField] private Slider _slider;
         [SerializeField] [Min(0f)] private float _fillSeconds = 0.4f;
 
         private PlayerLevel _playerLevel;
@@ -23,7 +23,7 @@ namespace _Project.UI.Hud
             _playerLevel.ExperienceChanged += OnExperienceChanged;
             _playerLevel.LevelReached += OnLevelReached;
             ShowLevel();
-            _fill.fillAmount = _playerLevel.LevelProgress;
+            _slider.value = _playerLevel.LevelProgress;
         }
 
         private void OnDestroy()
@@ -49,7 +49,7 @@ namespace _Project.UI.Hud
         {
             _fillTween?.Kill();
             _fillTween = DOTween
-                .To(() => _fill.fillAmount, value => _fill.fillAmount = value, _playerLevel.LevelProgress, _fillSeconds)
+                .To(() => _slider.value, value => _slider.value = value, _playerLevel.LevelProgress, _fillSeconds)
                 .SetEase(Ease.OutQuad)
                 .SetUpdate(true)
                 .SetLink(gameObject);
@@ -64,7 +64,7 @@ namespace _Project.UI.Hud
         private void OnLevelReached(int level)
         {
             _fillTween?.Kill();
-            _fill.fillAmount = 0f;
+            _slider.value = _slider.minValue;
         }
     }
 }
