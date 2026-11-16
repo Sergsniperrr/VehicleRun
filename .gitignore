@@ -114,3 +114,7 @@ InitTestScene*.unity*
 # OS
 .DS_Store
 *.DS_Store
+
+# Платный пак Asset Store, в публичный репозиторий не кладём
+/Assets/Layer Lab/
+/Assets/Layer Lab.meta

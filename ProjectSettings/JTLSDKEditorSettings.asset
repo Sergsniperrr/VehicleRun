@@ -47,10 +47,10 @@ MonoBehaviour:
   _aspectRatio: 9/16
   _freeAspectOnMobile: 0
   _pageUsesLoaderBackground: 0
-  _desktopPixelRatioMode: 1
-  _desktopPixelRatio: 1
-  _mobilePixelRatioMode: 1
-  _mobilePixelRatio: 1
+  _desktopPixelRatioMode: 2
+  _desktopPixelRatio: 2
+  _mobilePixelRatioMode: 2
+  _mobilePixelRatio: 3
   _buildOutput: 1
   _buildPath: E:/Builds/VehicleMerge
   _buildNamePattern: '{product}_{configuration}_b{build}'
