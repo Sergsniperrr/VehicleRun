@@ -14,6 +14,8 @@ namespace _Project.Features.Track
 
         [SerializeField] private FloatingTextView _popupPrefab;
         [SerializeField] private Transform _spawnAnchor;
+        [SerializeField] private ParticleSystem _coinBurst;
+        [SerializeField] private int _coinBurstCount;
 
         private readonly List<FloatingTextView> _popups = new List<FloatingTextView>();
         private readonly Stack<FloatingTextView> _freePopups = new Stack<FloatingTextView>();
@@ -64,6 +66,7 @@ namespace _Project.Features.Track
             string text = PayoutPrefix + _formatter.FormatShort(payout);
             Vector2 position = transform.InverseTransformPoint(_spawnAnchor.position);
             TakePopup().Show(text, position);
+            _coinBurst.Emit(_coinBurstCount);
         }
 
         private void OnPopupFinished(FloatingTextView popup)

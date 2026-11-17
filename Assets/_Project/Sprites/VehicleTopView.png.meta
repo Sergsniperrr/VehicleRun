@@ -113,8 +113,8 @@ TextureImporter:
       name: Vehicle_01_Track
       rect:
         serializedVersion: 2
-        x: 464
-        y: 118
+        x: 290
+        y: 1
         width: 98
         height: 179
       alignment: 0
@@ -134,8 +134,8 @@ TextureImporter:
       name: Vehicle_02_Track
       rect:
         serializedVersion: 2
-        x: 251
-        y: 118
+        x: 155
+        y: 9
         width: 103
         height: 182
       alignment: 0
@@ -155,8 +155,8 @@ TextureImporter:
       name: Vehicle_03_Track
       rect:
         serializedVersion: 2
-        x: 40
-        y: 724
+        x: 7
+        y: 621
         width: 126
         height: 175
       alignment: 0
@@ -176,8 +176,8 @@ TextureImporter:
       name: Vehicle_04_Track
       rect:
         serializedVersion: 2
-        x: 861
-        y: 724
+        x: 570
+        y: 598
         width: 123
         height: 177
       alignment: 0
@@ -197,8 +197,8 @@ TextureImporter:
       name: Vehicle_05_Track
       rect:
         serializedVersion: 2
-        x: 451
-        y: 309
+        x: 277
+        y: 192
         width: 122
         height: 192
       alignment: 0
@@ -218,8 +218,8 @@ TextureImporter:
       name: Vehicle_06_Track
       rect:
         serializedVersion: 2
-        x: 450
-        y: 727
+        x: 276
+        y: 610
         width: 127
         height: 177
       alignment: 0
@@ -239,8 +239,8 @@ TextureImporter:
       name: Vehicle_07_Track
       rect:
         serializedVersion: 2
-        x: 237
-        y: 721
+        x: 141
+        y: 612
         width: 126
         height: 182
       alignment: 0
@@ -260,8 +260,8 @@ TextureImporter:
       name: Vehicle_08_Track
       rect:
         serializedVersion: 2
-        x: 452
-        y: 516
+        x: 278
+        y: 399
         width: 124
         height: 196
       alignment: 0
@@ -281,8 +281,8 @@ TextureImporter:
       name: Vehicle_09_Track
       rect:
         serializedVersion: 2
-        x: 239
-        y: 310
+        x: 143
+        y: 201
         width: 123
         height: 193
       alignment: 0
@@ -302,8 +302,8 @@ TextureImporter:
       name: Vehicle_10_Track
       rect:
         serializedVersion: 2
-        x: 656
-        y: 721
+        x: 419
+        y: 600
         width: 134
         height: 192
       alignment: 0
@@ -323,8 +323,8 @@ TextureImporter:
       name: Vehicle_11_Track
       rect:
         serializedVersion: 2
-        x: 241
-        y: 516
+        x: 145
+        y: 407
         width: 118
         height: 196
       alignment: 0
@@ -344,8 +344,8 @@ TextureImporter:
       name: Vehicle_12_Track
       rect:
         serializedVersion: 2
-        x: 45
-        y: 513
+        x: 12
+        y: 410
         width: 117
         height: 203
       alignment: 0
@@ -365,8 +365,8 @@ TextureImporter:
       name: Vehicle_13_Track
       rect:
         serializedVersion: 2
-        x: 45
-        y: 312
+        x: 12
+        y: 209
         width: 117
         height: 194
       alignment: 0
@@ -386,8 +386,8 @@ TextureImporter:
       name: Vehicle_14_Track
       rect:
         serializedVersion: 2
-        x: 654
-        y: 517
+        x: 417
+        y: 396
         width: 134
         height: 193
       alignment: 0
@@ -407,8 +407,8 @@ TextureImporter:
       name: Vehicle_15_Track
       rect:
         serializedVersion: 2
-        x: 864
-        y: 519
+        x: 573
+        y: 393
         width: 118
         height: 195
       alignment: 0
@@ -428,8 +428,8 @@ TextureImporter:
       name: Vehicle_16_Track
       rect:
         serializedVersion: 2
-        x: 648
-        y: 315
+        x: 411
+        y: 194
         width: 145
         height: 185
       alignment: 0
@@ -449,8 +449,8 @@ TextureImporter:
       name: Vehicle_17_Track
       rect:
         serializedVersion: 2
-        x: 33
-        y: 121
+        x: 0
+        y: 18
         width: 138
         height: 180
       alignment: 0
@@ -470,8 +470,8 @@ TextureImporter:
       name: Vehicle_18_Track
       rect:
         serializedVersion: 2
-        x: 860
-        y: 315
+        x: 569
+        y: 189
         width: 127
         height: 194
       alignment: 0
@@ -491,8 +491,8 @@ TextureImporter:
       name: Vehicle_19_Track
       rect:
         serializedVersion: 2
-        x: 648
-        y: 122
+        x: 411
+        y: 0
         width: 142
         height: 191
       alignment: 0
@@ -512,8 +512,8 @@ TextureImporter:
       name: Vehicle_20_Track
       rect:
         serializedVersion: 2
-        x: 858
-        y: 126
+        x: 567
+        y: 0
         width: 130
         height: 178
       alignment: 0
@@ -529,6 +529,216 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_0
+      rect:
+        serializedVersion: 2
+        x: 589
+        y: 790
+        width: 93
+        height: 234
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3cee6e53ad32d36438209eee004e25b0
+      internalID: 140348626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_1
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 813
+        width: 106
+        height: 196
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a457317d4b123f419f8659262f9fae2
+      internalID: -1011971375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_2
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 800
+        width: 104
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfae687baec206e44a27aa577385e19b
+      internalID: 132957941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_3
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 810
+        width: 104
+        height: 201
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 802598461dd295e4cbd91fc7f513ada4
+      internalID: 1391811418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_4
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 807
+        width: 106
+        height: 203
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5622ddbc4dac7694598ac09ec2f8b5fe
+      internalID: 312859064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_5
+      rect:
+        serializedVersion: 2
+        x: 712
+        y: 831
+        width: 106
+        height: 193
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b968dc7694ce5874b8b24fdb9f607c2a
+      internalID: -917199640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_6
+      rect:
+        serializedVersion: 2
+        x: 715
+        y: 169
+        width: 105
+        height: 216
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eda116097bd8ea6438f247c4e63732ab
+      internalID: -1394327480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_7
+      rect:
+        serializedVersion: 2
+        x: 716
+        y: 0
+        width: 109
+        height: 165
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6d0a35de59e9da4f9d05199902cd46a
+      internalID: 133480130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_8
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 389
+        width: 124
+        height: 224
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bf7c4e6098a1394c8e6b6e7ca2a3a5c
+      internalID: -373401529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_9
+      rect:
+        serializedVersion: 2
+        x: 716
+        y: 615
+        width: 100
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e39b6816a44af2c429ac4deedc783dff
+      internalID: 1581887707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -540,6 +750,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      VehicleTopView_0: 140348626
+      VehicleTopView_1: -1011971375
+      VehicleTopView_2: 132957941
+      VehicleTopView_3: 1391811418
+      VehicleTopView_4: 312859064
+      VehicleTopView_5: -917199640
+      VehicleTopView_6: -1394327480
+      VehicleTopView_7: 133480130
+      VehicleTopView_8: -373401529
+      VehicleTopView_9: 1581887707
       Vehicle_01_Track: 2091854564
       Vehicle_02_Track: -1807074531
       Vehicle_03_Track: 809811616

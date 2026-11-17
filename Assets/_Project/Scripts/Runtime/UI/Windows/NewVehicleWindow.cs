@@ -21,8 +21,6 @@ namespace _Project.UI.Windows
         private const int InfiniteLoops = -1;
 
         [SerializeField] private Image _icon;
-        [SerializeField] private Image _rankBadge;
-        [SerializeField] private TMP_Text _rankValue;
         [SerializeField] private TMP_Text _name;
         [SerializeField] private TMP_Text _rank;
         [SerializeField] private TMP_Text _income;
@@ -58,8 +56,6 @@ namespace _Project.UI.Windows
             string income = _formatter.FormatIncome(definition.CalculateAverageIncome(_track.LapLength));
 
             _icon.sprite = definition.GarageSprite;
-            _rankBadge.color = definition.BadgeColor;
-            _rankValue.text = definition.Rank.ToString();
             _name.text = _localization.Get(definition.NameKey);
             _rank.text = string.Format(_localization.Get(RankKey), definition.Rank);
             _income.text = string.Format(_localization.Get(IncomeKey), income);

@@ -8,11 +8,7 @@ namespace _Project.UI.Windows
 {
     public class CatalogCardView : MonoBehaviour
     {
-        private static readonly Color LockedBadgeColor = new Color(0.45f, 0.45f, 0.45f);
-
         [SerializeField] private Image _icon;
-        [SerializeField] private Image _rankBadge;
-        [SerializeField] private TMP_Text _rankValue;
         [SerializeField] private TMP_Text _caption;
         [SerializeField] private TMP_Text _income;
 
@@ -22,7 +18,6 @@ namespace _Project.UI.Windows
         {
             ApplyRank(definition);
             _icon.color = Color.white;
-            _rankBadge.color = definition.BadgeColor;
             _caption.text = vehicleName;
             _income.gameObject.SetActive(true);
             _income.text = income;
@@ -32,7 +27,6 @@ namespace _Project.UI.Windows
         {
             ApplyRank(definition);
             _icon.color = Color.black;
-            _rankBadge.color = LockedBadgeColor;
             _caption.text = condition;
             _income.gameObject.SetActive(false);
         }
@@ -46,7 +40,6 @@ namespace _Project.UI.Windows
 
             Rank = definition.Rank;
             _icon.sprite = definition.GarageSprite;
-            _rankValue.text = definition.Rank.ToString();
         }
     }
 }

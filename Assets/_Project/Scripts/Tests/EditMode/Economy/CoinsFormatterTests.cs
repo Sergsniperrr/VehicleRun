@@ -10,6 +10,7 @@ namespace _Project.Tests.EditMode.Economy
         private const string ThousandKey = "ui.number.thousand";
         private const string MillionKey = "ui.number.million";
         private const string BillionKey = "ui.number.billion";
+        private const string TrillionKey = "ui.number.trillion";
 
         private CoinsFormatter _formatter;
 
@@ -18,9 +19,10 @@ namespace _Project.Tests.EditMode.Economy
         {
             FakeLocalizationService localization = new FakeLocalizationService(false);
             localization.Set(DecimalSeparatorKey, ",");
-            localization.Set(ThousandKey, "{0} тыс.");
-            localization.Set(MillionKey, "{0} млн");
-            localization.Set(BillionKey, "{0} млрд");
+            localization.Set(ThousandKey, "{0}K");
+            localization.Set(MillionKey, "{0}M");
+            localization.Set(BillionKey, "{0}B");
+            localization.Set(TrillionKey, "{0}T");
             _formatter = new CoinsFormatter(localization);
         }
 
@@ -38,23 +40,25 @@ namespace _Project.Tests.EditMode.Economy
             Assert.That(_formatter.FormatShort(coins), Is.EqualTo(expected));
         }
 
-        [TestCase(1000, "1 тыс.")]
-        [TestCase(1234, "1,2 тыс.")]
-        [TestCase(1999, "1,9 тыс.")]
-        [TestCase(12345, "12,3 тыс.")]
-        [TestCase(99999, "99,9 тыс.")]
-        [TestCase(123456, "123 тыс.")]
-        [TestCase(999999, "999 тыс.")]
+        [TestCase(1000, "1K")]
+        [TestCase(1234, "1,2K")]
+        [TestCase(1999, "1,9K")]
+        [TestCase(12345, "12,3K")]
+        [TestCase(99999, "99,9K")]
+        [TestCase(123456, "123K")]
+        [TestCase(999999, "999K")]
         public void ShortThousandsDropTheRest(long coins, string expected)
         {
             Assert.That(_formatter.FormatShort(coins), Is.EqualTo(expected));
         }
 
-        [TestCase(1234567, "1,2 млн")]
-        [TestCase(35912345, "35,9 млн")]
-        [TestCase(1299999999, "1,2 млрд")]
-        [TestCase(1234567890123, "1 234 млрд")]
-        public void ShortMillionsAndBillionsDropTheRest(long coins, string expected)
+        [TestCase(1234567, "1,2M")]
+        [TestCase(35912345, "35,9M")]
+        [TestCase(1299999999, "1,2B")]
+        [TestCase(999999999999, "999B")]
+        [TestCase(1234567890123, "1,2T")]
+        [TestCase(1234567890123456, "1 234T")]
+        public void ShortMillionsBillionsAndTrillionsDropTheRest(long coins, string expected)
         {
             Assert.That(_formatter.FormatShort(coins), Is.EqualTo(expected));
         }
@@ -86,8 +90,8 @@ namespace _Project.Tests.EditMode.Economy
             Assert.That(_formatter.FormatIncome(coinsPerSecond), Is.EqualTo(expected));
         }
 
-        [TestCase(1282598.6, "1,2 млн")]
-        [TestCase(4560.2, "4,5 тыс.")]
+        [TestCase(1282598.6, "1,2M")]
+        [TestCase(4560.2, "4,5K")]
         public void IncomeFromThousandIsShort(double coinsPerSecond, string expected)
         {
             Assert.That(_formatter.FormatIncome(coinsPerSecond), Is.EqualTo(expected));

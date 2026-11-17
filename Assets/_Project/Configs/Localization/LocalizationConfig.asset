@@ -106,14 +106,17 @@ MonoBehaviour:
     _russian: ','
     _english: .
   - _key: ui.number.thousand
-    _russian: "{0}\_\u0442\u044B\u0441."
+    _russian: '{0}K'
     _english: '{0}K'
   - _key: ui.number.million
-    _russian: "{0}\_\u043C\u043B\u043D"
+    _russian: '{0}M'
     _english: '{0}M'
   - _key: ui.number.billion
-    _russian: "{0}\_\u043C\u043B\u0440\u0434"
+    _russian: '{0}B'
     _english: '{0}B'
+  - _key: ui.number.trillion
+    _russian: '{0}T'
+    _english: '{0}T'
   - _key: ui.common.ok
     _russian: "\u0425\u043E\u0440\u043E\u0448\u043E"
     _english: OK

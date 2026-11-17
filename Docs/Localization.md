@@ -79,7 +79,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 51 запись:
+Сейчас в ассете 52 записи:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -97,7 +97,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
   - `ui.hud.turbo_track_empty` — «Отправьте машину на трассу» / «Send a vehicle to the track»: нажатие турбо без машин на трассе;
 - запись чисел (`CoinsFormatter`, [Gameplay.md](Gameplay.md), раздел 13):
   - `ui.number.decimal_separator` — «,» / «.»;
-  - `ui.number.thousand`, `ui.number.million`, `ui.number.billion` — «{0} тыс.», «{0} млн», «{0} млрд» / «{0}K», «{0}M», «{0}B». Между числом и сокращением в русском тексте стоит неразрывный пробел, `{0}` — число с одним знаком после запятой или целое;
+  - `ui.number.thousand`, `ui.number.million`, `ui.number.billion`, `ui.number.trillion` — «{0}K», «{0}M», «{0}B», «{0}T» в обоих языках (задача владельца VEH-22, 17.11.2026; до неё по-русски было «тыс.», «млн», «млрд», ключа триллионов не было). `{0}` — число с одним знаком после запятой или целое, пробела перед буквой нет;
 - карточка машины: `popup.vehicle.income` — «Доход: {0} в секунду» / «Income: {0} per second»;
 - условие на закрытой карточке каталога: `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles», где `{0}` — ранг машин для слияния (на единицу меньше ранга карточки);
 - сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;

@@ -52,10 +52,12 @@ namespace _Project.UI.Windows
             _name.text = string.Empty;
         }
 
-        public void ShowPrice(string price)
+        public void ShowPrice(string price, bool isAffordable)
         {
             _price.text = price;
             ShowSaleState(true);
+            _buyButton.interactable = isAffordable;
+            _buyButtonImage.sprite = isAffordable ? _buySprite : _lockedSprite;
         }
 
         public void ShowLock()

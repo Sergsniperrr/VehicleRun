@@ -29,6 +29,7 @@ namespace _Project.UI.Windows
         [SerializeField] private float _failureMessageRise;
 
         private BoxDelivery _delivery;
+        private Wallet _wallet;
         private RankProgress _progress;
         private VehicleCatalogConfig _catalog;
         private CoinsFormatter _formatter;
@@ -55,6 +56,7 @@ namespace _Project.UI.Windows
         [Inject]
         public void Construct(
             BoxDelivery delivery,
+            Wallet wallet,
             RankProgress progress,
             VehicleCatalogConfig catalog,
             CoinsFormatter formatter,
@@ -63,6 +65,7 @@ namespace _Project.UI.Windows
             IObjectResolver resolver)
         {
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
+            _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
@@ -76,6 +79,13 @@ namespace _Project.UI.Windows
             ShowCatalog();
             base.Show();
             ScrollToBoxRank();
+            _wallet.CoinsChanged += OnCoinsChanged;
+        }
+
+        public override void Hide()
+        {
+            _wallet.CoinsChanged -= OnCoinsChanged;
+            base.Hide();
         }
 
         private void ShowCatalog()
@@ -128,7 +138,8 @@ namespace _Project.UI.Windows
         private void ShowPrice(ShopRowView row)
         {
             long price = _delivery.GetPrice(row.Rank);
-            row.ShowPrice(_formatter.FormatShort(price));
+            bool isAffordable = _delivery.GetMissingCoins(row.Rank) == 0;
+            row.ShowPrice(_formatter.FormatShort(price), isAffordable);
         }
 
         private void ScrollToBoxRank()
@@ -163,6 +174,14 @@ namespace _Project.UI.Windows
             }
 
             ShowFailure(result.FailureReason, row);
+        }
+
+        private void OnCoinsChanged(long coins)
+        {
+            foreach (ShopRowView row in _rows)
+            {
+                ShowOffer(row);
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ namespace _Project.Features.Track
 
         [SerializeField] private SpriteRenderer _body;
         [SerializeField] private TrailRenderer _boostTrail;
+        [SerializeField] private ParticleSystem _smoke;
 
         public event Action<TrackVehicleView> Tapped;
 
@@ -29,6 +30,7 @@ namespace _Project.Features.Track
         {
             ShowBoost(false);
             _boostTrail.Clear();
+            _smoke.Clear();
             gameObject.SetActive(false);
         }
 

@@ -113,8 +113,8 @@ TextureImporter:
       name: Vehicle_01_Garage
       rect:
         serializedVersion: 2
-        x: 440
-        y: 132
+        x: 445
+        y: 195
         width: 143
         height: 156
       alignment: 7
@@ -134,8 +134,8 @@ TextureImporter:
       name: Vehicle_02_Garage
       rect:
         serializedVersion: 2
-        x: 248
-        y: 134
+        x: 247
+        y: 196
         width: 174
         height: 157
       alignment: 7
@@ -177,7 +177,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 828
-        y: 706
+        y: 708
         width: 182
         height: 138
       alignment: 7
@@ -198,7 +198,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 425
-        y: 333
+        y: 358
         width: 196
         height: 132
       alignment: 7
@@ -219,7 +219,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 423
-        y: 700
+        y: 696
         width: 192
         height: 156
       alignment: 7
@@ -260,8 +260,8 @@ TextureImporter:
       name: Vehicle_08_Garage
       rect:
         serializedVersion: 2
-        x: 424
-        y: 518
+        x: 425
+        y: 538
         width: 194
         height: 141
       alignment: 7
@@ -282,7 +282,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 228
-        y: 333
+        y: 358
         width: 196
         height: 149
       alignment: 7
@@ -303,7 +303,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 621
-        y: 703
+        y: 705
         width: 198
         height: 127
       alignment: 7
@@ -324,7 +324,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 216
-        y: 520
+        y: 540
         width: 201
         height: 153
       alignment: 7
@@ -345,7 +345,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 11
-        y: 523
+        y: 543
         width: 203
         height: 155
       alignment: 7
@@ -366,7 +366,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 10
-        y: 334
+        y: 359
         width: 215
         height: 161
       alignment: 7
@@ -387,7 +387,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 623
-        y: 515
+        y: 535
         width: 190
         height: 159
       alignment: 7
@@ -408,7 +408,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 816
-        y: 519
+        y: 540
         width: 203
         height: 154
       alignment: 7
@@ -429,7 +429,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 623
-        y: 326
+        y: 351
         width: 198
         height: 155
       alignment: 7
@@ -450,7 +450,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 6
-        y: 132
+        y: 175
         width: 229
         height: 178
       alignment: 7
@@ -471,7 +471,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 828
-        y: 331
+        y: 356
         width: 188
         height: 182
       alignment: 7
@@ -492,7 +492,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 601
-        y: 142
+        y: 184
         width: 220
         height: 137
       alignment: 7
@@ -512,8 +512,8 @@ TextureImporter:
       name: Vehicle_20_Garage
       rect:
         serializedVersion: 2
-        x: 832
-        y: 137
+        x: 831
+        y: 179
         width: 186
         height: 153
       alignment: 7
@@ -529,6 +529,216 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 179
+        height: 171
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b4494f8843716a448867fd132d49ad5
+      internalID: -2039404869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_1
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 0
+        width: 176
+        height: 193
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ebbeaf240f861e47bf705dd51fecfe1
+      internalID: -100590382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_2
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 11
+        width: 182
+        height: 171
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abf01f045d85b43429e2da4b422c25ce
+      internalID: 826394609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_3
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 10
+        width: 183
+        height: 169
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a26cd46fdda20340a05a8dbb8865106
+      internalID: -2107013325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_4
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 10
+        width: 192
+        height: 162
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 780c233fabde75c43b504b1d168807a6
+      internalID: 1059607207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_5
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 834
+        width: 190
+        height: 190
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8f78004627a9ac40929fce74ac784da
+      internalID: 283292947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_6
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 844
+        width: 190
+        height: 178
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f2086b7a6b87b944fb03b9fd71a92d93
+      internalID: 1909001089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_7
+      rect:
+        serializedVersion: 2
+        x: 405
+        y: 859
+        width: 196
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46d3e3914c8f989409ca3e6fae89d143
+      internalID: -886959382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_8
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 844
+        width: 212
+        height: 180
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9188a8ad0d66b404084455ccfea0dbb6
+      internalID: -1624023886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleSideView_9
+      rect:
+        serializedVersion: 2
+        x: 822
+        y: 851
+        width: 202
+        height: 173
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eaf02612d6606be4eaed66f9aebb7fd2
+      internalID: 594645367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -540,6 +750,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      VehicleSideView_0: -2039404869
+      VehicleSideView_1: -100590382
+      VehicleSideView_2: 826394609
+      VehicleSideView_3: -2107013325
+      VehicleSideView_4: 1059607207
+      VehicleSideView_5: 283292947
+      VehicleSideView_6: 1909001089
+      VehicleSideView_7: -886959382
+      VehicleSideView_8: -1624023886
+      VehicleSideView_9: 594645367
       Vehicle_01_Garage: -749692788
       Vehicle_02_Garage: 398276104
       Vehicle_03_Garage: -1258490958
