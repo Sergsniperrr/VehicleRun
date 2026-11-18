@@ -22,6 +22,7 @@ namespace _Project.Features.Save
         private readonly TurboService _turbo;
         private readonly CollectionMilestones _milestones;
         private readonly PlayerLevel _playerLevel;
+        private readonly CatalogNews _catalogNews;
         private readonly ITimeService _time;
 
         private bool _isWriting;
@@ -36,6 +37,7 @@ namespace _Project.Features.Save
             TurboService turbo,
             CollectionMilestones milestones,
             PlayerLevel playerLevel,
+            CatalogNews catalogNews,
             ITimeService time)
         {
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -45,6 +47,7 @@ namespace _Project.Features.Save
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
+            _catalogNews = catalogNews ?? throw new ArgumentNullException(nameof(catalogNews));
             _time = time ?? throw new ArgumentNullException(nameof(time));
         }
 
@@ -68,6 +71,7 @@ namespace _Project.Features.Save
             _turbo.TurboStarted += OnTurboStarted;
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
             _playerLevel.RewardClaimed += OnRewardClaimed;
+            _catalogNews.Seen += OnCatalogSeen;
         }
 
         public void LateTick()
@@ -109,6 +113,7 @@ namespace _Project.Features.Save
             _turbo.TurboStarted -= OnTurboStarted;
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
             _playerLevel.RewardClaimed -= OnRewardClaimed;
+            _catalogNews.Seen -= OnCatalogSeen;
         }
 
         private void Write(bool isImportant)
@@ -179,6 +184,11 @@ namespace _Project.Features.Save
         }
 
         private void OnRewardClaimed(int level, long coins)
+        {
+            MarkImportantChange();
+        }
+
+        private void OnCatalogSeen()
         {
             MarkImportantChange();
         }

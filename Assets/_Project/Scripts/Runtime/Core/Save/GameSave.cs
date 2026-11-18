@@ -25,5 +25,7 @@ namespace _Project.Core.Save
         public int PlayerLevel;
         public long PlayerExperience;
         public int ClaimedRewardLevel;
+        public int CatalogSeenRank;
+        public long TotalEarnedCoins;
     }
 }

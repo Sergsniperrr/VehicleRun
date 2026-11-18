@@ -6,6 +6,7 @@ using _Project.Features.Boxes;
 using _Project.Features.Economy;
 using _Project.Features.Garage;
 using _Project.Features.Instances;
+using _Project.Features.Leaderboards;
 using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Session;
@@ -85,6 +86,7 @@ namespace _Project.Composition
             builder.Register<Wallet>(Lifetime.Singleton);
             builder.Register<PlayerLevel>(Lifetime.Singleton);
             builder.Register<CollectionMilestones>(Lifetime.Singleton);
+            builder.Register<CatalogNews>(Lifetime.Singleton);
             builder.Register<BoxPricing>(Lifetime.Singleton);
             builder.Register<BoxDelivery>(Lifetime.Singleton);
             builder.Register<TrackPath>(Lifetime.Singleton);
@@ -93,6 +95,7 @@ namespace _Project.Composition
             builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();
+            builder.RegisterEntryPoint<LeaderboardScoreSubmitter>().AsSelf();
         }
 
         private void RegisterSave(IContainerBuilder builder)

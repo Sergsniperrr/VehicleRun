@@ -47,7 +47,7 @@ Assets/
 │   ├── Fonts/                         Kabel_1.asset — шрифт игры; Nunito/, VAG Rundschrift/, Baloo/ — прежний шрифт и шрифты референса (Docs/Localization.md, раздел 1)
 │   ├── Plugins/WebGL/                 YandexMetrica.jslib
 │   ├── Prefabs/                       RootLifetimeScope.prefab (корневой контейнер); Game/: GarageSlot, TrackVehicle, PayoutPopup; UI/: ShopRow, CatalogCard
-│   ├── Scenes/                        Bootstrap.unity, Game.unity
+│   ├── Scenes/                        Bootstrap.unity, Loading.unity, Game.unity
 │   ├── Sprites/                       листы машин VehicleSideView и VehicleTopView (спрайты Vehicle_NN_Garage и Vehicle_NN_Track), коробка Box_Closed и Box_Open
 │   └── Scripts/
 │       ├── Editor/                    сборка _Project.Editor: проверка конфигов, симулятор баланса
@@ -123,6 +123,7 @@ protected override void Configure(IContainerBuilder builder)
 |---|---|---|---|
 | `LocalizationConfig` (инстанс) | ассет из поля `_localizationConfig` | Singleton | `RegisterConfigs` |
 | `ISceneLoader` | `SceneLoader` | Singleton | `RegisterServices` |
+| `LoadingProgress` (сам класс) | `LoadingProgress` | Singleton | `RegisterServices` |
 | `IAudioService` | `AudioService` | Singleton | `RegisterServices` |
 | `ITimeService` | `TimeService` | Singleton | `RegisterServices` |
 | `IRandomSource` | `UnityRandomSource` | Singleton | `RegisterServices` |
@@ -130,6 +131,7 @@ protected override void Configure(IContainerBuilder builder)
 | `IPlatformInitializer` | `JTLSDKInitializer` | Singleton | `RegisterPlatform` |
 | `IAnalyticsService` | `JTLAnalyticsService` | Singleton | `RegisterPlatform` |
 | `ILocalizationService` | `JTLLocalizationService` | Singleton | `RegisterPlatform` |
+| `ILeaderboardService` | `JTLLeaderboardService` | Singleton | `RegisterPlatform` |
 | `IPurchaseService` | `JTLPurchaseService` | EntryPoint | `RegisterPlatform` |
 | `IAdvertisingService` | `JTLAdvertisingService` | EntryPoint | `RegisterPlatform` |
 | `IProgressStorage` | `JTLProgressStorage` | Singleton | `RegisterStorage` |
@@ -313,7 +315,10 @@ public class LoadLevelState : IPayloadState<int>
 | Сцена | Индекс в Build Settings | Что на ней |
 |---|---|---|
 | `Bootstrap` | 0 | `BootstrapLifetimeScope` |
-| `Game` | 1 | `Main Camera` (ортографическая, size 9,6, позиция (0, 0, -10), фон Solid Color цветом песка), `GameLifetimeScope`, мир `World` (трасса, гараж, зона переработки) и `Canvas` с HUD. Устройство в [Docs/TechPlan.md](Docs/TechPlan.md), раздел 4.6 |
+| `Loading` | 1 | экран загрузки (задача владельца VEH-25): `Main Camera` цветом песка, `LoadingLifetimeScope`, `Canvas` с названием игры, спрайтом машины и полосой загрузки `Slider` (`LoadingScreenView`). Показывается, пока грузится сцена `Game` |
+| `Game` | 2 | `Main Camera` (ортографическая, size 9,6, позиция (0, 0, -10), фон Solid Color цветом песка), `GameLifetimeScope`, мир `World` (трасса, гараж, зона переработки) и `Canvas` с HUD. Устройство в [Docs/TechPlan.md](Docs/TechPlan.md), раздел 4.6 |
+
+Переход между сценами с экраном загрузки делает `LoadRunState`: сообщает прогресс через `LoadingProgress` (`Core/SceneManagement`, singleton корневого контейнера), грузит `Loading`, затем `Game` с прогрессом. `SceneLoader.LoadAsync` принимает `IProgress<float>` и нормирует прогресс Unity (0…0,9) к 0…1, по нему `LoadingScreenView` заполняет полосу.
 
 Проект настроен под 2D. В Project Settings, Editor стоят Default Behavior Mode 2D (картинки импортируются как спрайты, новые сцены создаются с ортографической камерой и без света) и Sprite Packer Mode Sprite Atlas V2. На сцене `Game` нет `Directional Light` и скайбокса, Environment Lighting задан цветом. 2D-света (`Light 2D`) в Built-in RP нет, он работает только в URP с 2D Renderer, поэтому спрайты рисуются материалом `Sprites-Default` без освещения.
 
@@ -323,6 +328,8 @@ public class LoadLevelState : IPayloadState<int>
 public interface ISceneLoader
 {
     UniTask LoadAsync(SceneId sceneId, Action loaded = null, CancellationToken cancellationToken = default);
+
+    UniTask LoadAsync(SceneId sceneId, IProgress<float> progress, CancellationToken cancellationToken = default);
 }
 ```
 

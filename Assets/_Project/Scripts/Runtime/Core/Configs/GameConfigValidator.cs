@@ -309,6 +309,11 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(track, $"Точка старта {track.StartDistance} должна быть на круге: от 0 до длины круга {track.LapLength:0.###}"));
             }
 
+            if (track.FullTrackBonusPercent < 0)
+            {
+                errors.Add(new ConfigError(track, $"Бонус полной трассы {track.FullTrackBonusPercent}%, не может быть отрицательным"));
+            }
+
             ValidateSchedule(track, track.Capacity, TrackScheduleName, errors);
         }
 

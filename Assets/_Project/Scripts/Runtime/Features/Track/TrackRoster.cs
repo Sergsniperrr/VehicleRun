@@ -11,6 +11,8 @@ namespace _Project.Features.Track
 {
     public class TrackRoster
     {
+        private const double PercentBase = 100;
+
         private readonly GarageBoard _garage;
         private readonly PlayerLevel _playerLevel;
         private readonly TrackConfig _track;
@@ -32,6 +34,8 @@ namespace _Project.Features.Track
         public IReadOnlyList<TrackRunner> Runners => _runners;
         public int Count => _runners.Count;
         public int Capacity => _playerLevel.TrackCapacity;
+        public bool IsFull => Count > 0 && Count >= Capacity;
+        public double PayoutMultiplier => IsFull ? (PercentBase + _track.FullTrackBonusPercent) / PercentBase : 1;
 
         public bool CanSendToTrack(int slot)
         {
@@ -199,9 +203,20 @@ namespace _Project.Features.Track
 
         private void PayForLaps(TrackRunner runner, int crossings)
         {
-            long payout = runner.Vehicle.Definition.CoinsPerLap * crossings;
+            long basePayout = runner.Vehicle.Definition.CoinsPerLap * crossings;
+            double payout = CalculatePayout(basePayout);
             _wallet.Add(payout);
-            FinishCrossed?.Invoke(runner, payout);
+            FinishCrossed?.Invoke(runner, (long)Math.Floor(payout));
+        }
+
+        private double CalculatePayout(long basePayout)
+        {
+            if (IsFull == false)
+            {
+                return basePayout;
+            }
+
+            return basePayout * (PercentBase + _track.FullTrackBonusPercent) / PercentBase;
         }
 
         private TrackRunner FindRunner(int slot)

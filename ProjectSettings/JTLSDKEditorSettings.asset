@@ -43,7 +43,7 @@ MonoBehaviour:
   _progressRadius: 3
   _progressAtBottom: 0
   _loadingText: 
-  _fixedAspect: 1
+  _fixedAspect: 0
   _aspectRatio: 9/16
   _freeAspectOnMobile: 0
   _pageUsesLoaderBackground: 0
@@ -54,6 +54,6 @@ MonoBehaviour:
   _buildOutput: 1
   _buildPath: E:/Builds/VehicleMerge
   _buildNamePattern: '{product}_{configuration}_b{build}'
-  _buildNumber: 4
+  _buildNumber: 5
   _developmentBuild: 0
   _openFolderAfterBuild: 1

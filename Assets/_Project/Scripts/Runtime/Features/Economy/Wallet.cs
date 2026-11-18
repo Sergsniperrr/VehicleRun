@@ -13,12 +13,14 @@ namespace _Project.Features.Economy
             }
 
             Coins = economy.StartCoins;
+            TotalEarned = economy.StartCoins;
         }
 
         public event Action<long> CoinsChanged;
 
         public long Coins { get; private set; }
         public double Remainder { get; private set; }
+        public long TotalEarned { get; private set; }
 
         public void Add(double amount)
         {
@@ -68,6 +70,16 @@ namespace _Project.Features.Economy
             TryCollectWholeCoins(remainder);
         }
 
+        public void RestoreTotalEarned(long totalEarned)
+        {
+            if (totalEarned < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(totalEarned));
+            }
+
+            TotalEarned = Math.Max(totalEarned, Coins);
+        }
+
         private bool TryCollectWholeCoins(double amount)
         {
             double total = Remainder + amount;
@@ -90,6 +102,9 @@ namespace _Project.Features.Economy
             {
                 Coins += (long)wholeCoins;
             }
+
+            long earnedRoom = long.MaxValue - TotalEarned;
+            TotalEarned = wholeCoins >= earnedRoom ? long.MaxValue : TotalEarned + (long)wholeCoins;
 
             return true;
         }

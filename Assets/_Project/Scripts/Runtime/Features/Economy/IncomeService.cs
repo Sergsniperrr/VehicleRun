@@ -32,7 +32,7 @@ namespace _Project.Features.Economy
                 income += runner.Vehicle.Definition.CalculateAverageIncome(_track.LapLength);
             }
 
-            return income;
+            return income * _roster.PayoutMultiplier;
         }
     }
 }

@@ -34,6 +34,29 @@ namespace _Project.Tests.EditMode.Economy
         }
 
         [Test]
+        public void TotalEarnedGrowsWithIncomeAndIgnoresSpending()
+        {
+            long startCoins = _wallet.Coins;
+
+            _wallet.Add(100.5);
+            _wallet.TrySpend(40);
+            _wallet.Add(0.5);
+
+            Assert.That(_wallet.TotalEarned, Is.EqualTo(startCoins + 101));
+            Assert.That(_wallet.Coins, Is.EqualTo(startCoins + 61));
+        }
+
+        [Test]
+        public void RestoredTotalEarnedIsNotLessThanCoins()
+        {
+            _wallet.Restore(1000, 0);
+
+            _wallet.RestoreTotalEarned(0);
+
+            Assert.That(_wallet.TotalEarned, Is.EqualTo(1000));
+        }
+
+        [Test]
         public void FractionalIncomeAccumulatesIntoWholeCoins()
         {
             long startCoins = _wallet.Coins;

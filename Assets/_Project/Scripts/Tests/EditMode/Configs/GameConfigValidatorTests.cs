@@ -301,6 +301,14 @@ namespace _Project.Tests.EditMode.Configs
             AssertReportedBy(_fixture.Track);
         }
 
+        [Test]
+        public void NegativeFullTrackBonusIsReported()
+        {
+            _fixture.Change(_fixture.Track, "_fullTrackBonusPercent", property => property.intValue = -1);
+
+            AssertReportedBy(_fixture.Track);
+        }
+
         private IReadOnlyList<ConfigError> Validate()
         {
             return _validator.Validate(_fixture.Config, _fixture.Localization);

@@ -30,3 +30,4 @@ MonoBehaviour:
       _capacity: 9
     - _level: 12
       _capacity: 10
+  _fullTrackBonusPercent: 10

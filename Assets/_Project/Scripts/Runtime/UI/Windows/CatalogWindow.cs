@@ -36,6 +36,7 @@ namespace _Project.UI.Windows
         private TrackConfig _track;
         private IObjectResolver _resolver;
         private CollectionMilestones _collection;
+        private CatalogNews _news;
 
         protected override void Awake()
         {
@@ -66,7 +67,8 @@ namespace _Project.UI.Windows
             ILocalizationService localization,
             TrackConfig track,
             IObjectResolver resolver,
-            CollectionMilestones collection)
+            CollectionMilestones collection,
+            CatalogNews news)
         {
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
@@ -75,12 +77,14 @@ namespace _Project.UI.Windows
             _track = track ?? throw new ArgumentNullException(nameof(track));
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _collection = collection ?? throw new ArgumentNullException(nameof(collection));
+            _news = news ?? throw new ArgumentNullException(nameof(news));
         }
 
         public override void Show()
         {
             ShowCatalog();
             base.Show();
+            _news.MarkSeen();
             ScrollToNextGoal();
         }
 

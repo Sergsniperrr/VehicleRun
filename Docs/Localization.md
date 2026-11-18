@@ -79,7 +79,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 52 записи:
+Сейчас в ассете 56 записей:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -104,7 +104,8 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки»;
 - окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects»;
 - окно левелапа игрока ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!», кнопка — `ui.common.claim`;
-- окно новой машины: `popup.newvehicle.title` — «Новая машина!» / «New vehicle!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`.
+- окно новой машины: `popup.newvehicle.title` — «Новая машина!» / «New vehicle!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`;
+- окно лидерборда ([Gameplay.md](Gameplay.md), раздел 13): `popup.leaderboard.title` — «Рейтинг» / «Leaderboard», `popup.leaderboard.loading` — «Загрузка…» / «Loading…», `popup.leaderboard.empty` — «Рейтинг пока пуст» / «No scores yet», `popup.leaderboard.anonymous` — «Игрок» / «Player» (имя игрока без имени).
 
 Остальные тексты добавляются по мере их появления в игре.
 

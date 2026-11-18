@@ -32,7 +32,8 @@ namespace _Project.Tests.EditMode.Save
             Roster = new TrackRoster(Garage, Level, fixture.Track, Wallet);
             Turbo = new TurboService(fixture.Turbo, Progress, Roster);
             Milestones = new CollectionMilestones(Progress, Wallet, fixture.Economy);
-            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level);
+            News = new CatalogNews(Progress, Milestones, fixture.Economy);
+            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level, News);
             Restorer = new GameStateRestorer(
                 fixture.Vehicles,
                 InstanceIds,
@@ -45,7 +46,8 @@ namespace _Project.Tests.EditMode.Save
                 Turbo,
                 Milestones,
                 Level,
-                Levels);
+                Levels,
+                News);
         }
 
         public InstanceIdGenerator InstanceIds { get; }
@@ -60,6 +62,7 @@ namespace _Project.Tests.EditMode.Save
         public TrackRoster Roster { get; }
         public TurboService Turbo { get; }
         public CollectionMilestones Milestones { get; }
+        public CatalogNews News { get; }
         public GameSaveFactory Factory { get; }
         public GameStateRestorer Restorer { get; }
 
@@ -86,6 +89,7 @@ namespace _Project.Tests.EditMode.Save
 
         public void Dispose()
         {
+            News.Dispose();
             Level.Dispose();
             Progress.Dispose();
         }

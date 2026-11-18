@@ -19,6 +19,7 @@ Assets/_Project/Scripts/Runtime/
 │   ├── Analytics/IAnalyticsService.cs, IAnalyticsReporter.cs, IAnalyticsEvent.cs
 │   ├── Analytics/Events/GameReadyEvent.cs, GameplayStartedEvent.cs, GameplayStoppedEvent.cs
 │   ├── Purchasing/IPurchaseService.cs
+│   ├── Leaderboards/ILeaderboardService.cs, LeaderboardRow.cs, LeaderboardTable.cs
 │   ├── Save/IProgressStorage.cs, GameSave.cs и вложенные DTO
 │   └── Platform/IPlatformInitializer.cs
 ├── Infrastructure/                сборка _Project.Infrastructure, ссылается на JTLStudio.SDK
@@ -26,6 +27,7 @@ Assets/_Project/Scripts/Runtime/
 │   ├── JTL/JTLAnalyticsService.cs
 │   ├── JTL/JTLPurchaseService.cs
 │   ├── JTL/JTLProgressStorage.cs
+│   ├── JTL/JTLLeaderboardService.cs
 │   ├── JTL/JTLSDKInitializer.cs
 │   └── Analytics/YandexMetrica.cs
 └── Composition/
@@ -326,6 +328,31 @@ private const string NoAdsOwnedKey = "no_ads.owned";
 Сервис зарегистрирован как точка входа: в `Start()` он ждёт SDK и вызывает `RestorePurchases`, а в `Dispose()` отменяет ожидание. Так возвращается покупка, которую игрок оплатил, но не получил: оборвалась связь или закрылась вкладка. На площадках без покупок (YouTube) восстановление пропускается.
 
 Если понадобится второй товар, вынесите id товаров в настройку (ScriptableObject) и замените `BuyRemoveAds()` на `BuyProduct(string productId, Action onSuccess)`. Восстановление при этом тоже должно уметь выдавать любой товар, а не только `no_ads`. Расходуемые товары (монеты) начисляйте прибавлением к значению в `JTLSDK.Data`, а не присваиванием: SDK списывает такую покупку только после сохранения.
+
+---
+
+## 3.5 Лидерборд
+
+`Core/Leaderboards/ILeaderboardService.cs`:
+
+```csharp
+public interface ILeaderboardService
+{
+    bool CanLoad { get; }
+
+    void SubmitScore(long score);
+
+    UniTask<LeaderboardTable> LoadAsync(CancellationToken cancellationToken);
+}
+```
+
+*Это фактический код проекта, а не пример.*
+
+Реализация `Infrastructure/JTL/JTLLeaderboardService.cs` над `JTLSDK.Leaderboards` (задача владельца VEH-19). Лидерборд один, по всего заработанным монетам (`Wallet.TotalEarned`), id `total_coins`. `SubmitScore` вызывает `SetScore`, `LoadAsync` оборачивает колбэк `Load` (топ-10 и 3 вокруг игрока) в `UniTask` через `UniTaskCompletionSource`. Строки SDK (`LeaderboardEntry`, `LeaderboardPage`) переводятся в свои модели `Core` (`LeaderboardRow`, `LeaderboardTable`), чтобы игровой код не видел типы SDK. `CanLoad` отражает готовность модуля площадки: по нему прячется кнопка лидерборда и окно показывает «Рейтинг пока пуст». На площадке без лидерборда (`Load` вернёт пустую страницу) кнопка не показывается.
+
+Счёт шлёт `LeaderboardScoreSubmitter` (`Features/Leaderboards`): раз в 30 секунд активного времени и при открытии окна, только если `TotalEarned` вырос. UI — `LeaderboardWindow` ([Gameplay.md](Gameplay.md), раздел 13).
+
+**Лидерборд `total_coins` нужно объявить** в окне JTL SDK, раздел Leaderboards, иначе `SetScore` и `Load` работать не будут. SDK генерирует класс `LeaderboardIds` в `Assets/Scripts/Generated/`, но он попадает в `Assembly-CSharp`, а наши сборки его не видят, поэтому id хранится константой в `JTLLeaderboardService`.
 
 ---
 

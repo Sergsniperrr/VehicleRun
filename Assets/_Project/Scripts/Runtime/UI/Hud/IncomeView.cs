@@ -1,5 +1,6 @@
 using System;
 using _Project.Features.Economy;
+using _Project.Features.Progression;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
 using TMPro;
@@ -20,6 +21,7 @@ namespace _Project.UI.Hud
         private IncomeService _income;
         private TrackRoster _roster;
         private TurboService _turbo;
+        private PlayerLevel _playerLevel;
         private CoinsFormatter _formatter;
 
         private void Awake()
@@ -33,6 +35,7 @@ namespace _Project.UI.Hud
             _roster.VehicleReturned += OnVehicleReturned;
             _turbo.TurboStarted += OnTurboStarted;
             _turbo.TurboEnded += OnTurboEnded;
+            _playerLevel.TrackPlacesUnlocked += OnTrackPlacesUnlocked;
             ShowIncome();
         }
 
@@ -42,14 +45,21 @@ namespace _Project.UI.Hud
             _roster.VehicleReturned -= OnVehicleReturned;
             _turbo.TurboStarted -= OnTurboStarted;
             _turbo.TurboEnded -= OnTurboEnded;
+            _playerLevel.TrackPlacesUnlocked -= OnTrackPlacesUnlocked;
         }
 
         [Inject]
-        public void Construct(IncomeService income, TrackRoster roster, TurboService turbo, CoinsFormatter formatter)
+        public void Construct(
+            IncomeService income,
+            TrackRoster roster,
+            TurboService turbo,
+            PlayerLevel playerLevel,
+            CoinsFormatter formatter)
         {
             _income = income ?? throw new ArgumentNullException(nameof(income));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
+            _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
         }
 
@@ -91,6 +101,11 @@ namespace _Project.UI.Hud
         }
 
         private void OnTurboEnded()
+        {
+            ShowIncome();
+        }
+
+        private void OnTrackPlacesUnlocked(int capacity)
         {
             ShowIncome();
         }

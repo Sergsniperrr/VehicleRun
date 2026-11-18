@@ -74,6 +74,31 @@ namespace _Project.Tests.EditMode.Save
         }
 
         [Test]
+        public void JsonKeepsCatalogSeenRank()
+        {
+            _source.PlaceVehicle(0, 2);
+            _source.News.MarkSeen();
+            _source.PlaceVehicle(1, 3);
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.News.SeenRank, Is.EqualTo(2));
+            Assert.That(_target.News.HasUnseenVehicle, Is.True);
+        }
+
+        [Test]
+        public void JsonKeepsTotalEarnedCoins()
+        {
+            _source.Wallet.Add(500);
+            _source.Wallet.TrySpend(300);
+
+            _target.Restorer.Restore(PassThroughJson(_source.Factory.Create()));
+
+            Assert.That(_target.Wallet.TotalEarned, Is.EqualTo(_source.Wallet.TotalEarned));
+            Assert.That(_target.Wallet.TotalEarned, Is.GreaterThan(_target.Wallet.Coins));
+        }
+
+        [Test]
         public void JsonKeepsCoinsAndExactDistances()
         {
             PlaySourceGame();

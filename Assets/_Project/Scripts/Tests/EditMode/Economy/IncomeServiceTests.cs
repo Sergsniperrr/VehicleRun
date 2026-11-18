@@ -65,6 +65,18 @@ namespace _Project.Tests.EditMode.Economy
         }
 
         [Test]
+        public void FullTrackEarnsBonus()
+        {
+            _fixture.Change(_fixture.Track, "_fullTrackBonusPercent", property => property.intValue = 10);
+            PlaceVehicle(0, 4);
+            PlaceVehicle(1, 4);
+            _roster.SendToTrack(0);
+            _roster.SendToTrack(1);
+
+            Assert.That(_income.CalculateIncomePerSecond(), Is.EqualTo(9.37).Within(Tolerance));
+        }
+
+        [Test]
         public void ReturnedVehicleStopsEarning()
         {
             PlaceVehicle(0, 4);

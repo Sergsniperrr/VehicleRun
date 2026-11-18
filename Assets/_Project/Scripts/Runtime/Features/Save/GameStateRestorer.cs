@@ -26,6 +26,7 @@ namespace _Project.Features.Save
         private readonly CollectionMilestones _milestones;
         private readonly PlayerLevel _playerLevel;
         private readonly SaveLevelResolver _levels;
+        private readonly CatalogNews _catalogNews;
 
         public GameStateRestorer(
             VehicleCatalogConfig catalog,
@@ -39,7 +40,8 @@ namespace _Project.Features.Save
             TurboService turbo,
             CollectionMilestones milestones,
             PlayerLevel playerLevel,
-            SaveLevelResolver levels)
+            SaveLevelResolver levels,
+            CatalogNews catalogNews)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -53,6 +55,7 @@ namespace _Project.Features.Save
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _levels = levels ?? throw new ArgumentNullException(nameof(levels));
+            _catalogNews = catalogNews ?? throw new ArgumentNullException(nameof(catalogNews));
         }
 
         public void Restore(GameSave save)
@@ -85,10 +88,12 @@ namespace _Project.Features.Save
             }
 
             _wallet.Restore(save.Coins, save.CoinsRemainder);
+            _wallet.RestoreTotalEarned(save.TotalEarnedCoins);
             _pricing.RestorePurchaseCounts(save.BoxPurchaseCounts);
             _delivery.Restore(save.FreeBoxRemainingSeconds, save.HasReadyDelivery);
             _turbo.Restore(save.TurboRemainingSeconds, save.TurboCooldownRemainingSeconds);
             _milestones.RestoreClaimed(save.ClaimedMilestoneRanks);
+            _catalogNews.Restore(save.CatalogSeenRank);
         }
 
         private VehicleDefinition GetDefinition(string vehicleId)

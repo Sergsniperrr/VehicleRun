@@ -1,6 +1,7 @@
 using _Project.Core.Advertising;
 using _Project.Core.Analytics;
 using _Project.Core.Audio;
+using _Project.Core.Leaderboards;
 using _Project.Core.Localization;
 using _Project.Core.Platform;
 using _Project.Core.Purchasing;
@@ -61,6 +62,7 @@ namespace _Project.Composition
             builder.Register<JTLSDKInitializer>(Lifetime.Singleton).As<IPlatformInitializer>();
             builder.Register<JTLAnalyticsService>(Lifetime.Singleton).As<IAnalyticsService>();
             builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
+            builder.Register<JTLLeaderboardService>(Lifetime.Singleton).As<ILeaderboardService>();
             builder.RegisterEntryPoint<JTLPurchaseService>().As<IPurchaseService>();
             builder.RegisterEntryPoint<JTLAdvertisingService>().As<IAdvertisingService>();
         }
@@ -68,6 +70,7 @@ namespace _Project.Composition
         private void RegisterServices(IContainerBuilder builder)
         {
             builder.Register<SceneLoader>(Lifetime.Singleton).As<ISceneLoader>();
+            builder.Register<LoadingProgress>(Lifetime.Singleton);
             builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
             builder.Register<UnityRandomSource>(Lifetime.Singleton).As<IRandomSource>();
             builder.Register<TimeService>(Lifetime.Singleton).As<ITimeService>();

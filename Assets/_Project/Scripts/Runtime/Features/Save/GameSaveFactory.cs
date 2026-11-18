@@ -26,6 +26,7 @@ namespace _Project.Features.Save
         private readonly TurboService _turbo;
         private readonly CollectionMilestones _milestones;
         private readonly PlayerLevel _playerLevel;
+        private readonly CatalogNews _catalogNews;
 
         public GameSaveFactory(
             GameConfig config,
@@ -38,7 +39,8 @@ namespace _Project.Features.Save
             TrackRoster roster,
             TurboService turbo,
             CollectionMilestones milestones,
-            PlayerLevel playerLevel)
+            PlayerLevel playerLevel,
+            CatalogNews catalogNews)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -51,6 +53,7 @@ namespace _Project.Features.Save
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
+            _catalogNews = catalogNews ?? throw new ArgumentNullException(nameof(catalogNews));
         }
 
         public GameSave Create()
@@ -75,6 +78,8 @@ namespace _Project.Features.Save
                 PlayerLevel = _playerLevel.Level,
                 PlayerExperience = _playerLevel.Experience,
                 ClaimedRewardLevel = _playerLevel.ClaimedRewardLevel,
+                CatalogSeenRank = _catalogNews.SeenRank,
+                TotalEarnedCoins = _wallet.TotalEarned,
             };
         }
 

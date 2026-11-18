@@ -30,7 +30,9 @@ Assets/_Project/Scripts/Runtime/Features/
 │                  виды GarageView, GarageSlotView, GarageInputView
 ├── Progression/   RankProgress: K, открытые ранги, ранг коробки;
 │                  PlayerLevel: уровень игрока, опыт за слияния, награды за уровень, места гаража и трассы;
-│                  CollectionMilestones: награды гифт-дорожки каталога, их забор и состояние узла
+│                  CollectionMilestones: награды гифт-дорожки каталога, их забор и состояние узла;
+│                  CatalogNews: есть ли новости для значка «!» на каталоге (новый ранг или незабранная награда)
+├── Leaderboards/  LeaderboardScoreSubmitter: отправляет в лидерборд всего заработанных монет
 ├── Track/         TrackRoster и TrackRunner: состав трассы, движение, выплаты на финише;
 │                  IRunnerTimeScale: сколько секунд за кадр едет каждая машина;
 │                  TrackPath: точка и направление по пройденному пути, расстояние до осевой линии;
@@ -54,8 +56,10 @@ Assets/_Project/Scripts/Runtime/Infrastructure/JTL/ JTLProgressStorage: сейв
 Assets/_Project/Scripts/Runtime/UI/
 ├── Hud/           CoinsView, IncomeView, PlayerLevelView, BoxButtonView, FreeBoxView: монеты, доход, уровень игрока и опыт, кнопка коробки, бесплатная поставка;
 │                  TurboButtonView: турбо, замок до порога, таймер эффекта и отката; BestLineupButtonView: «Лучший состав»;
-│                  WindowButtonView: кнопка, которая открывает окно
+│                  WindowButtonView: кнопка, которая открывает окно; CatalogNewsBadgeView: значок «!» на каталоге;
+│                  LeaderboardButtonView: кнопка лидерборда (прячется, если площадка не даёт лидерборд)
 ├── Boxes/         BoxPurchaseFailureText: текст отказа покупки коробки для HUD и магазина
+├── Loading/       LoadingScreenView: полоса загрузки на сцене Loading
 └── Windows/       IWindow, Window: окно и его показ; WindowQueue: очередь окон, блокировка поля;
                    WindowEscapeInput: Esc; WindowGameplayReporter: остановка геймплея за полноэкранным окном;
                    RecycleConfirmWindow: подтверждение переработки; VehicleCardWindow: карточка машины;
@@ -64,7 +68,8 @@ Assets/_Project/Scripts/Runtime/UI/
                    CatalogWindow, CatalogCardView, CatalogMilestoneView: каталог и гифт-дорожка наград;
                    SettingsWindow: настройки звука (громкость музыки и эффектов);
                    NewVehicleWindow и NewVehicleNotice: окно новой машины при открытии нового ранга;
-                   LevelUpWindow и LevelUpNotice: окно левелапа игрока с наградой
+                   LevelUpWindow и LevelUpNotice: окно левелапа игрока с наградой;
+                   LeaderboardWindow и LeaderboardRowView: окно лидерборда со списком игроков
 └── Sounds/        UiSounds: звуки клика, окна и левелапа; ButtonClickSound: клик на кнопке
 ```
 
@@ -197,11 +202,13 @@ Assets/_Project/Scripts/Runtime/UI/
 | Член | Что делает |
 |---|---|
 | `Coins` | целые монеты, `long` (решение 10 тех.плана). Их показывает UI |
-| `Remainder` | дробный остаток от 0 до 1. Выплаты бывают дробными (`D × C_r`), остаток копится до целой монеты (ГДД 9) |
+| `Remainder` | дробный остаток от 0 до 1. Выплаты бывают дробными (`D × C_r`, бонус полной трассы), остаток копится до целой монеты (ГДД 9) |
+| `TotalEarned` | всего начислено монет за всю игру, `long`. Растёт вместе с `Coins` при `Add`, трата (`TrySpend`) его не уменьшает. По нему строится лидерборд (раздел 13). Новый кошелёк начинается с `StartCoins`, как и `Coins` |
 | `Add(amount)` | начисляет: к остатку прибавляется сумма, целая часть уходит в `Coins`. Отрицательная сумма, NaN и бесконечность дают `ArgumentOutOfRangeException` |
 | `TrySpend(amount)` | списывает, если монет хватает, и возвращает `true`. Иначе возвращает `false` и ничего не меняет. Отрицательная сумма — исключение |
 | `CoinsChanged(coins)` | событие с новым балансом. Поднимается, только когда изменилась целая часть |
 | `Restore(coins, remainder)` | ставит баланс из сейва без события. Остаток принимается от 0 до 1 включительно: `JsonUtility` пишет `double` 16 значащими цифрами, и остаток 0,99999999999999989 возвращается из JSON как 1. Такой остаток сразу становится монетой. Отрицательные монеты, NaN и остаток вне [0; 1] дают `ArgumentOutOfRangeException` |
+| `RestoreTotalEarned(totalEarned)` | ставит `TotalEarned` из сейва, не меньше текущего баланса `Coins` (`max`), поэтому сейв без этого поля — 0 — не занижает «всего заработано» ниже видимого баланса. Отрицательное значение даёт `ArgumentOutOfRangeException` |
 
 Баланс не переполняется: он останавливается на `long.MaxValue`, остаток при этом обнуляется (ГДД 20, «ограничение от переполнения»).
 
@@ -288,6 +295,8 @@ Assets/_Project/Scripts/Runtime/UI/
 | `Runners` | машины трассы в порядке отправки |
 | `Count` | сколько машин на трассе |
 | `Capacity` | сколько мест: `PlayerLevel.TrackCapacity`, растёт с уровнем игрока |
+| `IsFull` | все места заняты (`Count ≥ Capacity` и хотя бы одна машина). Пока трасса полна, выплаты идут с бонусом |
+| `PayoutMultiplier` | множитель выплат: `1 + FullTrackBonusPercent / 100`, когда `IsFull`, иначе 1 (задача владельца VEH-11). По нему `IncomeService` показывает доход с бонусом |
 | `CanSendToTrack(slot)` | пройдёт ли `SendToTrack`. По нему вид подсвечивает дорожку |
 | `HasRunner(runner)` | машина ещё на трассе. Снятая машина — уже другой объект: при новой отправке создаётся новый `TrackRunner` |
 
@@ -304,6 +313,8 @@ Assets/_Project/Scripts/Runtime/UI/
 **Движение: `Advance(deltaTime, timeScale)`.** Каждая машина проезжает `v_r × t` (`VehicleDefinition.TrackSpeed`), где `t` — её секунды за кадр от `IRunnerTimeScale.CalculateRunnerSeconds(runner, dt)`. Без ускорений `t = dt`, так считает и `Advance(deltaTime)` без второго аргумента, его зовут тесты. Когда путь доходит до `L`, машина пересекает финиш: путь начинается заново, а машина приносит `C_r` (`VehicleDefinition.CoinsPerLap`) в `Wallet`. При длинном кадре пересечений бывает несколько, тогда выплата одна, `C_r × пересечения` (ГДД 9). После выплаты поднимается `FinishCrossed(runner, payout)`, по нему `FinishPayoutsView` показывает всплывающую сумму (раздел 10).
 
 Машина, которую сняли до финиша, за неполный круг ничего не получает. Отправленная снова, она выезжает со старта с путём 0 (ГДД 1.3). Отрицательное время и NaN дают `ArgumentOutOfRangeException`, `Advance` без `timeScale` — `ArgumentNullException`.
+
+**Бонус полной трассы** (задача владельца VEH-11, 18.11.2026). Пока заняты все места (`IsFull`), выплата на финише умножается на `PayoutMultiplier` = `1 + TrackConfig.FullTrackBonusPercent / 100` (сейчас +10%). Базовая выплата `C_r × пересечения` считается в `long`, затем умножается на бонус в `double`, и `Wallet.Add` получает дробную сумму: дробная часть копится в `Remainder`, как у декора. В событие `FinishCrossed` уходит округлённая вниз сумма (её показывает всплывающая надпись). При неполной трассе множитель равен 1, выплата целая. Процент лежит в `TrackConfig` ([Configs.md](Configs.md), раздел 2).
 
 **Загрузка: `RestoreRunner(slot, distance)`.** Ставит машину слота на трассу с сохранённым путём, без события `VehicleSent`. Проверки те же, что у `SendToTrack`: при отказе `InvalidOperationException`. Путь заворачивается по длине круга, так сейв переживает укороченную трассу. Бегуны восстанавливаются в порядке сейва, поэтому порядок отправки сохраняется.
 
@@ -333,7 +344,7 @@ Assets/_Project/Scripts/Runtime/UI/
 |---|---|---|
 | `TrackView` | `World/Track/Vehicles` | на каждую машину трассы создаёт экземпляр префаба `TrackVehicle` через `IObjectResolver.Instantiate` и каждый кадр ставит его по `Distance`. Снятые машины прячет и переиспользует. По `Tapped` машины вызывает `TurboService.BoostRunner`, если `IFieldInputBlocker.IsBlocking` не закрывает поле. Каждый кадр включает шлейф машинам, у которых `IsRunnerBoosted`: после тапа и в турбо |
 | `TrackVehicleView` | корень префаба `TrackVehicle` | ставит спрайт `TrackSprite` машины и поворачивает корень по направлению. Спрайт нарисован носом вверх. Нажатие левой кнопкой или касание (`IPointerDownHandler`) поднимает `Tapped`. `ShowBoost(bool)` включает `emitting` шлейфа, `Hide` гасит и очищает его |
-| `StartSignView` | `World/Track/StartSign` | пишет на табличке «занято/доступно» `Count/Capacity`, обновляет по `VehicleSent`, `VehicleReturned` и `TrackPlacesUnlocked` |
+| `StartSignView` | `World/Track/StartSign` | пишет на табличке «занято/доступно» `Count/Capacity`, обновляет по `VehicleSent`, `VehicleReturned` и `TrackPlacesUnlocked`. Пока трасса полна и бонус включён, над табличкой горит жёлтая надпись «+N%» (`FullTrackBonus`, задача VEH-11): показывается при `TrackRoster.IsFull` и `FullTrackBonusPercent > 0`, иначе скрыта |
 | `FinishPayoutsView` | `World/Track/Payouts` | по `FinishCrossed` показывает «+сумма», вылетающую из таблички старта: надпись рождается в позиции якоря `Spawn Anchor` и поднимается. Якорь — пустой объект `World/Track/StartSign/PayoutAnchor`, его двигают в редакторе, чтобы поправить точку вылета (решение владельца 12.11.2026). До этого сумма появлялась в точке пересечения на дороге (`TrackPath.GetPoint(0)` со сдвигом), а не у таблички. Надписи берёт из пула, новые создаёт через `IObjectResolver.Instantiate`. Вместе с надписью из того же якоря вылетают монеты (задача владельца VEH-4, 17.11.2026): вид вызывает `Emit(Coin Burst Count)` у `ParticleSystem` из поля `Coin Burst` — это объект `PayoutAnchor/CoinBurst`, 6 монет `ItemIcon_Money_Coin` (пак Layer Lab, копия в `Art/UI/LayerLab`) на выплату фонтаном вверх с гравитацией, слой `Vehicles` с порядком 29, под надписью. Материал `CoinBurst` — шейдер частиц `Particles/Standard Unlit` в режиме Fade: в последние 40% жизни монета плавно гаснет (`Color over Lifetime`). Шейдер FlatKit `Stylized Surface Cutout` пробовали 17.11.2026 и убрали: он режет по альфе и плавно гасить не умеет |
 | `FloatingTextView` | корень префаба `PayoutPopup` (`Features/Effects`) | надпись поднимается на `Rise Height` = 1 и за `Lifetime` = 0,9 секунды гаснет, с 0,5 секунды начинает тускнеть. Потом выключается, поднимает `Finished` и возвращается в пул. Тот же компонент показывает отказ покупки в HUD (раздел 13) |
 
@@ -346,7 +357,7 @@ Assets/_Project/Scripts/Runtime/UI/
 ## 11. Доход, турбо и тик экономики
 
 **`IncomeService(TrackRoster, TrackConfig, TurboService)`** монет не начисляет, а считает средний доход трассы:
-- `CalculateIncomePerSecondWithoutTurbo()` — `R = Σ I_r`, где `I_r = C_r × v_r / L`. По нему посчитается офлайн: офлайн-формула не учитывает `B` (ГДД 16, задача 2.5). Две машины ранга 4 дают около 8,52 монеты в секунду, с декором 1,1 будет 9,37, как в примере ГДД 9;
+- `CalculateIncomePerSecondWithoutTurbo()` — `R = Σ I_r × PayoutMultiplier`, где `I_r = C_r × v_r / L`, а `PayoutMultiplier` добавляет бонус полной трассы (раздел 9). По нему посчитается офлайн: офлайн-формула не учитывает `B` (ГДД 16, задача 2.5). Две машины ранга 4 дают около 8,52 монеты в секунду, а если это вся трасса (бонус +10%) — 9,37;
 - `CalculateIncomePerSecond()` — то же, умноженное на `TurboService.SpeedMultiplier`, то есть `B × Σ I_r`. Его показывает HUD: в турбо доход вдвое больше.
 
 **Турбо: `TurboService(TurboConfig, RankProgress, TrackRoster)`** (`Features/Turbo`, ГДД 8). Бесплатное турбо удваивает скорость всех машин трассы на 30 секунд, потом идёт откат 180 секунд. Числа лежат в `TurboConfig` ([Configs.md](Configs.md), раздел 2).
@@ -514,7 +525,9 @@ Assets/_Project/Scripts/Runtime/UI/
 | `FreeBoxView` | `Canvas/Hud/BoxButton/FreeBox` | таймер бесплатной поставки: круг `Fill` заполняется по `FreeBoxProgress`, внутри оставшиеся секунды с округлением вверх. При готовой поставке вместо секунд восклицательный знак `Waiting`: коробка ждёт места. Читает `BoxDelivery` каждый кадр |
 | `TurboButtonView` | `Canvas/Hud/TurboButton` | иконка яркая, когда турбо действует или его можно включить (`CanStartTurbo`), иначе затемнена цветом `Locked Tint` (0,45 серого). Пока K ниже `TurboConfig.UnlockRank` = 3, поверх замок `Lock` с подписью «Ранг 3» (ключ `ui.common.rank`). В правом верхнем углу круглый таймер `Timer`, как у бесплатной поставки: пока турбо действует, жёлтый круг `Fill` убывает по `RemainingProgress`, во время отката белый растёт по `CooldownProgress`. Внутри оставшееся время «м:сс» с округлением вверх, шрифт сжимается под длинное время. У готового турбо таймера нет. Читает `TurboService` каждый кадр. Нажатие вызывает `StartTurbo()` |
 | `BestLineupButtonView` | `Canvas/Hud/BestLineupButton` | кнопка «Лучший состав» (ключ `ui.hud.best_lineup`), нажатие вызывает `TrackRoster.ApplyBestLineup()` (раздел 9) |
-| `WindowButtonView` | `SettingsButton`, `DecorButton`, `ShopButton`, `CatalogButton` в `Canvas/Hud` | нажатие открывает окно из поля `Window` через очередь |
+| `WindowButtonView` | `SettingsButton`, `DecorButton`, `ShopButton`, `CatalogButton`, `LeaderboardButton` в `Canvas/Hud` | нажатие открывает окно из поля `Window` через очередь |
+| `CatalogNewsBadgeView` | `Canvas/Hud/CatalogButton` | красный кружок «!» (`NewsBadge`) в углу кнопки каталога, пока есть новости: открыт новый ранг, которого игрок не видел в каталоге, или есть незабранная награда гифт-дорожки (задача владельца VEH-17). Включает и выключает `NewsBadge` по `CatalogNews.Changed` (ниже) |
+| `LeaderboardButtonView` | `Canvas/Hud/LeaderboardButton` | кнопка лидерборда справа вверху, под «Настройками». В `Start` прячет себя, если площадка не умеет грузить лидерборд (`ILeaderboardService.CanLoad` = false, например YouTube без лидерборда). Само окно открывает `WindowButtonView` на той же кнопке (задача владельца VEH-19) |
 
 **Раскладка HUD** (решения владельца 06.11.2026, ГДД 13). Сверху значок уровня игрока и полоска опыта (до 13.11.2026 — K и «K/20»), монеты и доход по центру, настройки справа. Нижний ряд — пять мест на высоте 130 от низа Canvas: «Турбо» (−432), «Окружение» (−216), зона переработки мира в центре, «Магазин» (216), «Каталог» (432). Кнопка коробки стоит одна над ними, по центру овала (420 от низа). «Лучший состав» стоит на правом краю трассы под табличкой старта, в точке (435; 240) от центра Canvas, и не закрывает правый слот второго ряда. Кнопки не меньше 144 px Canvas, это 48 логических единиц экрана 360 × 800. Safe area и вёрстку под узкие экраны добавит задача 2.9.
 
@@ -557,6 +570,7 @@ Assets/_Project/Scripts/Runtime/UI/
 | `SettingsWindow` | `SettingsWindow` | да | настройки звука: громкость музыки и эффектов, ниже |
 | `NewVehicleWindow` | `NewVehicle` | нет | окно новой машины при открытии нового ранга, ниже |
 | `LevelUpWindow` | `LevelUp` | нет | окно левелапа игрока с наградой, ниже |
+| `LeaderboardWindow` | `LeaderboardWindow` | да | лидерборд всего заработанных монет, ниже |
 | `Window` | `DecorWindow` | да | заглушка раздела, которого ещё нет: название раздела, «Раздел появится позже» (`popup.section.coming_soon`) и крестик. Его заменит задача 3.2 |
 
 **Магазин: `ShopWindow`** (08.11.2026, ГДД 1.11, по снимкам референса). Наследник `Window`, поля `Row Prefab` (префаб `Prefabs/UI/ShopRow`), `Rows Root` (`Scroll/Viewport/Content`), `Scroll`, `Failure Message` и `Failure Message Rise` = 110.
@@ -591,6 +605,18 @@ Assets/_Project/Scripts/Runtime/UI/
 - **Очередь.** Окно открывается через `WindowQueue`. Пока оно на экране, поле закрыто, поэтому второй ранг за это время не откроется. Если ранг откроется, пока окно ждёт в очереди, оно покажет последний ранг.
 - Лучи крутит DOTween в unscaled time, твин останавливается в `Hide()`.
 
+**Значок новостей каталога: `CatalogNews`** (`Features/Progression`, задача владельца VEH-17, 18.11.2026). Решает, показывать ли кружок «!» на кнопке каталога. Конструктор: `CatalogNews(RankProgress, CollectionMilestones, EconomyConfig)`.
+- `HasNews` истинно, если `HasUnseenVehicle` (открыт ранг выше `SeenRank`, то есть в каталоге есть машина, которую игрок ещё не видел) или есть незабранная награда гифт-дорожки (`CollectionMilestones.GetState` = `Claimable` на любом пороге).
+- `SeenRank` — старший ранг, который игрок видел открытым в каталоге. Новый объект начинает с `EconomyConfig.StartVehicleRank`: стартовые машины новостью не считаются.
+- `MarkSeen()` вызывает `CatalogWindow.Show()` при открытии: ставит `SeenRank` на текущий `MaxRank` и поднимает `Seen` (его слушает `SaveScheduler`) и `Changed`. После этого незабранная награда гифт-дорожки по-прежнему держит «!», пока её не заберут.
+- `Changed` поднимается на `RankUnlocked`, `MilestoneClaimed` и `MarkSeen`; по нему `CatalogNewsBadgeView` обновляет кружок.
+- `Restore(seenRank)` из сейва: `0` (сейв до VEH-17) трактуется как «всё виденное» — `SeenRank` ставится на текущий `MaxRank`, чтобы старый сейв не зажёг «!» на всех рангах; иначе берётся сохранённое значение, не выше `MaxRank`. Отрицательное — `ArgumentOutOfRangeException`.
+
+**Окно лидерборда: `LeaderboardWindow`** (задача владельца VEH-19, 18.11.2026). Наследник `Window`, полноэкранное окно (клон магазина: рамка, прокручиваемый список, крестик). Лидерборд строится по всего заработанным монетам каждого игрока (`Wallet.TotalEarned`).
+- **Счёт.** Отправляет `LeaderboardScoreSubmitter` (`Features/Leaderboards`, entry point `ITickable` сцены): раз в 30 секунд активного времени и при открытии окна шлёт `ILeaderboardService.SubmitScore(Wallet.TotalEarned)`, если счёт изменился с прошлой отправки. Лидерборд всегда растёт: трата монет его не снижает.
+- **Загрузка.** При `Show()` окно шлёт счёт и асинхронно грузит страницу `ILeaderboardService.LoadAsync`. Пока идёт загрузка — надпись «Загрузка…» (`popup.leaderboard.loading`), на пустом лидерборде — «Рейтинг пока пуст» (`popup.leaderboard.empty`). Готовые строки создаются из префаба `Prefabs/UI/LeaderboardRow` (`LeaderboardRowView`): место, имя игрока (пустое — «Игрок», `popup.leaderboard.anonymous`), счёт коротко (`FormatShort`), монета. Строка текущего игрока жёлтая, остальные синие. Закрытие окна отменяет незаконченную загрузку.
+- **Сервис.** `ILeaderboardService` (`Core/Leaderboards`), реализация `JTLLeaderboardService` (`Infrastructure/JTL`) над `JTLSDK.Leaderboards` (id `total_coins`, топ-10 и 3 вокруг игрока). `CanLoad` отражает готовность модуля площадки; по нему прячется кнопка лидерборда (выше). Модели `LeaderboardRow` и `LeaderboardTable` в `Core`, чтобы `Features` и `UI` не видели типы SDK. Лидерборд нужно объявить в окне JTL SDK, раздел Leaderboards, с тем же id.
+
 Гараж живой (раздел 12), турбо работает (раздел 11), магазин коробок и каталог с наградами открыты, настройки звука работают. Раздел окружения появится в задаче 3.2, остаток настроек — в задаче 3.6, покупка `workshop_style` в магазине — в задаче 4.2, кнопка «Бесплатно» за рекламу — в задаче 4.1. Шлейф машин и частицы турбо добавит задача 2.6, музыку турбо — 3.5, рекламное турбо — 4.1.
 
 ---
@@ -617,8 +643,10 @@ Assets/_Project/Scripts/Runtime/UI/
 | `ClaimedMilestoneRanks` | забранные пороги гифт-дорожки каталога по возрастанию (ГДД 1.12) |
 | `PlayerLevel`, `PlayerExperience` | уровень игрока и опыт на текущем уровне (задача VEH-3). 0 в `PlayerLevel` значит сейв, записанный до уровней |
 | `ClaimedRewardLevel` | последний уровень, награда за который забрана. Меньше `PlayerLevel` — есть незабранные награды |
+| `CatalogSeenRank` | старший ранг, который игрок видел в каталоге (`CatalogNews.SeenRank`, задача VEH-17). 0 значит сейв до VEH-17: тогда новости считаются виденными |
+| `TotalEarnedCoins` | всего заработано монет за игру (`Wallet.TotalEarned`, задача VEH-19). 0 в старом сейве поднимается до текущего баланса при восстановлении |
 
-Машина и коробка хранят `VehicleId`, а не ранг: ранг берётся из каталога. Поэтому числа `BoxSource` закреплены явно (`Free = 0`, `Purchased = 1`, `Tutorial = 2`, `Emergency = 3`), их нельзя переставлять. Сейв без полей турбо (записанный до задачи 2.4) читается: `JsonUtility` ставит им 0, и турбо готово. Так же читается сейв без `ClaimedMilestoneRanks` (до 09.11.2026): поле инициализировано пустым массивом, поэтому для старого сейва забранных порогов нет. Сейв без `PlayerLevel` (до 13.11.2026) тоже читается: `SaveLevelResolver` берёт для него наименьший уровень, при котором хватает полок для занятых слотов и мест трассы для бегунов, опыт 0, все награды считаются забранными. Поэтому `SchemaVersion` осталась 1. Поля обучения, наград, офлайна, кубков и `lastActiveUtc` добавят задачи 2.3, 2.5 и 3.4.
+Машина и коробка хранят `VehicleId`, а не ранг: ранг берётся из каталога. Поэтому числа `BoxSource` закреплены явно (`Free = 0`, `Purchased = 1`, `Tutorial = 2`, `Emergency = 3`), их нельзя переставлять. Сейв без полей турбо (записанный до задачи 2.4) читается: `JsonUtility` ставит им 0, и турбо готово. Так же читается сейв без `ClaimedMilestoneRanks` (до 09.11.2026): поле инициализировано пустым массивом, поэтому для старого сейва забранных порогов нет. Сейв без `PlayerLevel` (до 13.11.2026) тоже читается: `SaveLevelResolver` берёт для него наименьший уровень, при котором хватает полок для занятых слотов и мест трассы для бегунов, опыт 0, все награды считаются забранными. Так же читается сейв без `CatalogSeenRank` и `TotalEarnedCoins` (до 18.11.2026): 0 в них `JsonUtility` ставит сам, `CatalogNews` трактует 0 как «всё виденное», а `Wallet` поднимает «всего заработано» до текущего баланса. Поэтому `SchemaVersion` осталась 1. Поля обучения, наград, офлайна, кубков и `lastActiveUtc` добавят задачи 2.3, 2.5 и 3.4.
 
 **Классы.**
 
@@ -642,16 +670,17 @@ Assets/_Project/Scripts/Runtime/UI/
 - машина с неизвестным id или рангом, который не открыт; коробка с неизвестным id, рангом выше K или неизвестным источником;
 - `InstanceId` вне [1; `NextInstanceId`) или повтор среди машин и коробок;
 - уровень игрока отрицательный, опыт отрицательный, забранный уровень вне 1..уровень (для сейва с уровнем);
+- `TotalEarnedCoins` отрицательный, `CatalogSeenRank` вне 0..MaxRank каталога;
 - слот вне открытых для уровня игрока или два предмета в одном слоте;
 - бегунов больше мест трассы для уровня игрока, бегун ссылается не на машину, повтор бегуна, путь отрицательный, NaN или бесконечный;
 - забранный порог `ClaimedMilestoneRanks` вне диапазона 1..MaxRank каталога или повтор.
 
 Путь длиннее круга, таймер длиннее интервала и таймеры турбо длиннее конфига проверку проходят: восстановление их заворачивает и урезает, так сейв переживает правку конфига.
 
-**Восстановление** идёт по порядку: счётчик id, ранги, уровень игрока (открывает слоты), машины, коробки, бегуны (машины уже в слотах), кошелёк, `n_b`, поставка, турбо, забранные пороги каталога. Событий команд и прогрессии нет. Поднимается только `GarageBoard.SlotsUnlocked` из открытия слотов, но на него ещё никто не подписан: виды подписываются позже, в `Start`, и показывают уже загруженное состояние.
+**Восстановление** идёт по порядку: счётчик id, ранги, уровень игрока (открывает слоты), машины, коробки, бегуны (машины уже в слотах), кошелёк (баланс и «всего заработано»), `n_b`, поставка, турбо, забранные пороги каталога, виденный ранг каталога. Событий команд и прогрессии нет. Поднимается только `GarageBoard.SlotsUnlocked` из открытия слотов, но на него ещё никто не подписан: виды подписываются позже, в `Start`, и показывают уже загруженное состояние.
 
 **Когда пишем** (`SaveScheduler`, тех.план, раздел 4.5):
-- после команды, которая меняет гараж или трассу, — `WriteState(important: true)`. Команды одного кадра дают одну запись в `LateTick`. Слушаются `VehiclePlaced`, `BoxPlaced`, `BoxOpened`, `VehicleMoved`, `VehicleMerged`, `VehicleRecycled`, `BoxRecycled`, `VehicleSent`, `VehicleReturned`, `TurboStarted`, `MilestoneClaimed` и `RewardClaimed` (награда за уровень). Опыт и рост уровня приходят со слиянием и пишутся его записью. Покупка коробки пишется через `BoxPlaced`, бесплатная поставка — так же. Конец эффекта турбо и ход отката попадают в неважную запись;
+- после команды, которая меняет гараж или трассу, — `WriteState(important: true)`. Команды одного кадра дают одну запись в `LateTick`. Слушаются `VehiclePlaced`, `BoxPlaced`, `BoxOpened`, `VehicleMoved`, `VehicleMerged`, `VehicleRecycled`, `BoxRecycled`, `VehicleSent`, `VehicleReturned`, `TurboStarted`, `MilestoneClaimed`, `RewardClaimed` (награда за уровень) и `CatalogNews.Seen` (игрок открыл каталог, виденный ранг сдвинулся). Опыт и рост уровня приходят со слиянием и пишутся его записью. Покупка коробки пишется через `BoxPlaced`, бесплатная поставка — так же. Конец эффекта турбо и ход отката попадают в неважную запись;
 - без команд раз в секунду активного времени (`ITimeService.DeltaTime`) — `WriteState(important: false)`. Так монеты, путь машин и таймер в памяти SDK отстают не больше чем на секунду. Неважная запись не отправляет документ: SDK отправит его с ближайшей важной записью, при скрытии страницы и при выходе;
 - до `StartWriting()` и после `Dispose()` записи нет.
 

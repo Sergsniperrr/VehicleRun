@@ -19,6 +19,11 @@ namespace _Project.Tests.EditMode.Track
         private const float HalfLap = 0.5f;
         private const float LongStepLaps = 3.5f;
         private const int LongStepCrossings = 3;
+        private const float SlightlyMoreThanLap = 1.01f;
+        private const int FullTrackBonusPercent = 10;
+        private const int BonusRank = 4;
+        private const long BonusRankPayout = 40;
+        private const long TwoBonusPayoutsCoins = 81;
 
         private GameConfigFixture _fixture;
         private InstanceIdGenerator _instanceIds;
@@ -254,6 +259,50 @@ namespace _Project.Tests.EditMode.Track
             Assert.That(_roster.CanSendToTrack(0), Is.False);
             Assert.That(_roster.CanSendToTrack(_roster.Capacity), Is.False);
             Assert.That(_roster.Count, Is.EqualTo(_roster.Capacity));
+        }
+
+        [Test]
+        public void FullTrackPaysBonus()
+        {
+            SetFullTrackBonus();
+            Vehicle vehicle = PlaceVehicle(0, BonusRank);
+            PlaceVehicle(1, BonusRank);
+            _roster.SendToTrack(0);
+            _roster.SendToTrack(1);
+            List<long> payouts = new List<long>();
+            _roster.FinishCrossed += (runner, payout) => payouts.Add(payout);
+
+            _roster.Advance(CalculateLapTime(vehicle) * SlightlyMoreThanLap);
+
+            Assert.That(_roster.IsFull, Is.True);
+            Assert.That(payouts, Is.EqualTo(new[] { BonusRankPayout, BonusRankPayout }));
+            Assert.That(_wallet.Coins, Is.EqualTo(_startCoins + TwoBonusPayoutsCoins));
+        }
+
+        [Test]
+        public void PartlyFilledTrackPaysNoBonus()
+        {
+            SetFullTrackBonus();
+            Vehicle vehicle = PlaceVehicle(0, BonusRank);
+            _roster.SendToTrack(0);
+
+            _roster.Advance(CalculateLapTime(vehicle) * SlightlyMoreThanLap);
+
+            Assert.That(_roster.IsFull, Is.False);
+            Assert.That(_wallet.Coins, Is.EqualTo(_startCoins + vehicle.Definition.CoinsPerLap));
+            Assert.That(_wallet.Remainder, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void EmptyTrackIsNotFull()
+        {
+            Assert.That(_roster.IsFull, Is.False);
+            Assert.That(_roster.PayoutMultiplier, Is.EqualTo(1));
+        }
+
+        private void SetFullTrackBonus()
+        {
+            _fixture.Change(_fixture.Track, "_fullTrackBonusPercent", property => property.intValue = FullTrackBonusPercent);
         }
 
         private Vehicle PlaceVehicle(int slot, int rank)

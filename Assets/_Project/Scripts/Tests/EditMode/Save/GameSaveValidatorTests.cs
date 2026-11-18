@@ -215,6 +215,19 @@ namespace _Project.Tests.EditMode.Save
         }
 
         [Test]
+        public void BrokenCatalogSeenRankIsInvalid()
+        {
+            AssertInvalid(save => save.CatalogSeenRank = -1);
+            AssertInvalid(save => save.CatalogSeenRank = _fixture.Vehicles.MaxRank + 1);
+        }
+
+        [Test]
+        public void NegativeTotalEarnedCoinsAreInvalid()
+        {
+            AssertInvalid(save => save.TotalEarnedCoins = -1);
+        }
+
+        [Test]
         public void LevelWithTooFewSlotsIsInvalid()
         {
             AssertInvalid(save =>

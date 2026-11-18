@@ -130,6 +130,11 @@ namespace _Project.Features.Save
                 return false;
             }
 
+            if (save.TotalEarnedCoins < 0 || save.CatalogSeenRank < 0 || save.CatalogSeenRank > _catalog.MaxRank)
+            {
+                return false;
+            }
+
             if (IsNonNegativeNumber(save.FreeBoxRemainingSeconds) == false)
             {
                 return false;
