@@ -24,7 +24,7 @@ namespace _Project.Features.Garage
         [SerializeField] private GameObject _trackHighlight;
         [SerializeField] private float _laneHalfWidth = 1f;
         [SerializeField] private Collider2D _recycleZone;
-        [SerializeField] private GameObject _recycleHighlight;
+        [SerializeField] private RecycleGearsView _recycleGears;
 
         private GarageBoard _garage;
         private GarageGestures _gestures;
@@ -196,13 +196,18 @@ namespace _Project.Features.Garage
         private void ShowTargets(int slot)
         {
             _trackHighlight.SetActive(_gestures.CanDropOnTrack(slot));
-            _recycleHighlight.SetActive(_gestures.CanRecycle(slot));
         }
 
         private void HideTargets()
         {
             _trackHighlight.SetActive(false);
-            _recycleHighlight.SetActive(false);
+            _recycleGears.SetSpinning(false);
+        }
+
+        private void UpdateRecycleGears(int slot, Vector3 point)
+        {
+            bool isOverZone = _gestures.CanRecycle(slot) && _recycleZone.OverlapPoint(point);
+            _recycleGears.SetSpinning(isOverZone);
         }
 
         private bool TryFindSlot(Vector2 point, out int slot)
@@ -268,7 +273,9 @@ namespace _Project.Features.Garage
                 return;
             }
 
-            _garageView.GetSlot(slot).MoveContent(ToWorld(eventData.position) + _grabOffset);
+            Vector3 point = ToWorld(eventData.position);
+            _garageView.GetSlot(slot).MoveContent(point + _grabOffset);
+            UpdateRecycleGears(slot, point);
         }
 
         private void OnSlotDragEnded(int slot, PointerEventData eventData)
