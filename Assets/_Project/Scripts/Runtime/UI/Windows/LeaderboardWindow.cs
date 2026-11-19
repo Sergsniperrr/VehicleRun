@@ -32,6 +32,12 @@ namespace _Project.UI.Windows
         private IObjectResolver _resolver;
         private CancellationTokenSource _loading;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            CollectDesignRows();
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -122,6 +128,18 @@ namespace _Project.UI.Windows
             {
                 LeaderboardRowView row = _resolver.Instantiate(_rowPrefab, _rowsRoot);
                 _rows.Add(row);
+            }
+        }
+
+        private void CollectDesignRows()
+        {
+            foreach (Transform child in _rowsRoot)
+            {
+                if (child.TryGetComponent(out LeaderboardRowView row))
+                {
+                    _rows.Add(row);
+                    row.Hide();
+                }
             }
         }
 

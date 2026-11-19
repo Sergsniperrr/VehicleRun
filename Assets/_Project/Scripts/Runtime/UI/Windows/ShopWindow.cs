@@ -214,25 +214,25 @@ namespace _Project.UI.Windows
                 return;
             }
 
-            RewardOffer offer = _rewards.SelectOffer(OpenedRanks());
+            RewardOffer offer = _rewards.SelectOffer(SellableRanks());
             _freeOfferRank = offer.FreeRank;
             _discountOfferRank = offer.DiscountRank;
             ShowRewardButtons();
         }
 
-        private List<int> OpenedRanks()
+        private List<int> SellableRanks()
         {
-            List<int> opened = new List<int>();
+            List<int> sellable = new List<int>();
 
             for (int rank = FirstRank; rank <= _catalog.MaxRank; rank++)
             {
-                if (_progress.IsRankUnlocked(rank))
+                if (_delivery.IsRankForSale(rank))
                 {
-                    opened.Add(rank);
+                    sellable.Add(rank);
                 }
             }
 
-            return opened;
+            return sellable;
         }
 
         private void ShowRewardButtons()
