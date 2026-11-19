@@ -30,6 +30,8 @@ namespace _Project.Tests.EditMode.Sounds
         private AudioAsset _boxOpen;
         private AudioAsset _startMoving;
         private AudioAsset _boost;
+        private AudioAsset _buy;
+        private AudioAsset _nitro;
         private GameplaySounds _sounds;
 
         [SetUp]
@@ -44,6 +46,8 @@ namespace _Project.Tests.EditMode.Sounds
             _boxOpen = ScriptableObject.CreateInstance<AudioAsset>();
             _startMoving = ScriptableObject.CreateInstance<AudioAsset>();
             _boost = ScriptableObject.CreateInstance<AudioAsset>();
+            _buy = ScriptableObject.CreateInstance<AudioAsset>();
+            _nitro = ScriptableObject.CreateInstance<AudioAsset>();
             _config = ScriptableObject.CreateInstance<GameSoundsConfig>();
 
             SerializedObject serializedConfig = new SerializedObject(_config);
@@ -52,6 +56,8 @@ namespace _Project.Tests.EditMode.Sounds
             serializedConfig.FindProperty("_boxOpen").objectReferenceValue = _boxOpen;
             serializedConfig.FindProperty("_startMoving").objectReferenceValue = _startMoving;
             serializedConfig.FindProperty("_boost").objectReferenceValue = _boost;
+            serializedConfig.FindProperty("_buy").objectReferenceValue = _buy;
+            serializedConfig.FindProperty("_nitro").objectReferenceValue = _nitro;
             serializedConfig.FindProperty("_startMovingFirstRankPitch").floatValue = FirstRankPitch;
             serializedConfig.FindProperty("_startMovingLastRankPitch").floatValue = LastRankPitch;
             serializedConfig.FindProperty("_moneyMinIntervalSeconds").floatValue = MoneyMinIntervalSeconds;
@@ -82,6 +88,8 @@ namespace _Project.Tests.EditMode.Sounds
             Object.DestroyImmediate(_boxOpen);
             Object.DestroyImmediate(_startMoving);
             Object.DestroyImmediate(_boost);
+            Object.DestroyImmediate(_buy);
+            Object.DestroyImmediate(_nitro);
         }
 
         [Test]
@@ -223,13 +231,31 @@ namespace _Project.Tests.EditMode.Sounds
         }
 
         [Test]
-        public void TapBoostPlaysBoostSound()
+        public void TapBoostPlaysNitroSound()
         {
             SendVehicleToTrack();
 
             _game.Turbo.BoostRunner(_game.Roster.Runners[0]);
 
-            Assert.That(_audio.Played, Is.EqualTo(new[] { _boost }));
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _nitro }));
+        }
+
+        [Test]
+        public void PurchasedBoxPlaysBuySound()
+        {
+            _game.Wallet.Add(1000);
+
+            _game.Delivery.BuyBox();
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _buy }));
+        }
+
+        [Test]
+        public void FreeBoxDoesNotPlayBuySound()
+        {
+            _game.Delivery.GrantRewardBox(1);
+
+            Assert.That(_audio.Played, Is.Empty);
         }
 
         [Test]

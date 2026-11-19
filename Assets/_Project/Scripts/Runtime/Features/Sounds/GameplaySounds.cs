@@ -2,6 +2,7 @@ using System;
 using _Project.Core.Audio;
 using _Project.Core.Time;
 using _Project.Core.Vehicles;
+using _Project.Features.Boxes;
 using _Project.Features.Garage;
 using _Project.Features.Progression;
 using _Project.Features.Track;
@@ -52,6 +53,7 @@ namespace _Project.Features.Sounds
         {
             _garage.VehicleMerged += OnVehicleMerged;
             _garage.BoxOpened += OnBoxOpened;
+            _garage.BoxPlaced += OnBoxPlaced;
             _roster.FinishCrossed += OnFinishCrossed;
             _roster.VehicleSent += OnVehicleSent;
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
@@ -64,6 +66,7 @@ namespace _Project.Features.Sounds
         {
             _garage.VehicleMerged -= OnVehicleMerged;
             _garage.BoxOpened -= OnBoxOpened;
+            _garage.BoxPlaced -= OnBoxPlaced;
             _roster.FinishCrossed -= OnFinishCrossed;
             _roster.VehicleSent -= OnVehicleSent;
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
@@ -111,6 +114,14 @@ namespace _Project.Features.Sounds
             _audio.PlayOneShot(_sounds.BoxOpen);
         }
 
+        private void OnBoxPlaced(int slot, Box box)
+        {
+            if (box.Source == BoxSource.Purchased)
+            {
+                _audio.PlayOneShot(_sounds.Buy);
+            }
+        }
+
         private void OnFinishCrossed(TrackRunner runner, long payout)
         {
             PlayMoney();
@@ -134,7 +145,7 @@ namespace _Project.Features.Sounds
 
         private void OnRunnerBoosted(TrackRunner runner)
         {
-            _audio.PlayOneShot(_sounds.Boost);
+            _audio.PlayOneShot(_sounds.Nitro);
         }
 
         private void OnRewardClaimed(int level, long coins)

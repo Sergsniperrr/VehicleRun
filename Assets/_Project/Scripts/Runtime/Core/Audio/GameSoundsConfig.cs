@@ -14,6 +14,8 @@ namespace _Project.Core.Audio
         [SerializeField] private AudioAsset _boxShake;
         [SerializeField] private AudioAsset _startMoving;
         [SerializeField] private AudioAsset _boost;
+        [SerializeField] private AudioAsset _buy;
+        [SerializeField] private AudioAsset _nitro;
         [SerializeField] [Min(0.1f)] private float _startMovingFirstRankPitch = 1.3f;
         [SerializeField] [Min(0.1f)] private float _startMovingLastRankPitch = 0.7f;
         [SerializeField] [Min(0f)] private float _moneyMinIntervalSeconds = 0.5f;
@@ -27,6 +29,8 @@ namespace _Project.Core.Audio
         public AudioAsset BoxShake => _boxShake;
         public AudioAsset StartMoving => _startMoving;
         public AudioAsset Boost => _boost;
+        public AudioAsset Buy => _buy;
+        public AudioAsset Nitro => _nitro;
         public float StartMovingFirstRankPitch => _startMovingFirstRankPitch;
         public float StartMovingLastRankPitch => _startMovingLastRankPitch;
         public float MoneyMinIntervalSeconds => _moneyMinIntervalSeconds;
