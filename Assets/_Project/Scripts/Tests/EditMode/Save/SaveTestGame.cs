@@ -5,6 +5,7 @@ using _Project.Features.Garage;
 using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Save;
+using _Project.Features.Shop;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
 using _Project.Features.Vehicles;
@@ -31,6 +32,7 @@ namespace _Project.Tests.EditMode.Save
             Delivery = new BoxDelivery(fixture.Economy, fixture.Vehicles, Garage, Progress, Wallet, Pricing, InstanceIds, Random);
             Roster = new TrackRoster(Garage, Level, fixture.Track, Wallet);
             Turbo = new TurboService(fixture.Turbo, Progress, Roster);
+            ShopRewards = new ShopRewards(fixture.Economy, Wallet, Delivery, Random);
             Milestones = new CollectionMilestones(Progress, Wallet, fixture.Economy);
             News = new CatalogNews(Progress, Milestones, fixture.Economy);
             Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level, News);
@@ -61,6 +63,7 @@ namespace _Project.Tests.EditMode.Save
         public BoxDelivery Delivery { get; }
         public TrackRoster Roster { get; }
         public TurboService Turbo { get; }
+        public ShopRewards ShopRewards { get; }
         public CollectionMilestones Milestones { get; }
         public CatalogNews News { get; }
         public GameSaveFactory Factory { get; }

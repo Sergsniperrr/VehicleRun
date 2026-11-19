@@ -30,6 +30,8 @@ namespace _Project.Core.Economy
         [SerializeField] private bool _isBoxPriceGrowthLimited;
         [SerializeField] private int _boxPriceGrowthPurchaseLimit;
         [SerializeField] private float _freeBoxIntervalSeconds;
+        [SerializeField] private float _rewardAdCooldownSeconds = 180f;
+        [SerializeField] private int _rewardAdDiscountPercent = 20;
         [SerializeField] private float _offlineMinAwaySeconds;
         [SerializeField] private float _offlineMaxAwaySeconds;
         [SerializeField] private double _offlineIncomeRate;
@@ -48,6 +50,8 @@ namespace _Project.Core.Economy
         public bool IsBoxPriceGrowthLimited => _isBoxPriceGrowthLimited;
         public int BoxPriceGrowthPurchaseLimit => _boxPriceGrowthPurchaseLimit;
         public float FreeBoxIntervalSeconds => _freeBoxIntervalSeconds;
+        public float RewardAdCooldownSeconds => _rewardAdCooldownSeconds;
+        public int RewardAdDiscountPercent => _rewardAdDiscountPercent;
         public float OfflineMinAwaySeconds => _offlineMinAwaySeconds;
         public float OfflineMaxAwaySeconds => _offlineMaxAwaySeconds;
         public double OfflineIncomeRate => _offlineIncomeRate;

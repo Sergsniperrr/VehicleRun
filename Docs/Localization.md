@@ -79,7 +79,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 
 Оба текстовых поля многострочные, так что длинные описания и текст в несколько абзацев вставляются нормально.
 
-Сейчас в ассете 56 записей:
+Сейчас в ассете 58 записей:
 - имена 20 машин с ключами `vehicle.<id>.name` (см. [Configs.md](Configs.md));
 - тексты окна переработки:
   - `popup.recycle.title` — «Переработка»;
@@ -99,9 +99,11 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
   - `ui.number.decimal_separator` — «,» / «.»;
   - `ui.number.thousand`, `ui.number.million`, `ui.number.billion`, `ui.number.trillion` — «{0}K», «{0}M», «{0}B», «{0}T» в обоих языках (задача владельца VEH-22, 17.11.2026; до неё по-русски было «тыс.», «млн», «млрд», ключа триллионов не было). `{0}` — число с одним знаком после запятой или целое, пробела перед буквой нет;
 - карточка машины: `popup.vehicle.income` — «Доход: {0} в секунду» / «Income: {0} per second»;
-- условие на закрытой карточке каталога: `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles», где `{0}` — ранг машин для слияния (на единицу меньше ранга карточки);
+- подпись на закрытой карточке каталога (задача VEH-32): `popup.catalog.locked` — «Закрыто» / «Closed». Стоит снизу карточки; с 19.11.2026 заменила условие слияния;
+- `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles». С 19.11.2026 в коде не используется (закрытая карточка показывает «Закрыто»), ключ оставлен в ассете;
+- подпись бесплатной рекламной кнопки в магазине (задача VEH-30): `shop.reward.free` — «беспл.» / «free». Кнопка «−20%» подписывается числом из конфига, своего ключа у неё нет;
 - сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;
-- заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Каталог», «Окружение», «Магазин», «Настройки»;
+- заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Достижения» / «Achievements» (задача VEH-21, до 19.11.2026 — «Каталог» / «Catalog»), «Окружение», «Магазин», «Настройки»;
 - окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects»;
 - окно левелапа игрока ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!», кнопка — `ui.common.claim`;
 - окно новой машины: `popup.newvehicle.title` — «Новая машина!» / «New vehicle!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`;

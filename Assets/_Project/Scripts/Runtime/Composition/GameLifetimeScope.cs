@@ -11,6 +11,7 @@ using _Project.Features.Progression;
 using _Project.Features.Save;
 using _Project.Features.Session;
 using _Project.Features.Settings;
+using _Project.Features.Shop;
 using _Project.Features.Sounds;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
@@ -89,6 +90,7 @@ namespace _Project.Composition
             builder.Register<CatalogNews>(Lifetime.Singleton);
             builder.Register<BoxPricing>(Lifetime.Singleton);
             builder.Register<BoxDelivery>(Lifetime.Singleton);
+            builder.Register<ShopRewards>(Lifetime.Singleton);
             builder.Register<TrackPath>(Lifetime.Singleton);
             builder.Register<TrackRoster>(Lifetime.Singleton);
             builder.Register<TurboService>(Lifetime.Singleton);

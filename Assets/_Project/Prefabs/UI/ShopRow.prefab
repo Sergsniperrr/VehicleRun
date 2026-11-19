@@ -360,7 +360,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6632310713589618038
 RectTransform:
   m_ObjectHideFlags: 0
@@ -766,6 +766,9 @@ MonoBehaviour:
   _price: {fileID: 8935773316045116694}
   _lock: {fileID: 8220801245839261510}
   _lockRankValue: {fileID: 6960120395131864925}
+  _rewardAd: {fileID: 2358060405281844055}
+  _rewardButton: {fileID: 3193918647544151035}
+  _rewardLabel: {fileID: 1807801477048185482}
 --- !u!1 &3635667162886134547
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,7 +856,7 @@ GameObject:
   - component: {fileID: 2711582465750567439}
   - component: {fileID: 1807801477048185482}
   m_Layer: 0
-  m_Name: Value
+  m_Name: Discount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

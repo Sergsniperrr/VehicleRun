@@ -34,7 +34,7 @@ namespace _Project.Tests.EditMode.Turbo
             _fixture = new GameConfigFixture();
             _game = new SaveTestGame(_fixture);
             _time = new FakeTimeService();
-            _ticker = new EconomyTicker(_time, _game.Roster, _game.Turbo, _game.Delivery);
+            _ticker = new EconomyTicker(_time, _game.Roster, _game.Turbo, _game.Delivery, _game.ShopRewards);
             _startedCount = 0;
             _endedCount = 0;
             _game.Turbo.TurboStarted += OnTurboStarted;

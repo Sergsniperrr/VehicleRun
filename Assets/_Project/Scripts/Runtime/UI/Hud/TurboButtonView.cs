@@ -1,4 +1,5 @@
 using System;
+using _Project.Core.Advertising;
 using _Project.Core.Localization;
 using _Project.Core.Turbo;
 using _Project.Features.Commands;
@@ -15,6 +16,7 @@ namespace _Project.UI.Hud
     {
         private const string UnlockRankKey = "ui.common.rank";
         private const string TrackEmptyKey = "ui.hud.turbo_track_empty";
+        private const string RewardId = "turbo";
         private const int SecondsPerMinute = 60;
         private const int NoShownSeconds = -1;
 
@@ -34,6 +36,7 @@ namespace _Project.UI.Hud
         private TurboService _turbo;
         private TurboConfig _config;
         private ILocalizationService _localization;
+        private IAdvertisingService _advertising;
         private int _shownSeconds = NoShownSeconds;
 
         private void Awake()
@@ -59,11 +62,16 @@ namespace _Project.UI.Hud
         }
 
         [Inject]
-        public void Construct(TurboService turbo, TurboConfig config, ILocalizationService localization)
+        public void Construct(
+            TurboService turbo,
+            TurboConfig config,
+            ILocalizationService localization,
+            IAdvertisingService advertising)
         {
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _advertising = advertising ?? throw new ArgumentNullException(nameof(advertising));
         }
 
         private void ShowState()
@@ -112,12 +120,26 @@ namespace _Project.UI.Hud
 
         private void OnButtonClicked()
         {
-            CommandResult result = _turbo.StartTurbo();
+            FailureReason reason = _turbo.CheckStart();
 
-            if (result.FailureReason == FailureReason.TrackEmpty)
+            if (reason == FailureReason.TrackEmpty)
             {
                 _failureMessage.Show(_localization.Get(TrackEmptyKey), _failureMessagePosition);
+
+                return;
             }
+
+            if (reason != FailureReason.None)
+            {
+                return;
+            }
+
+            _advertising.ShowRewarded(RewardId, OnTurboRewarded, null);
+        }
+
+        private void OnTurboRewarded()
+        {
+            _turbo.StartTurbo();
         }
     }
 }

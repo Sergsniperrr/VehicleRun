@@ -150,8 +150,8 @@ MonoBehaviour:
       \u043F\u043E\u0437\u0436\u0435"
     _english: Coming soon
   - _key: popup.catalog.title
-    _russian: "\u041A\u0430\u0442\u0430\u043B\u043E\u0433"
-    _english: Catalog
+    _russian: "\u0414\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F"
+    _english: Achievements
   - _key: popup.decor.title
     _russian: "\u041E\u043A\u0440\u0443\u0436\u0435\u043D\u0438\u0435"
     _english: Decor
@@ -197,3 +197,9 @@ MonoBehaviour:
   - _key: popup.leaderboard.anonymous
     _russian: "\u0418\u0433\u0440\u043E\u043A"
     _english: Player
+  - _key: popup.catalog.locked
+    _russian: "\u0417\u0430\u043A\u0440\u044B\u0442\u043E"
+    _english: Closed
+  - _key: shop.reward.free
+    _russian: "\u0431\u0435\u0441\u043F\u043B."
+    _english: free

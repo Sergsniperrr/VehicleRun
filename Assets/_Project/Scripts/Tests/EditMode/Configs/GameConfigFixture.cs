@@ -37,6 +37,8 @@ namespace _Project.Tests.EditMode.Configs
         private const bool IsBoxPriceGrowthLimited = false;
         private const int BoxPriceGrowthPurchaseLimit = 20;
         private const float FreeBoxIntervalSeconds = 20f;
+        private const float RewardAdCooldownSeconds = 180f;
+        private const int RewardAdDiscountPercent = 20;
         private const float OfflineMinAwaySeconds = 60f;
         private const float OfflineMaxAwaySeconds = 14400f;
         private const double OfflineIncomeRate = 0.5;
@@ -191,6 +193,8 @@ namespace _Project.Tests.EditMode.Configs
             economy.FindProperty("_isBoxPriceGrowthLimited").boolValue = IsBoxPriceGrowthLimited;
             economy.FindProperty("_boxPriceGrowthPurchaseLimit").intValue = BoxPriceGrowthPurchaseLimit;
             economy.FindProperty("_freeBoxIntervalSeconds").floatValue = FreeBoxIntervalSeconds;
+            economy.FindProperty("_rewardAdCooldownSeconds").floatValue = RewardAdCooldownSeconds;
+            economy.FindProperty("_rewardAdDiscountPercent").intValue = RewardAdDiscountPercent;
             economy.FindProperty("_offlineMinAwaySeconds").floatValue = OfflineMinAwaySeconds;
             economy.FindProperty("_offlineMaxAwaySeconds").floatValue = OfflineMaxAwaySeconds;
             economy.FindProperty("_offlineIncomeRate").doubleValue = OfflineIncomeRate;

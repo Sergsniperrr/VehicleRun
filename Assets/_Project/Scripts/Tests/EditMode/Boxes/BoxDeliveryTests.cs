@@ -347,6 +347,87 @@ namespace _Project.Tests.EditMode.Boxes
             Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.Advance(-1f));
         }
 
+        [Test]
+        public void GrantRewardBoxPlacesFreeBoxWithoutSpendingOrRaisingPrice()
+        {
+            long startCoins = _wallet.Coins;
+
+            CommandResult result = _delivery.GrantRewardBox(2);
+
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(_wallet.Coins, Is.EqualTo(startCoins));
+            Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
+            Assert.That(box.Rank, Is.EqualTo(2));
+            Assert.That(box.Source, Is.EqualTo(BoxSource.Free));
+            Assert.That(_pricing.GetPurchaseCount(2), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GrantRewardBoxInFullGarageIsRejected()
+        {
+            FillGarage(1);
+
+            CommandResult result = _delivery.GrantRewardBox(2);
+
+            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NoFreeSlot));
+        }
+
+        [Test]
+        public void DiscountedPriceIsFullPriceMinusPercent()
+        {
+            Assert.That(_delivery.GetDiscountedPrice(1, 20), Is.EqualTo(64));
+            Assert.That(_delivery.GetDiscountedPrice(3, 20), Is.EqualTo(4560));
+        }
+
+        [Test]
+        public void BuyDiscountedBoxSpendsDiscountedPriceAndRaisesPrice()
+        {
+            _wallet.Add(10000);
+            long coins = _wallet.Coins;
+
+            CommandResult result = _delivery.BuyDiscountedBox(3, 20);
+
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(_wallet.Coins, Is.EqualTo(coins - 4560));
+            Assert.That(_garage.TryGetBox(0, out Box box), Is.True);
+            Assert.That(box.Rank, Is.EqualTo(3));
+            Assert.That(box.Source, Is.EqualTo(BoxSource.Purchased));
+            Assert.That(_pricing.GetPurchaseCount(3), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void BuyDiscountedBoxWithoutEnoughCoinsIsRejectedWithoutChanges()
+        {
+            _wallet.TrySpend(_wallet.Coins);
+
+            CommandResult result = _delivery.BuyDiscountedBox(3, 20);
+
+            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NotEnoughCoins));
+            Assert.That(CountBoxes(), Is.EqualTo(0));
+            Assert.That(_pricing.GetPurchaseCount(3), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void HasFreeSlotIsFalseWhenGarageIsFull()
+        {
+            Assert.That(_delivery.HasFreeSlot(), Is.True);
+
+            FillGarage(1);
+
+            Assert.That(_delivery.HasFreeSlot(), Is.False);
+        }
+
+        [Test]
+        public void RewardBoxMethodsRejectRankOutsideCatalog()
+        {
+            int outsideRank = _fixture.Vehicles.MaxRank + 1;
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.GrantRewardBox(0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.GrantRewardBox(outsideRank));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.BuyDiscountedBox(outsideRank, 20));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _delivery.GetDiscountedPrice(0, 20));
+        }
+
         private void PlaceVehicle(int slot, int rank)
         {
             Vehicle vehicle = new Vehicle(_instanceIds.Create(), _fixture.Vehicles.GetByRank(rank));

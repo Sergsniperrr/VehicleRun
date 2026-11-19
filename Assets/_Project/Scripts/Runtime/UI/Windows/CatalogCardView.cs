@@ -23,11 +23,11 @@ namespace _Project.UI.Windows
             _income.text = income;
         }
 
-        public void ShowSilhouette(VehicleDefinition definition, string condition)
+        public void ShowSilhouette(VehicleDefinition definition, string lockedText)
         {
             ApplyRank(definition);
             _icon.color = Color.black;
-            _caption.text = condition;
+            _caption.text = lockedText;
             _income.gameObject.SetActive(false);
         }
 

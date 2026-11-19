@@ -13,6 +13,7 @@ namespace _Project.Features.Boxes
     public class BoxDelivery
     {
         private const int FirstRank = 1;
+        private const double RoundingTolerance = 1e-9;
 
         private readonly EconomyConfig _economy;
         private readonly VehicleCatalogConfig _catalog;
@@ -85,6 +86,11 @@ namespace _Project.Features.Boxes
             return Math.Max(0, _pricing.GetPrice(rank) - _wallet.Coins);
         }
 
+        public bool HasFreeSlot()
+        {
+            return _garage.TryFindFreeSlot(out int _);
+        }
+
         public bool IsRankForSale(int rank)
         {
             if (rank < FirstRank || rank > _catalog.MaxRank)
@@ -128,6 +134,56 @@ namespace _Project.Features.Boxes
             return new CommandResult(FailureReason.None);
         }
 
+        public long GetDiscountedPrice(int rank, int discountPercent)
+        {
+            CheckRank(rank);
+
+            double full = _pricing.GetPrice(rank);
+            double discounted = full * (100 - discountPercent) / 100.0;
+            double price = Math.Ceiling(discounted - discounted * RoundingTolerance);
+
+            if (price >= long.MaxValue)
+            {
+                return long.MaxValue;
+            }
+
+            return (long)price;
+        }
+
+        public CommandResult GrantRewardBox(int rank)
+        {
+            CheckRank(rank);
+
+            if (_garage.TryFindFreeSlot(out int slot) == false)
+            {
+                return new CommandResult(FailureReason.NoFreeSlot);
+            }
+
+            PlaceBox(slot, BoxSource.Free, rank);
+
+            return new CommandResult(FailureReason.None);
+        }
+
+        public CommandResult BuyDiscountedBox(int rank, int discountPercent)
+        {
+            CheckRank(rank);
+
+            if (_garage.TryFindFreeSlot(out int slot) == false)
+            {
+                return new CommandResult(FailureReason.NoFreeSlot);
+            }
+
+            if (_wallet.TrySpend(GetDiscountedPrice(rank, discountPercent)) == false)
+            {
+                return new CommandResult(FailureReason.NotEnoughCoins);
+            }
+
+            _pricing.RecordPurchase(rank);
+            PlaceBox(slot, BoxSource.Purchased, rank);
+
+            return new CommandResult(FailureReason.None);
+        }
+
         public void Restore(float freeBoxRemainingSeconds, bool hasReadyDelivery)
         {
             if (float.IsNaN(freeBoxRemainingSeconds) || freeBoxRemainingSeconds < 0)
@@ -154,6 +210,14 @@ namespace _Project.Features.Boxes
         private int PickFreeBoxRank()
         {
             return _random.Range(_progress.FreeBoxLowestRank, _progress.FreeBoxHighestRank);
+        }
+
+        private void CheckRank(int rank)
+        {
+            if (rank < FirstRank || rank > _catalog.MaxRank)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rank));
+            }
         }
 
         private void PlaceBox(int slot, BoxSource source, int rank)

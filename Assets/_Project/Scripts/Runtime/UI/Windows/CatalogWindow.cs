@@ -18,7 +18,7 @@ namespace _Project.UI.Windows
     {
         private const int FirstRank = 1;
         private const float ViewportCenter = 0.5f;
-        private const string ConditionKey = "popup.catalog.unlock_condition";
+        private const string LockedKey = "popup.catalog.locked";
 
         private readonly List<CatalogCardView> _cards = new List<CatalogCardView>();
 
@@ -129,7 +129,7 @@ namespace _Project.UI.Windows
                 return;
             }
 
-            card.ShowSilhouette(definition, string.Format(_localization.Get(ConditionKey), rank - 1));
+            card.ShowSilhouette(definition, _localization.Get(LockedKey));
         }
 
         private void ScrollToNextGoal()

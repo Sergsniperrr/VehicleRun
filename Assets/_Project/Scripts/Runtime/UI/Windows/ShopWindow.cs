@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Project.Core.Advertising;
 using _Project.Core.Localization;
 using _Project.Core.Vehicles;
 using _Project.Features.Boxes;
@@ -7,6 +8,7 @@ using _Project.Features.Commands;
 using _Project.Features.Economy;
 using _Project.Features.Effects;
 using _Project.Features.Progression;
+using _Project.Features.Shop;
 using _Project.UI.Boxes;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,9 +20,16 @@ namespace _Project.UI.Windows
     public class ShopWindow : Window
     {
         private const int FirstRank = 1;
+        private const int NoRank = 0;
         private const float ViewportCenter = 0.5f;
+        private const string RewardId = "shop_discount";
+        private const string FreeLabelKey = "shop.reward.free";
 
         private readonly List<ShopRowView> _rows = new List<ShopRowView>();
+
+        private int _freeOfferRank = NoRank;
+        private int _discountOfferRank = NoRank;
+        private bool _isWatchingAd;
 
         [SerializeField] private ShopRowView _rowPrefab;
         [SerializeField] private RectTransform _rowsRoot;
@@ -36,6 +45,8 @@ namespace _Project.UI.Windows
         private ILocalizationService _localization;
         private BoxPurchaseFailureText _failureText;
         private IObjectResolver _resolver;
+        private ShopRewards _rewards;
+        private IAdvertisingService _advertising;
 
         protected override void Awake()
         {
@@ -50,6 +61,7 @@ namespace _Project.UI.Windows
             foreach (ShopRowView row in _rows)
             {
                 row.BuyClicked -= OnRowBuyClicked;
+                row.RewardClicked -= OnRowRewardClicked;
             }
         }
 
@@ -62,7 +74,9 @@ namespace _Project.UI.Windows
             CoinsFormatter formatter,
             ILocalizationService localization,
             BoxPurchaseFailureText failureText,
-            IObjectResolver resolver)
+            IObjectResolver resolver,
+            ShopRewards rewards,
+            IAdvertisingService advertising)
         {
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
@@ -72,6 +86,8 @@ namespace _Project.UI.Windows
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
             _failureText = failureText ?? throw new ArgumentNullException(nameof(failureText));
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+            _rewards = rewards ?? throw new ArgumentNullException(nameof(rewards));
+            _advertising = advertising ?? throw new ArgumentNullException(nameof(advertising));
         }
 
         public override void Show()
@@ -79,6 +95,7 @@ namespace _Project.UI.Windows
             ShowCatalog();
             base.Show();
             ScrollToBoxRank();
+            ApplyRewardOffers();
             _wallet.CoinsChanged += OnCoinsChanged;
         }
 
@@ -105,6 +122,7 @@ namespace _Project.UI.Windows
             {
                 ShopRowView row = _resolver.Instantiate(_rowPrefab, _rowsRoot);
                 row.BuyClicked += OnRowBuyClicked;
+                row.RewardClicked += OnRowRewardClicked;
                 _rows.Add(row);
             }
         }
@@ -182,6 +200,113 @@ namespace _Project.UI.Windows
             {
                 ShowOffer(row);
             }
+        }
+
+        private void ApplyRewardOffers()
+        {
+            _freeOfferRank = NoRank;
+            _discountOfferRank = NoRank;
+
+            if (_rewards.IsReady == false)
+            {
+                HideAllRewards();
+
+                return;
+            }
+
+            RewardOffer offer = _rewards.SelectOffer(OpenedRanks());
+            _freeOfferRank = offer.FreeRank;
+            _discountOfferRank = offer.DiscountRank;
+            ShowRewardButtons();
+        }
+
+        private List<int> OpenedRanks()
+        {
+            List<int> opened = new List<int>();
+
+            for (int rank = FirstRank; rank <= _catalog.MaxRank; rank++)
+            {
+                if (_progress.IsRankUnlocked(rank))
+                {
+                    opened.Add(rank);
+                }
+            }
+
+            return opened;
+        }
+
+        private void ShowRewardButtons()
+        {
+            string freeLabel = _localization.Get(FreeLabelKey);
+            string discountLabel = "-" + _rewards.DiscountPercent + "%";
+
+            foreach (ShopRowView row in _rows)
+            {
+                if (row.Rank == _freeOfferRank)
+                {
+                    row.ShowReward(freeLabel);
+                }
+                else if (row.Rank == _discountOfferRank)
+                {
+                    row.ShowReward(discountLabel);
+                }
+                else
+                {
+                    row.HideReward();
+                }
+            }
+        }
+
+        private void HideAllRewards()
+        {
+            foreach (ShopRowView row in _rows)
+            {
+                row.HideReward();
+            }
+        }
+
+        private void OnRowRewardClicked(ShopRowView row)
+        {
+            if (_isWatchingAd)
+            {
+                return;
+            }
+
+            bool isFree = row.Rank == _freeOfferRank;
+            bool isDiscount = row.Rank == _discountOfferRank;
+
+            if (isFree == false && isDiscount == false)
+            {
+                return;
+            }
+
+            if (_delivery.HasFreeSlot() == false)
+            {
+                ShowFailure(FailureReason.NoFreeSlot, row);
+
+                return;
+            }
+
+            int rank = row.Rank;
+            _isWatchingAd = true;
+            _advertising.ShowRewarded(RewardId, () => OnRewardGranted(rank, isFree, row), () => _isWatchingAd = false);
+        }
+
+        private void OnRewardGranted(int rank, bool isFree, ShopRowView row)
+        {
+            CommandResult result = isFree ? _rewards.ClaimFree(rank) : _rewards.ClaimDiscount(rank);
+
+            if (result.IsSuccess == false)
+            {
+                ShowFailure(result.FailureReason, row);
+
+                return;
+            }
+
+            _freeOfferRank = NoRank;
+            _discountOfferRank = NoRank;
+            HideAllRewards();
+            ShowOffer(row);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using _Project.Core.Vehicles;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,9 @@ namespace _Project.UI.Windows
 {
     public class ShopRowView : MonoBehaviour
     {
+        private const float PulseScale = 1.12f;
+        private const float PulseSeconds = 0.5f;
+
         [SerializeField] private Image _icon;
         [SerializeField] private Image _rankBadge;
         [SerializeField] private TMP_Text _rankValue;
@@ -20,8 +24,14 @@ namespace _Project.UI.Windows
         [SerializeField] private TMP_Text _price;
         [SerializeField] private GameObject _lock;
         [SerializeField] private TMP_Text _lockRankValue;
+        [SerializeField] private GameObject _rewardAd;
+        [SerializeField] private Button _rewardButton;
+        [SerializeField] private TMP_Text _rewardLabel;
+
+        private Tween _rewardPulse;
 
         public event Action<ShopRowView> BuyClicked;
+        public event Action<ShopRowView> RewardClicked;
 
         public int Rank { get; private set; }
         public Vector3 BuyButtonPosition => _buyButton.transform.position;
@@ -29,11 +39,15 @@ namespace _Project.UI.Windows
         private void Awake()
         {
             _buyButton.onClick.AddListener(OnBuyButtonClicked);
+            _rewardButton.onClick.AddListener(OnRewardButtonClicked);
+            _rewardAd.SetActive(false);
         }
 
         private void OnDestroy()
         {
             _buyButton.onClick.RemoveListener(OnBuyButtonClicked);
+            _rewardButton.onClick.RemoveListener(OnRewardButtonClicked);
+            _rewardPulse?.Kill();
         }
 
         public void ShowVehicle(VehicleDefinition definition, string vehicleName)
@@ -65,6 +79,21 @@ namespace _Project.UI.Windows
             ShowSaleState(false);
         }
 
+        public void ShowReward(string label)
+        {
+            _rewardLabel.text = label;
+            _rewardAd.SetActive(true);
+            StartPulse();
+        }
+
+        public void HideReward()
+        {
+            _rewardAd.SetActive(false);
+            _rewardPulse?.Kill();
+            _rewardPulse = null;
+            _rewardButton.transform.localScale = Vector3.one;
+        }
+
         private void ShowRank(VehicleDefinition definition)
         {
             if (definition == null)
@@ -88,9 +117,28 @@ namespace _Project.UI.Windows
             _lock.SetActive(isForSale == false);
         }
 
+        private void StartPulse()
+        {
+            if (_rewardPulse != null)
+            {
+                return;
+            }
+
+            _rewardButton.transform.localScale = Vector3.one;
+            _rewardPulse = _rewardButton.transform
+                .DOScale(PulseScale, PulseSeconds)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetUpdate(true);
+        }
+
         private void OnBuyButtonClicked()
         {
             BuyClicked?.Invoke(this);
+        }
+
+        private void OnRewardButtonClicked()
+        {
+            RewardClicked?.Invoke(this);
         }
     }
 }

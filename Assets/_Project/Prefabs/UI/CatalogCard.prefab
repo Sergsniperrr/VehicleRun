@@ -437,3 +437,4 @@ MonoBehaviour:
   _icon: {fileID: 6766170343049448015}
   _caption: {fileID: 7429428253068064473}
   _income: {fileID: 5848538465917457741}
+  _lockedLabel: {fileID: 0}

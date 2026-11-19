@@ -210,6 +210,16 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(economy, $"Интервал бесплатной поставки {economy.FreeBoxIntervalSeconds} секунд, должен быть больше 0"));
             }
 
+            if (economy.RewardAdCooldownSeconds < 0)
+            {
+                errors.Add(new ConfigError(economy, $"Откат рекламной награды {economy.RewardAdCooldownSeconds} секунд, не может быть отрицательным"));
+            }
+
+            if (economy.RewardAdDiscountPercent < 0 || economy.RewardAdDiscountPercent >= 100)
+            {
+                errors.Add(new ConfigError(economy, $"Скидка за рекламу {economy.RewardAdDiscountPercent}%, должна быть от 0 до 99"));
+            }
+
             if (economy.OfflineMinAwaySeconds < 0 || economy.OfflineMinAwaySeconds > economy.OfflineMaxAwaySeconds)
             {
                 errors.Add(new ConfigError(economy, $"Порог офлайна {economy.OfflineMinAwaySeconds} секунд должен быть от 0 до предела {economy.OfflineMaxAwaySeconds}"));
@@ -331,12 +341,12 @@ namespace _Project.Core.Configs
 
             if (turbo.FreeDurationSeconds <= 0)
             {
-                errors.Add(new ConfigError(turbo, $"Длительность бесплатного турбо {turbo.FreeDurationSeconds} секунд, должна быть больше 0"));
+                errors.Add(new ConfigError(turbo, $"Длительность турбо {turbo.FreeDurationSeconds} секунд, должна быть больше 0"));
             }
 
             if (turbo.FreeCooldownSeconds < 0)
             {
-                errors.Add(new ConfigError(turbo, $"Откат бесплатного турбо {turbo.FreeCooldownSeconds} секунд, не может быть отрицательным"));
+                errors.Add(new ConfigError(turbo, $"Откат турбо {turbo.FreeCooldownSeconds} секунд, не может быть отрицательным"));
             }
 
             if (turbo.TapBoostSeconds <= 0)

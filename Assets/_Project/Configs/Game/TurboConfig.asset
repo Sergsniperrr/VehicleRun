@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unlockRank: 3
   _speedMultiplier: 2
-  _freeDurationSeconds: 30
+  _freeDurationSeconds: 90
   _freeCooldownSeconds: 180
   _tapBoostSeconds: 2

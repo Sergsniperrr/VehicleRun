@@ -38,6 +38,31 @@ namespace _Project.Features.Turbo
             return CheckStart() == FailureReason.None;
         }
 
+        public FailureReason CheckStart()
+        {
+            if (IsUnlocked == false)
+            {
+                return FailureReason.TurboLocked;
+            }
+
+            if (IsActive)
+            {
+                return FailureReason.TurboActive;
+            }
+
+            if (IsCoolingDown)
+            {
+                return FailureReason.TurboCooldown;
+            }
+
+            if (_roster.Count == 0)
+            {
+                return FailureReason.TrackEmpty;
+            }
+
+            return FailureReason.None;
+        }
+
         public CommandResult StartTurbo()
         {
             FailureReason failureReason = CheckStart();
@@ -126,31 +151,6 @@ namespace _Project.Features.Turbo
 
             RemainingSeconds = Math.Min(remainingSeconds, _config.FreeDurationSeconds);
             CooldownRemainingSeconds = Math.Min(cooldownRemainingSeconds, _config.FreeCooldownSeconds);
-        }
-
-        private FailureReason CheckStart()
-        {
-            if (IsUnlocked == false)
-            {
-                return FailureReason.TurboLocked;
-            }
-
-            if (IsActive)
-            {
-                return FailureReason.TurboActive;
-            }
-
-            if (IsCoolingDown)
-            {
-                return FailureReason.TurboCooldown;
-            }
-
-            if (_roster.Count == 0)
-            {
-                return FailureReason.TrackEmpty;
-            }
-
-            return FailureReason.None;
         }
 
         private void AdvanceTapBoosts(float deltaTime)

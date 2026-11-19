@@ -25,6 +25,8 @@ MonoBehaviour:
   _isBoxPriceGrowthLimited: 0
   _boxPriceGrowthPurchaseLimit: 20
   _freeBoxIntervalSeconds: 20
+  _rewardAdCooldownSeconds: 180
+  _rewardAdDiscountPercent: 20
   _offlineMinAwaySeconds: 60
   _offlineMaxAwaySeconds: 14400
   _offlineIncomeRate: 0.5
