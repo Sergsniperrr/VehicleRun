@@ -12,6 +12,7 @@ namespace _Project.Features.Economy
         private const string MillionKey = "ui.number.million";
         private const string BillionKey = "ui.number.billion";
         private const string TrillionKey = "ui.number.trillion";
+        private const string QuadrillionKey = "ui.number.quadrillion";
         private const string WholeNumberFormat = "N0";
         private const string FractionalFormat = "0.#";
         private const double FractionalIncomeLimit = 10;
@@ -19,6 +20,7 @@ namespace _Project.Features.Economy
         private const long Million = 1000000;
         private const long Billion = 1000000000;
         private const long Trillion = 1000000000000;
+        private const long Quadrillion = 1000000000000000;
         private const long FractionalUnitLimit = 100;
         private const long TenthsPerUnit = 10;
         private const double TenthsPerUnitAsDouble = 10;
@@ -41,6 +43,11 @@ namespace _Project.Features.Economy
 
         public string FormatShort(long coins)
         {
+            if (coins >= Quadrillion)
+            {
+                return FormatInUnits(coins, Quadrillion, QuadrillionKey);
+            }
+
             if (coins >= Trillion)
             {
                 return FormatInUnits(coins, Trillion, TrillionKey);

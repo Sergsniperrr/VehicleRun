@@ -97,7 +97,7 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
   - `ui.hud.turbo_track_empty` — «Отправьте машину на трассу» / «Send a vehicle to the track»: нажатие турбо без машин на трассе;
 - запись чисел (`CoinsFormatter`, [Gameplay.md](Gameplay.md), раздел 13):
   - `ui.number.decimal_separator` — «,» / «.»;
-  - `ui.number.thousand`, `ui.number.million`, `ui.number.billion`, `ui.number.trillion` — «{0}K», «{0}M», «{0}B», «{0}T» в обоих языках (задача владельца VEH-22, 17.11.2026; до неё по-русски было «тыс.», «млн», «млрд», ключа триллионов не было). `{0}` — число с одним знаком после запятой или целое, пробела перед буквой нет;
+  - `ui.number.thousand`, `ui.number.million`, `ui.number.billion`, `ui.number.trillion`, `ui.number.quadrillion` — «{0}K», «{0}M», «{0}B», «{0}T», «{0}Qa» в обоих языках (задача владельца VEH-22, 17.11.2026; квадриллион добавлен 20.11.2026; до VEH-22 по-русски было «тыс.», «млн», «млрд», ключей триллионов и квадриллионов не было). Сокращение единицы одинаково во всех локализациях. `{0}` — число с одним знаком после запятой или целое, пробела перед буквой нет;
 - карточка машины: `popup.vehicle.income` — «Доход: {0} в секунду» / «Income: {0} per second»;
 - подпись на закрытой карточке каталога (задача VEH-32): `popup.catalog.locked` — «Закрыто» / «Closed». Стоит снизу карточки; с 19.11.2026 заменила условие слияния;
 - `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles». С 19.11.2026 в коде не используется (закрытая карточка показывает «Закрыто»), ключ оставлен в ассете;

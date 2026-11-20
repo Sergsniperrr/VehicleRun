@@ -11,6 +11,7 @@ namespace _Project.Tests.EditMode.Economy
         private const string MillionKey = "ui.number.million";
         private const string BillionKey = "ui.number.billion";
         private const string TrillionKey = "ui.number.trillion";
+        private const string QuadrillionKey = "ui.number.quadrillion";
 
         private CoinsFormatter _formatter;
 
@@ -23,6 +24,7 @@ namespace _Project.Tests.EditMode.Economy
             localization.Set(MillionKey, "{0}M");
             localization.Set(BillionKey, "{0}B");
             localization.Set(TrillionKey, "{0}T");
+            localization.Set(QuadrillionKey, "{0}Qa");
             _formatter = new CoinsFormatter(localization);
         }
 
@@ -57,8 +59,11 @@ namespace _Project.Tests.EditMode.Economy
         [TestCase(1299999999, "1,2B")]
         [TestCase(999999999999, "999B")]
         [TestCase(1234567890123, "1,2T")]
-        [TestCase(1234567890123456, "1 234T")]
-        public void ShortMillionsBillionsAndTrillionsDropTheRest(long coins, string expected)
+        [TestCase(123456789012345, "123T")]
+        [TestCase(1200000000000000, "1,2Qa")]
+        [TestCase(1234567890123456, "1,2Qa")]
+        [TestCase(1234567890123456789, "1 234Qa")]
+        public void ShortMillionsBillionsTrillionsAndQuadrillionsDropTheRest(long coins, string expected)
         {
             Assert.That(_formatter.FormatShort(coins), Is.EqualTo(expected));
         }

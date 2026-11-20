@@ -117,6 +117,9 @@ MonoBehaviour:
   - _key: ui.number.trillion
     _russian: '{0}T'
     _english: '{0}T'
+  - _key: ui.number.quadrillion
+    _russian: '{0}Qa'
+    _english: '{0}Qa'
   - _key: ui.common.ok
     _russian: "\u0425\u043E\u0440\u043E\u0448\u043E"
     _english: OK
