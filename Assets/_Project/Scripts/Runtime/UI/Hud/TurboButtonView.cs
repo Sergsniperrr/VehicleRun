@@ -1,7 +1,7 @@
 using System;
-using _Project.Core.Advertising;
 using _Project.Core.Localization;
 using _Project.Core.Turbo;
+using _Project.Features.Ads;
 using _Project.Features.Commands;
 using _Project.Features.Effects;
 using _Project.Features.Turbo;
@@ -36,7 +36,7 @@ namespace _Project.UI.Hud
         private TurboService _turbo;
         private TurboConfig _config;
         private ILocalizationService _localization;
-        private IAdvertisingService _advertising;
+        private AdPresenter _ads;
         private int _shownSeconds = NoShownSeconds;
 
         private void Awake()
@@ -66,12 +66,12 @@ namespace _Project.UI.Hud
             TurboService turbo,
             TurboConfig config,
             ILocalizationService localization,
-            IAdvertisingService advertising)
+            AdPresenter ads)
         {
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-            _advertising = advertising ?? throw new ArgumentNullException(nameof(advertising));
+            _ads = ads ?? throw new ArgumentNullException(nameof(ads));
         }
 
         private void ShowState()
@@ -134,7 +134,7 @@ namespace _Project.UI.Hud
                 return;
             }
 
-            _advertising.ShowRewarded(RewardId, OnTurboRewarded, null);
+            _ads.ShowRewarded(RewardId, OnTurboRewarded, null);
         }
 
         private void OnTurboRewarded()

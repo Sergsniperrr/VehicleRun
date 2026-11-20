@@ -1,7 +1,9 @@
 using System;
+using _Project.Features.Ads;
 using _Project.Features.Commands;
 using _Project.Features.Economy;
 using _Project.Features.Track;
+using _Project.Tests.EditMode.Ads;
 using _Project.Tests.EditMode.Configs;
 using _Project.Tests.EditMode.Save;
 using NUnit.Framework;
@@ -34,7 +36,8 @@ namespace _Project.Tests.EditMode.Turbo
             _fixture = new GameConfigFixture();
             _game = new SaveTestGame(_fixture);
             _time = new FakeTimeService();
-            _ticker = new EconomyTicker(_time, _game.Roster, _game.Turbo, _game.Delivery, _game.ShopRewards);
+            AdPresenter ads = new AdPresenter(new FakeAdvertisingService(), _fixture.Economy);
+            _ticker = new EconomyTicker(_time, _game.Roster, _game.Turbo, _game.Delivery, _game.ShopRewards, ads);
             _startedCount = 0;
             _endedCount = 0;
             _game.Turbo.TurboStarted += OnTurboStarted;

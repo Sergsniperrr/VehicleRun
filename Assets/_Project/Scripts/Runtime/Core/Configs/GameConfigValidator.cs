@@ -215,6 +215,11 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(economy, $"Откат рекламной награды {economy.RewardAdCooldownSeconds} секунд, не может быть отрицательным"));
             }
 
+            if (economy.InterstitialCooldownSeconds < 0)
+            {
+                errors.Add(new ConfigError(economy, $"Откат интерстишела {economy.InterstitialCooldownSeconds} секунд, не может быть отрицательным"));
+            }
+
             if (economy.RewardAdDiscountPercent < 0 || economy.RewardAdDiscountPercent >= 100)
             {
                 errors.Add(new ConfigError(economy, $"Скидка за рекламу {economy.RewardAdDiscountPercent}%, должна быть от 0 до 99"));

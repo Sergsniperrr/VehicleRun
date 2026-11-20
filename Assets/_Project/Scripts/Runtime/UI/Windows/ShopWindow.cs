@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using _Project.Core.Advertising;
 using _Project.Core.Localization;
 using _Project.Core.Vehicles;
+using _Project.Features.Ads;
 using _Project.Features.Boxes;
 using _Project.Features.Commands;
 using _Project.Features.Economy;
@@ -46,7 +46,7 @@ namespace _Project.UI.Windows
         private BoxPurchaseFailureText _failureText;
         private IObjectResolver _resolver;
         private ShopRewards _rewards;
-        private IAdvertisingService _advertising;
+        private AdPresenter _ads;
 
         protected override void Awake()
         {
@@ -76,7 +76,7 @@ namespace _Project.UI.Windows
             BoxPurchaseFailureText failureText,
             IObjectResolver resolver,
             ShopRewards rewards,
-            IAdvertisingService advertising)
+            AdPresenter ads)
         {
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
@@ -87,7 +87,7 @@ namespace _Project.UI.Windows
             _failureText = failureText ?? throw new ArgumentNullException(nameof(failureText));
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _rewards = rewards ?? throw new ArgumentNullException(nameof(rewards));
-            _advertising = advertising ?? throw new ArgumentNullException(nameof(advertising));
+            _ads = ads ?? throw new ArgumentNullException(nameof(ads));
         }
 
         public override void Show()
@@ -182,6 +182,8 @@ namespace _Project.UI.Windows
 
         private void OnRowBuyClicked(ShopRowView row)
         {
+            _ads.TryShowInterstitial();
+
             CommandResult result = _delivery.BuyBox(row.Rank);
 
             if (result.IsSuccess)
@@ -289,7 +291,7 @@ namespace _Project.UI.Windows
 
             int rank = row.Rank;
             _isWatchingAd = true;
-            _advertising.ShowRewarded(RewardId, () => OnRewardGranted(rank, isFree, row), () => _isWatchingAd = false);
+            _ads.ShowRewarded(RewardId, () => OnRewardGranted(rank, isFree, row), () => _isWatchingAd = false);
         }
 
         private void OnRewardGranted(int rank, bool isFree, ShopRowView row)

@@ -2,6 +2,7 @@ using System;
 using _Project.Composition.Startup;
 using _Project.Core.Audio;
 using _Project.Core.Configs;
+using _Project.Features.Ads;
 using _Project.Features.Boxes;
 using _Project.Features.Economy;
 using _Project.Features.Garage;
@@ -91,6 +92,7 @@ namespace _Project.Composition
             builder.Register<BoxPricing>(Lifetime.Singleton);
             builder.Register<BoxDelivery>(Lifetime.Singleton);
             builder.Register<ShopRewards>(Lifetime.Singleton);
+            builder.Register<AdPresenter>(Lifetime.Singleton);
             builder.Register<TrackPath>(Lifetime.Singleton);
             builder.Register<TrackRoster>(Lifetime.Singleton);
             builder.Register<TurboService>(Lifetime.Singleton);
