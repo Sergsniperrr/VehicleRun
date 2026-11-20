@@ -25711,6 +25711,8 @@ MonoBehaviour:
   _fill: {fileID: 2058792924}
   _seconds: {fileID: 1058335211}
   _waitingIcon: {fileID: 1768489252}
+  _normalColor: {r: 0.33, g: 0.8, b: 0.16, a: 1}
+  _alertColor: {r: 0.9, g: 0.2, b: 0.17, a: 1}
 --- !u!1 &1856149875
 GameObject:
   m_ObjectHideFlags: 0
