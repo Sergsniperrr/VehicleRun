@@ -14,6 +14,7 @@ using _Project.Core.Time;
 using _Project.Infrastructure.Analytics;
 using _Project.Infrastructure.Audio;
 using _Project.Infrastructure.JTL;
+using _Project.Infrastructure.Leaderboards;
 using _Project.Infrastructure.Randomness;
 using _Project.Infrastructure.SceneManagement;
 using _Project.Infrastructure.StateMachine;
@@ -74,6 +75,7 @@ namespace _Project.Composition
             builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
             builder.Register<UnityRandomSource>(Lifetime.Singleton).As<IRandomSource>();
             builder.Register<TimeService>(Lifetime.Singleton).As<ITimeService>();
+            builder.Register<AvatarLoader>(Lifetime.Singleton).As<IAvatarLoader>();
         }
 
         private void RegisterStateMachine(IContainerBuilder builder)

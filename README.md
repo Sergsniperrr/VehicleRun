@@ -127,6 +127,7 @@ protected override void Configure(IContainerBuilder builder)
 | `IAudioService` | `AudioService` | Singleton | `RegisterServices` |
 | `ITimeService` | `TimeService` | Singleton | `RegisterServices` |
 | `IRandomSource` | `UnityRandomSource` | Singleton | `RegisterServices` |
+| `IAvatarLoader` | `AvatarLoader` (аватары лидерборда по URL) | Singleton | `RegisterServices` |
 | `YandexMetrica` (сам класс) | `YandexMetrica`, номер счётчика из поля `_yandexMetricaCounterId` | EntryPoint | `RegisterAnalytics` |
 | `IPlatformInitializer` | `JTLSDKInitializer` | Singleton | `RegisterPlatform` |
 | `IAnalyticsService` | `JTLAnalyticsService` | Singleton | `RegisterPlatform` |

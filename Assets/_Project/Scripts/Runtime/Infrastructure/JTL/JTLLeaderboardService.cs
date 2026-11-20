@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using _Project.Core.Leaderboards;
@@ -9,8 +10,10 @@ namespace _Project.Infrastructure.JTL
     public class JTLLeaderboardService : ILeaderboardService
     {
         private const string TotalCoinsLeaderboardId = "total_coins";
-        private const int TopCount = 10;
-        private const int AroundCount = 3;
+        private const int TopCount = 4;
+        private const int AroundCount = 4;
+        private const int VisibleCount = 8;
+        private const int EntriesAbovePlayer = 4;
 
         public bool CanLoad => JTLSDK.Leaderboards.CanLoad;
 
@@ -47,12 +50,26 @@ namespace _Project.Infrastructure.JTL
 
             rows.Sort(CompareByRank);
 
-            return new LeaderboardTable(rows);
+            return new LeaderboardTable(SelectVisibleWindow(rows));
+        }
+
+        private List<LeaderboardRow> SelectVisibleWindow(List<LeaderboardRow> rows)
+        {
+            if (rows.Count <= VisibleCount)
+            {
+                return rows;
+            }
+
+            int currentIndex = rows.FindIndex(row => row.IsCurrentPlayer);
+            int start = currentIndex < 0 ? 0 : currentIndex - EntriesAbovePlayer;
+            start = Math.Max(0, Math.Min(start, rows.Count - VisibleCount));
+
+            return rows.GetRange(start, VisibleCount);
         }
 
         private LeaderboardRow CreateRow(LeaderboardEntry entry)
         {
-            return new LeaderboardRow(entry.Rank, entry.Score, entry.PlayerName, entry.IsCurrentPlayer);
+            return new LeaderboardRow(entry.Rank, entry.Score, entry.PlayerName, entry.AvatarUrl, entry.IsCurrentPlayer);
         }
 
         private int CompareByRank(LeaderboardRow first, LeaderboardRow second)
