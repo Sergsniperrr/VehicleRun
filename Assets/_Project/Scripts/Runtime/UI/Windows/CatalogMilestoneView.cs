@@ -12,7 +12,6 @@ namespace _Project.UI.Windows
         private static readonly Color LockedCircleColor = new Color(0.27f, 0.3f, 0.22f);
         private static readonly Color ClaimedGiftColor = new Color(0.55f, 0.55f, 0.55f);
 
-        [SerializeField] private int _rank;
         [SerializeField] private Image _circle;
         [SerializeField] private Image _gift;
         [SerializeField] private GameObject _lock;
@@ -22,7 +21,7 @@ namespace _Project.UI.Windows
 
         public event Action<CatalogMilestoneView> Clicked;
 
-        public int Rank => _rank;
+        public int Rank { get; private set; }
         public Vector3 Position => transform.position;
 
         private void Awake()
@@ -35,13 +34,14 @@ namespace _Project.UI.Windows
             _button.onClick.RemoveListener(OnButtonClicked);
         }
 
-        public void Show(MilestoneState state)
+        public void Show(int rank, MilestoneState state)
         {
             bool isLocked = state == MilestoneState.Locked;
             bool isClaimable = state == MilestoneState.Claimable;
             bool isClaimed = state == MilestoneState.Claimed;
 
-            _number.text = _rank.ToString();
+            Rank = rank;
+            _number.text = rank.ToString();
             _circle.color = isLocked ? LockedCircleColor : ReachedCircleColor;
             _lock.SetActive(isLocked);
             _number.gameObject.SetActive(isLocked);

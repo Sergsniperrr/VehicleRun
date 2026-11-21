@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Project.Core.Economy;
 using _Project.Core.Localization;
 using _Project.Core.Track;
 using _Project.Core.Vehicles;
@@ -37,6 +38,7 @@ namespace _Project.UI.Windows
         private IObjectResolver _resolver;
         private CollectionMilestones _collection;
         private CatalogNews _news;
+        private EconomyConfig _economy;
 
         protected override void Awake()
         {
@@ -68,8 +70,10 @@ namespace _Project.UI.Windows
             TrackConfig track,
             IObjectResolver resolver,
             CollectionMilestones collection,
-            CatalogNews news)
+            CatalogNews news,
+            EconomyConfig economy)
         {
+            _economy = economy ?? throw new ArgumentNullException(nameof(economy));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
@@ -102,9 +106,17 @@ namespace _Project.UI.Windows
 
         private void ShowMilestones()
         {
-            foreach (CatalogMilestoneView milestone in _milestones)
+            IReadOnlyList<EconomyConfig.MilestoneReward> rewards = _economy.MilestoneRewards;
+
+            if (_milestones.Length != rewards.Count)
             {
-                milestone.Show(_collection.GetState(milestone.Rank));
+                throw new InvalidOperationException(nameof(_milestones));
+            }
+
+            for (int i = 0; i < _milestones.Length; i++)
+            {
+                int rank = rewards[i].Rank;
+                _milestones[i].Show(rank, _collection.GetState(rank));
             }
         }
 
@@ -167,7 +179,7 @@ namespace _Project.UI.Windows
                 return;
             }
 
-            milestone.Show(_collection.GetState(milestone.Rank));
+            milestone.Show(milestone.Rank, _collection.GetState(milestone.Rank));
             ShowClaimPopup(milestone, reward);
         }
 

@@ -23,7 +23,7 @@ namespace _Project.Features.Progression
         public event Action Seen;
 
         public int SeenRank { get; private set; }
-        public bool HasNews => HasUnseenVehicle || HasClaimableMilestone();
+        public bool HasNews => HasClaimableMilestone();
         public bool HasUnseenVehicle => _progress.MaxRank > SeenRank;
 
         public void MarkSeen()

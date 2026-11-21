@@ -33,12 +33,16 @@ MonoBehaviour:
   _offlineIncomeRate: 0.5
   _milestoneRewards:
   - _rank: 6
-    _coins: 3800
-  - _rank: 12
-    _coins: 1800000
+    _coins: 1900
+  - _rank: 10
+    _coins: 120000
+  - _rank: 14
+    _coins: 7500000
   - _rank: 18
-    _coins: 900000000
-  - _rank: 24
-    _coins: 420000000000
+    _coins: 450000000
+  - _rank: 22
+    _coins: 27500000000
+  - _rank: 26
+    _coins: 1650000000000
   - _rank: 30
-    _coins: 210000000000000
+    _coins: 105000000000000

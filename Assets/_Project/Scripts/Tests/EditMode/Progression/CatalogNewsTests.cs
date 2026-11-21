@@ -56,12 +56,23 @@ namespace _Project.Tests.EditMode.Progression
         }
 
         [Test]
-        public void UnlockedRankIsNews()
+        public void UnlockedRankWithoutRewardIsNotNews()
+        {
+            _progress.UnlockRank(StartRank);
+
+            PlaceVehicle(0, NewRank);
+
+            Assert.That(_news.HasUnseenVehicle, Is.True);
+            Assert.That(_news.HasNews, Is.False);
+        }
+
+        [Test]
+        public void UnlockedMilestoneRankIsNews()
         {
             _progress.UnlockRank(StartRank);
             _changeCount = 0;
 
-            PlaceVehicle(0, NewRank);
+            PlaceVehicle(0, MilestoneRank);
 
             Assert.That(_news.HasNews, Is.True);
             Assert.That(_changeCount, Is.EqualTo(1));
