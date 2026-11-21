@@ -316,7 +316,7 @@ public class LoadLevelState : IPayloadState<int>
 | Сцена | Индекс в Build Settings | Что на ней |
 |---|---|---|
 | `Bootstrap` | 0 | `BootstrapLifetimeScope` |
-| `Loading` | 1 | экран загрузки (задача владельца VEH-25): `Main Camera` цветом песка, `LoadingLifetimeScope`, `Canvas` с названием игры, спрайтом машины и полосой загрузки `Slider` (`LoadingScreenView`). Показывается, пока грузится сцена `Game` |
+| `Loading` | 1 | экран загрузки (задача владельца VEH-25), с 21.11.2026 оформлен как экран студии JTL и повторяет загрузчик страницы WebGL: `Main Camera`, `LoadingLifetimeScope`, `Canvas` с фоном `Background` (радиальный голубой градиент `Art/Branding/LoaderGradient.png`), логотипом `Logo` (`Art/Branding/JTLStudioLogo.png`, 480 × 480) и тонкой полосой загрузки `ProgressBar` 432 × 18 — `Slider`, синяя заливка на белой дорожке (`LoadingScreenView`). До этого на экране были название игры и мотороллер на фоне цвета песка. Показывается, пока грузится сцена `Game` |
 | `Game` | 2 | `Main Camera` (ортографическая, size 9,6, позиция (0, 0, -10), фон Solid Color цветом песка), `GameLifetimeScope`, мир `World` (трасса, гараж, зона переработки) и `Canvas` с HUD. Устройство в [Docs/TechPlan.md](Docs/TechPlan.md), раздел 4.6 |
 
 Переход между сценами с экраном загрузки делает `LoadRunState`: сообщает прогресс через `LoadingProgress` (`Core/SceneManagement`, singleton корневого контейнера), грузит `Loading`, затем `Game` с прогрессом. `SceneLoader.LoadAsync` принимает `IProgress<float>` и нормирует прогресс Unity (0…0,9) к 0…1, по нему `LoadingScreenView` заполняет полосу.

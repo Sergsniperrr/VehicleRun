@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 064ad9ff330d640fa854924ad856f87d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _logoMode: 0
-  _logo: {fileID: 0}
+  _logoMode: 1
+  _logo: {fileID: 2800000, guid: d6d23402894b345d4964ebb4e056f142, type: 3}
   _logoSize: 160
   _loaderBackground:
     _kind: 1
     _color: {r: 0.102, g: 0.102, b: 0.102, a: 1}
-    _gradientFrom: {r: 0.063, g: 0.133, b: 0.247, a: 1}
-    _gradientTo: {r: 0.024, g: 0.031, b: 0.051, a: 1}
+    _gradientFrom: {r: 0.9386792, g: 0.97536135, b: 1, a: 1}
+    _gradientTo: {r: 0.6556604, g: 0.80665296, b: 1, a: 1}
     _radial: 1
     _angle: 140
     _image: {fileID: 0}
@@ -32,7 +32,7 @@ MonoBehaviour:
     _angle: 140
     _image: {fileID: 0}
   _progressFill: {r: 0.184, g: 0.549, b: 1, a: 1}
-  _progressTrack: {r: 0.106, g: 0.141, b: 0.2, a: 1}
+  _progressTrack: {r: 1, g: 1, b: 1, a: 1}
   _progressGradient: 0
   _progressFillTo: {r: 0.482, g: 0.247, b: 0.949, a: 1}
   _progressBorderWidth: 0
