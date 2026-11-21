@@ -21,21 +21,21 @@ MonoBehaviour:
     _garageSprite: {fileID: -749692788, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 2091854564, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.9490196, g: 0, b: 0.015686275, a: 1}
-  - _id: atv
+  - _id: motorcycle
     _rank: 2
-    _nameKey: vehicle.atv.name
+    _nameKey: vehicle.motorcycle.name
     _coinsPerLap: 8
     _trackSpeed: 4.361
-    _garageSprite: {fileID: -886959382, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
-    _trackSprite: {fileID: 133480130, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
-    _badgeColor: {r: 1, g: 1, b: 1, a: 1}
-  - _id: motorcycle
-    _rank: 3
-    _nameKey: vehicle.motorcycle.name
-    _coinsPerLap: 17
-    _trackSpeed: 4.515
     _garageSprite: {fileID: 398276104, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1807074531, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
+    _badgeColor: {r: 1, g: 1, b: 1, a: 1}
+  - _id: atv
+    _rank: 3
+    _nameKey: vehicle.atv.name
+    _coinsPerLap: 17
+    _trackSpeed: 4.515
+    _garageSprite: {fileID: -886959382, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
+    _trackSprite: {fileID: 133480130, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
     _badgeColor: {r: 0.08235294, g: 0.5019608, b: 0.9607843, a: 1}
   - _id: car
     _rank: 4
