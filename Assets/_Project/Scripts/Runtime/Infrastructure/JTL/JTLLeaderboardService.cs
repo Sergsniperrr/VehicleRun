@@ -10,10 +10,8 @@ namespace _Project.Infrastructure.JTL
     public class JTLLeaderboardService : ILeaderboardService
     {
         private const string TotalCoinsLeaderboardId = "total_coins";
-        private const int TopCount = 4;
-        private const int AroundCount = 4;
-        private const int VisibleCount = 8;
-        private const int EntriesAbovePlayer = 4;
+        private const int TopCount = 3;
+        private const int AroundCount = 3;
 
         public bool CanLoad => JTLSDK.Leaderboards.CanLoad;
 
@@ -50,21 +48,26 @@ namespace _Project.Infrastructure.JTL
 
             rows.Sort(CompareByRank);
 
-            return new LeaderboardTable(SelectVisibleWindow(rows));
+            return new LeaderboardTable(SelectVisibleRows(rows));
         }
 
-        private List<LeaderboardRow> SelectVisibleWindow(List<LeaderboardRow> rows)
+        private List<LeaderboardRow> SelectVisibleRows(List<LeaderboardRow> rows)
         {
-            if (rows.Count <= VisibleCount)
+            int currentIndex = rows.FindIndex(row => row.IsCurrentPlayer);
+            List<LeaderboardRow> visibleRows = new List<LeaderboardRow>();
+
+            foreach (LeaderboardRow row in rows)
             {
-                return rows;
+                bool isTop = row.Rank <= TopCount;
+                bool isNearPlayer = currentIndex >= 0 && Math.Abs(row.Rank - rows[currentIndex].Rank) <= AroundCount;
+
+                if (isTop || isNearPlayer)
+                {
+                    visibleRows.Add(row);
+                }
             }
 
-            int currentIndex = rows.FindIndex(row => row.IsCurrentPlayer);
-            int start = currentIndex < 0 ? 0 : currentIndex - EntriesAbovePlayer;
-            start = Math.Max(0, Math.Min(start, rows.Count - VisibleCount));
-
-            return rows.GetRange(start, VisibleCount);
+            return visibleRows;
         }
 
         private LeaderboardRow CreateRow(LeaderboardEntry entry)
