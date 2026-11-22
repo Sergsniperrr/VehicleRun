@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Project.Core.Collector;
 using _Project.Core.Configs;
 using _Project.Core.Economy;
 using _Project.Core.Garage;
@@ -55,6 +56,12 @@ namespace _Project.Tests.EditMode.Configs
         private const float TurboFreeDurationSeconds = 30f;
         private const float TurboFreeCooldownSeconds = 180f;
         private const float TurboTapBoostSeconds = 2f;
+        private const int CollectorSpawnIntervalMinSeconds = 60;
+        private const int CollectorSpawnIntervalMaxSeconds = 150;
+        private const float CollectorLifetimeSeconds = 10f;
+        private const int CollectorMinCharges = 5;
+        private const int CollectorMaxCharges = 10;
+        private const float CollectorTrackSpeed = 4.4f;
         private const long FirstLevelExperience = 4;
         private const long ExperienceStepPerLevel = 8;
         private const long FirstRewardCoins = 100;
@@ -72,6 +79,7 @@ namespace _Project.Tests.EditMode.Configs
             Track = Create<TrackConfig>();
             Turbo = Create<TurboConfig>();
             PlayerLevel = Create<PlayerLevelConfig>();
+            Collector = Create<CollectorConfig>();
             Config = Create<GameConfig>();
 
             FillLocalization();
@@ -81,6 +89,7 @@ namespace _Project.Tests.EditMode.Configs
             FillTrack();
             FillTurbo();
             FillPlayerLevel();
+            FillCollector();
             FillConfig();
         }
 
@@ -91,6 +100,7 @@ namespace _Project.Tests.EditMode.Configs
         public TrackConfig Track { get; }
         public TurboConfig Turbo { get; }
         public PlayerLevelConfig PlayerLevel { get; }
+        public CollectorConfig Collector { get; }
         public GameConfig Config { get; }
 
         public void Change(Object target, string propertyPath, Action<SerializedProperty> change)
@@ -274,6 +284,18 @@ namespace _Project.Tests.EditMode.Configs
             playerLevel.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        private void FillCollector()
+        {
+            SerializedObject collector = new SerializedObject(Collector);
+            collector.FindProperty("_spawnIntervalMinSeconds").intValue = CollectorSpawnIntervalMinSeconds;
+            collector.FindProperty("_spawnIntervalMaxSeconds").intValue = CollectorSpawnIntervalMaxSeconds;
+            collector.FindProperty("_lifetimeSeconds").floatValue = CollectorLifetimeSeconds;
+            collector.FindProperty("_minCharges").intValue = CollectorMinCharges;
+            collector.FindProperty("_maxCharges").intValue = CollectorMaxCharges;
+            collector.FindProperty("_trackSpeed").floatValue = CollectorTrackSpeed;
+            collector.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private void FillSchedule(SerializedProperty schedule, int initial, (int Level, int Capacity)[] steps)
         {
             schedule.FindPropertyRelative("_initial").intValue = initial;
@@ -299,6 +321,7 @@ namespace _Project.Tests.EditMode.Configs
             config.FindProperty("_track").objectReferenceValue = Track;
             config.FindProperty("_turbo").objectReferenceValue = Turbo;
             config.FindProperty("_playerLevel").objectReferenceValue = PlayerLevel;
+            config.FindProperty("_collector").objectReferenceValue = Collector;
             config.ApplyModifiedPropertiesWithoutUndo();
         }
     }

@@ -3,6 +3,7 @@ using _Project.Core.Audio;
 using _Project.Core.Time;
 using _Project.Core.Vehicles;
 using _Project.Features.Boxes;
+using _Project.Features.Collector;
 using _Project.Features.Garage;
 using _Project.Features.Progression;
 using _Project.Features.Track;
@@ -23,6 +24,7 @@ namespace _Project.Features.Sounds
         private readonly TurboService _turbo;
         private readonly VehicleCatalogConfig _catalog;
         private readonly PlayerLevel _playerLevel;
+        private readonly CollectorService _collector;
 
         private bool _hasMoneyPlayed;
         private float _lastMoneyTime;
@@ -36,7 +38,8 @@ namespace _Project.Features.Sounds
             CollectionMilestones milestones,
             TurboService turbo,
             VehicleCatalogConfig catalog,
-            PlayerLevel playerLevel)
+            PlayerLevel playerLevel,
+            CollectorService collector)
         {
             _audio = audio ?? throw new ArgumentNullException(nameof(audio));
             _sounds = sounds ?? throw new ArgumentNullException(nameof(sounds));
@@ -47,6 +50,7 @@ namespace _Project.Features.Sounds
             _turbo = turbo ?? throw new ArgumentNullException(nameof(turbo));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
+            _collector = collector ?? throw new ArgumentNullException(nameof(collector));
         }
 
         public void Start()
@@ -60,6 +64,8 @@ namespace _Project.Features.Sounds
             _turbo.TurboStarted += OnTurboStarted;
             _turbo.RunnerBoosted += OnRunnerBoosted;
             _playerLevel.RewardClaimed += OnRewardClaimed;
+            _collector.Appeared += OnCollectorAppeared;
+            _collector.ChargeCollected += OnChargeCollected;
         }
 
         public void Dispose()
@@ -73,6 +79,8 @@ namespace _Project.Features.Sounds
             _turbo.TurboStarted -= OnTurboStarted;
             _turbo.RunnerBoosted -= OnRunnerBoosted;
             _playerLevel.RewardClaimed -= OnRewardClaimed;
+            _collector.Appeared -= OnCollectorAppeared;
+            _collector.ChargeCollected -= OnChargeCollected;
         }
 
         private void PlayMoney()
@@ -151,6 +159,16 @@ namespace _Project.Features.Sounds
         private void OnRewardClaimed(int level, long coins)
         {
             PlayMoney();
+        }
+
+        private void OnCollectorAppeared()
+        {
+            _audio.PlayOneShot(_sounds.BonusShow);
+        }
+
+        private void OnChargeCollected(long amount)
+        {
+            _audio.PlayOneShot(_sounds.BonusCoins);
         }
     }
 }

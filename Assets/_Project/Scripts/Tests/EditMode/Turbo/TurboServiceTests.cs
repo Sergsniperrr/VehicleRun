@@ -37,7 +37,7 @@ namespace _Project.Tests.EditMode.Turbo
             _game = new SaveTestGame(_fixture);
             _time = new FakeTimeService();
             AdPresenter ads = new AdPresenter(new FakeAdvertisingService(), _fixture.Economy);
-            _ticker = new EconomyTicker(_time, _game.Roster, _game.Turbo, _game.Delivery, _game.ShopRewards, ads);
+            _ticker = new EconomyTicker(_time, _game.Roster, _game.Turbo, _game.Delivery, _game.ShopRewards, ads, _game.Collector);
             _startedCount = 0;
             _endedCount = 0;
             _game.Turbo.TurboStarted += OnTurboStarted;

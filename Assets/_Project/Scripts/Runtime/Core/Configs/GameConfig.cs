@@ -1,3 +1,4 @@
+using _Project.Core.Collector;
 using _Project.Core.Economy;
 using _Project.Core.Garage;
 using _Project.Core.Progression;
@@ -18,6 +19,7 @@ namespace _Project.Core.Configs
         [SerializeField] private TrackConfig _track;
         [SerializeField] private TurboConfig _turbo;
         [SerializeField] private PlayerLevelConfig _playerLevel;
+        [SerializeField] private CollectorConfig _collector;
 
         public int Version => _version;
         public VehicleCatalogConfig Vehicles => _vehicles;
@@ -26,5 +28,6 @@ namespace _Project.Core.Configs
         public TrackConfig Track => _track;
         public TurboConfig Turbo => _turbo;
         public PlayerLevelConfig PlayerLevel => _playerLevel;
+        public CollectorConfig Collector => _collector;
     }
 }

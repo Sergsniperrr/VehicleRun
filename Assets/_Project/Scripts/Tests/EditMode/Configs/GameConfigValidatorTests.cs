@@ -309,6 +309,65 @@ namespace _Project.Tests.EditMode.Configs
             AssertReportedBy(_fixture.Track);
         }
 
+        [Test]
+        public void MissingCollectorConfigIsReported()
+        {
+            _fixture.Change(_fixture.Config, "_collector", property => property.objectReferenceValue = null);
+
+            AssertReportedBy(_fixture.Config);
+        }
+
+        [TestCase(0)]
+        [TestCase(-1)]
+        public void CollectorSpawnIntervalNotAboveZeroIsReported(int minSeconds)
+        {
+            _fixture.Change(_fixture.Collector, "_spawnIntervalMinSeconds", property => property.intValue = minSeconds);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
+        [Test]
+        public void CollectorSpawnIntervalMaxBelowMinIsReported()
+        {
+            _fixture.Change(_fixture.Collector, "_spawnIntervalMaxSeconds", property => property.intValue = 30);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
+        [TestCase(0f)]
+        [TestCase(-1f)]
+        public void CollectorLifetimeNotAboveZeroIsReported(float lifetimeSeconds)
+        {
+            _fixture.Change(_fixture.Collector, "_lifetimeSeconds", property => property.floatValue = lifetimeSeconds);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
+        [Test]
+        public void CollectorMinChargesBelowOneIsReported()
+        {
+            _fixture.Change(_fixture.Collector, "_minCharges", property => property.intValue = 0);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
+        [Test]
+        public void CollectorMaxChargesBelowMinIsReported()
+        {
+            _fixture.Change(_fixture.Collector, "_maxCharges", property => property.intValue = 4);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
+        [TestCase(0f)]
+        [TestCase(-1f)]
+        public void CollectorSpeedNotAboveZeroIsReported(float trackSpeed)
+        {
+            _fixture.Change(_fixture.Collector, "_trackSpeed", property => property.floatValue = trackSpeed);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
         private IReadOnlyList<ConfigError> Validate()
         {
             return _validator.Validate(_fixture.Config, _fixture.Localization);

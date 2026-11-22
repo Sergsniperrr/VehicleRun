@@ -23,6 +23,8 @@ MonoBehaviour:
   _boost: {fileID: 11400000, guid: bbbc4b0701cd64b498a46c34ed4f5244, type: 2}
   _buy: {fileID: 11400000, guid: 1974cbb4af3f1754bbb530a01319ca34, type: 2}
   _nitro: {fileID: 11400000, guid: 6a3897cc3290cf244b3d03603fe0e7ec, type: 2}
+  _bonusShow: {fileID: 11400000, guid: d3d275eeb5b05704e8e7d4fd6e7e2bcc, type: 2}
+  _bonusCoins: {fileID: 11400000, guid: 9e2e7366ae16ce4439e5268f6b5c5a3b, type: 2}
   _startMovingFirstRankPitch: 1.3
   _startMovingLastRankPitch: 0.7
   _moneyMinIntervalSeconds: 0.1

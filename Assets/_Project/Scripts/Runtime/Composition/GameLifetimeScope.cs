@@ -4,6 +4,7 @@ using _Project.Core.Audio;
 using _Project.Core.Configs;
 using _Project.Features.Ads;
 using _Project.Features.Boxes;
+using _Project.Features.Collector;
 using _Project.Features.Economy;
 using _Project.Features.Garage;
 using _Project.Features.Instances;
@@ -78,6 +79,7 @@ namespace _Project.Composition
             builder.RegisterInstance(_gameConfig.Track);
             builder.RegisterInstance(_gameConfig.Turbo);
             builder.RegisterInstance(_gameConfig.PlayerLevel);
+            builder.RegisterInstance(_gameConfig.Collector);
         }
 
         private void RegisterGameplay(IContainerBuilder builder)
@@ -96,6 +98,7 @@ namespace _Project.Composition
             builder.Register<TrackPath>(Lifetime.Singleton);
             builder.Register<TrackRoster>(Lifetime.Singleton);
             builder.Register<TurboService>(Lifetime.Singleton);
+            builder.Register<CollectorService>(Lifetime.Singleton);
             builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();

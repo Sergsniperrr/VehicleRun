@@ -19,6 +19,7 @@ namespace _Project.Tests.EditMode.Sounds
         private const float LastRankPitch = 0.7f;
         private const float PitchTolerance = 0.0001f;
         private const int TurboUnlockRank = 3;
+        private const float CollectorSpawnIntervalSeconds = 60f;
 
         private GameConfigFixture _fixture;
         private SaveTestGame _game;
@@ -32,6 +33,8 @@ namespace _Project.Tests.EditMode.Sounds
         private AudioAsset _boost;
         private AudioAsset _buy;
         private AudioAsset _nitro;
+        private AudioAsset _bonusShow;
+        private AudioAsset _bonusCoins;
         private GameplaySounds _sounds;
 
         [SetUp]
@@ -48,6 +51,8 @@ namespace _Project.Tests.EditMode.Sounds
             _boost = ScriptableObject.CreateInstance<AudioAsset>();
             _buy = ScriptableObject.CreateInstance<AudioAsset>();
             _nitro = ScriptableObject.CreateInstance<AudioAsset>();
+            _bonusShow = ScriptableObject.CreateInstance<AudioAsset>();
+            _bonusCoins = ScriptableObject.CreateInstance<AudioAsset>();
             _config = ScriptableObject.CreateInstance<GameSoundsConfig>();
 
             SerializedObject serializedConfig = new SerializedObject(_config);
@@ -58,6 +63,8 @@ namespace _Project.Tests.EditMode.Sounds
             serializedConfig.FindProperty("_boost").objectReferenceValue = _boost;
             serializedConfig.FindProperty("_buy").objectReferenceValue = _buy;
             serializedConfig.FindProperty("_nitro").objectReferenceValue = _nitro;
+            serializedConfig.FindProperty("_bonusShow").objectReferenceValue = _bonusShow;
+            serializedConfig.FindProperty("_bonusCoins").objectReferenceValue = _bonusCoins;
             serializedConfig.FindProperty("_startMovingFirstRankPitch").floatValue = FirstRankPitch;
             serializedConfig.FindProperty("_startMovingLastRankPitch").floatValue = LastRankPitch;
             serializedConfig.FindProperty("_moneyMinIntervalSeconds").floatValue = MoneyMinIntervalSeconds;
@@ -72,7 +79,8 @@ namespace _Project.Tests.EditMode.Sounds
                 _game.Milestones,
                 _game.Turbo,
                 _fixture.Vehicles,
-                _game.Level);
+                _game.Level,
+                _game.Collector);
             _sounds.Start();
         }
 
@@ -90,6 +98,31 @@ namespace _Project.Tests.EditMode.Sounds
             Object.DestroyImmediate(_boost);
             Object.DestroyImmediate(_buy);
             Object.DestroyImmediate(_nitro);
+            Object.DestroyImmediate(_bonusShow);
+            Object.DestroyImmediate(_bonusCoins);
+        }
+
+        [Test]
+        public void CollectorAppearPlaysBonusShowSound()
+        {
+            _game.PlaceVehicle(0, 1);
+
+            _game.Collector.Advance(CollectorSpawnIntervalSeconds);
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _bonusShow }));
+        }
+
+        [Test]
+        public void EveryCollectorChargePlaysBonusCoinsSound()
+        {
+            _game.PlaceVehicle(0, 1);
+            _game.Collector.Advance(CollectorSpawnIntervalSeconds);
+            _audio.Clear();
+
+            _game.Collector.Collect();
+            _game.Collector.Collect();
+
+            Assert.That(_audio.Played, Is.EqualTo(new[] { _bonusCoins, _bonusCoins }));
         }
 
         [Test]

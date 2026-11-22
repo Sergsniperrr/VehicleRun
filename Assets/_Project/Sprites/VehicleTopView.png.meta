@@ -706,7 +706,7 @@ TextureImporter:
         width: 124
         height: 224
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -727,7 +727,7 @@ TextureImporter:
         width: 100
         height: 215
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -735,6 +735,27 @@ TextureImporter:
       bones: []
       spriteID: e39b6816a44af2c429ac4deedc783dff
       internalID: 1581887707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VehicleTopView_10
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 736
+        width: 130
+        height: 288
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8dfc6448174beb14d8eaab3c6cda2391
+      internalID: 155660894
       vertices: []
       indices: 
       edges: []
@@ -752,6 +773,7 @@ TextureImporter:
     nameFileIdTable:
       VehicleTopView_0: 140348626
       VehicleTopView_1: -1011971375
+      VehicleTopView_10: 155660894
       VehicleTopView_2: 132957941
       VehicleTopView_3: 1391811418
       VehicleTopView_4: 312859064

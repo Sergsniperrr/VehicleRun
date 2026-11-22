@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Project.Core.Collector;
 using _Project.Core.Economy;
 using _Project.Core.Garage;
 using _Project.Core.Localization;
@@ -52,6 +53,7 @@ namespace _Project.Core.Configs
             ValidateTrack(config.Track, errors);
             ValidateTurbo(config.Turbo, maxRank, errors);
             ValidatePlayerLevel(config.PlayerLevel, maxRank, errors);
+            ValidateCollector(config.Collector, errors);
 
             return errors;
         }
@@ -88,6 +90,11 @@ namespace _Project.Core.Configs
             if (config.PlayerLevel == null)
             {
                 errors.Add(new ConfigError(config, "Не назначен конфиг уровня игрока"));
+            }
+
+            if (config.Collector == null)
+            {
+                errors.Add(new ConfigError(config, "Не назначен конфиг инкассатора"));
             }
 
             return errors.Count == errorCount;
@@ -429,6 +436,39 @@ namespace _Project.Core.Configs
             if (double.IsNaN(playerLevel.RewardGrowth) || playerLevel.RewardGrowth < 1)
             {
                 errors.Add(new ConfigError(playerLevel, $"Рост награды за уровень {playerLevel.RewardGrowth}, должен быть не меньше 1"));
+            }
+        }
+
+        private void ValidateCollector(CollectorConfig collector, List<ConfigError> errors)
+        {
+            if (collector.SpawnIntervalMinSeconds <= 0)
+            {
+                errors.Add(new ConfigError(collector, $"Минимальный интервал появления инкассатора {collector.SpawnIntervalMinSeconds} секунд, должен быть больше 0"));
+            }
+
+            if (collector.SpawnIntervalMaxSeconds < collector.SpawnIntervalMinSeconds)
+            {
+                errors.Add(new ConfigError(collector, $"Максимальный интервал появления инкассатора {collector.SpawnIntervalMaxSeconds} секунд меньше минимального {collector.SpawnIntervalMinSeconds}"));
+            }
+
+            if (collector.LifetimeSeconds <= 0)
+            {
+                errors.Add(new ConfigError(collector, $"Время жизни инкассатора {collector.LifetimeSeconds} секунд, должно быть больше 0"));
+            }
+
+            if (collector.MinCharges < 1)
+            {
+                errors.Add(new ConfigError(collector, $"Минимум зарядов инкассатора {collector.MinCharges}, должен быть не меньше 1"));
+            }
+
+            if (collector.MaxCharges < collector.MinCharges)
+            {
+                errors.Add(new ConfigError(collector, $"Максимум зарядов инкассатора {collector.MaxCharges} меньше минимума {collector.MinCharges}"));
+            }
+
+            if (collector.TrackSpeed <= 0)
+            {
+                errors.Add(new ConfigError(collector, $"Скорость инкассатора {collector.TrackSpeed}, должна быть больше 0"));
             }
         }
 

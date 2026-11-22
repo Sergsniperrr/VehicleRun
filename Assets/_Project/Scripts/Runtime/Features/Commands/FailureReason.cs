@@ -25,5 +25,6 @@ namespace _Project.Features.Commands
         BoxRankLocked,
         MilestoneUnavailable,
         NoLevelReward,
+        CollectorInactive,
     }
 }
