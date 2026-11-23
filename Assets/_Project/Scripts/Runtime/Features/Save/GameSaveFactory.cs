@@ -9,6 +9,7 @@ using _Project.Features.Instances;
 using _Project.Features.Progression;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.Features.Tutorial;
 using _Project.Features.Vehicles;
 
 namespace _Project.Features.Save
@@ -27,6 +28,7 @@ namespace _Project.Features.Save
         private readonly CollectionMilestones _milestones;
         private readonly PlayerLevel _playerLevel;
         private readonly CatalogNews _catalogNews;
+        private readonly TutorialService _tutorial;
 
         public GameSaveFactory(
             GameConfig config,
@@ -40,7 +42,8 @@ namespace _Project.Features.Save
             TurboService turbo,
             CollectionMilestones milestones,
             PlayerLevel playerLevel,
-            CatalogNews catalogNews)
+            CatalogNews catalogNews,
+            TutorialService tutorial)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _instanceIds = instanceIds ?? throw new ArgumentNullException(nameof(instanceIds));
@@ -54,6 +57,7 @@ namespace _Project.Features.Save
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _catalogNews = catalogNews ?? throw new ArgumentNullException(nameof(catalogNews));
+            _tutorial = tutorial ?? throw new ArgumentNullException(nameof(tutorial));
         }
 
         public GameSave Create()
@@ -80,6 +84,7 @@ namespace _Project.Features.Save
                 ClaimedRewardLevel = _playerLevel.ClaimedRewardLevel,
                 CatalogSeenRank = _catalogNews.SeenRank,
                 TotalEarnedCoins = _wallet.TotalEarned,
+                TutorialStep = _tutorial.Step,
             };
         }
 

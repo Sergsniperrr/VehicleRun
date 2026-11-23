@@ -9,6 +9,7 @@ using _Project.Features.Save;
 using _Project.Features.Shop;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.Features.Tutorial;
 using _Project.Features.Vehicles;
 using _Project.Tests.EditMode.Boxes;
 using _Project.Tests.EditMode.Configs;
@@ -37,7 +38,8 @@ namespace _Project.Tests.EditMode.Save
             Collector = new CollectorService(fixture.Collector, fixture.Track, Garage, Wallet, Random);
             Milestones = new CollectionMilestones(Progress, Wallet, fixture.Economy);
             News = new CatalogNews(Progress, Milestones, fixture.Economy);
-            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level, News);
+            Tutorial = new TutorialService(Garage, Roster, Delivery, News);
+            Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level, News, Tutorial);
             Restorer = new GameStateRestorer(
                 fixture.Vehicles,
                 InstanceIds,
@@ -51,7 +53,8 @@ namespace _Project.Tests.EditMode.Save
                 Milestones,
                 Level,
                 Levels,
-                News);
+                News,
+                Tutorial);
         }
 
         public InstanceIdGenerator InstanceIds { get; }
@@ -69,6 +72,7 @@ namespace _Project.Tests.EditMode.Save
         public CollectorService Collector { get; }
         public CollectionMilestones Milestones { get; }
         public CatalogNews News { get; }
+        public TutorialService Tutorial { get; }
         public GameSaveFactory Factory { get; }
         public GameStateRestorer Restorer { get; }
 
@@ -95,6 +99,7 @@ namespace _Project.Tests.EditMode.Save
 
         public void Dispose()
         {
+            Tutorial.Dispose();
             News.Dispose();
             Level.Dispose();
             Progress.Dispose();

@@ -152,6 +152,16 @@ namespace _Project.Features.Boxes
 
         public CommandResult GrantRewardBox(int rank)
         {
+            return GrantBox(rank, BoxSource.Free);
+        }
+
+        public CommandResult GrantTutorialBox(int rank)
+        {
+            return GrantBox(rank, BoxSource.Tutorial);
+        }
+
+        private CommandResult GrantBox(int rank, BoxSource source)
+        {
             CheckRank(rank);
 
             if (_garage.TryFindFreeSlot(out int slot) == false)
@@ -159,7 +169,7 @@ namespace _Project.Features.Boxes
                 return new CommandResult(FailureReason.NoFreeSlot);
             }
 
-            PlaceBox(slot, BoxSource.Free, rank);
+            PlaceBox(slot, source, rank);
 
             return new CommandResult(FailureReason.None);
         }

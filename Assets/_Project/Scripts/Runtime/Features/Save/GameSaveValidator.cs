@@ -135,6 +135,11 @@ namespace _Project.Features.Save
                 return false;
             }
 
+            if (save.TutorialStep < Tutorial.TutorialService.CompletedStep || save.TutorialStep > Tutorial.TutorialService.MaxStep)
+            {
+                return false;
+            }
+
             if (IsNonNegativeNumber(save.FreeBoxRemainingSeconds) == false)
             {
                 return false;

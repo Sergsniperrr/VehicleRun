@@ -2,6 +2,7 @@ using System;
 using _Project.Core.Save;
 using _Project.Features.Boxes;
 using _Project.Features.Save;
+using _Project.Features.Tutorial;
 using _Project.Tests.EditMode.Configs;
 using NUnit.Framework;
 
@@ -67,6 +68,22 @@ namespace _Project.Tests.EditMode.Save
             AssertInvalid(save => save.ClaimedMilestoneRanks = new[] { 4, 4 });
             AssertInvalid(save => save.ClaimedMilestoneRanks = new[] { 0 });
             AssertInvalid(save => save.ClaimedMilestoneRanks = new[] { _fixture.Vehicles.MaxRank + 1 });
+        }
+
+        [Test]
+        public void ActiveTutorialStepIsValid()
+        {
+            GameSave save = _game.Factory.Create();
+            save.TutorialStep = TutorialService.MaxStep;
+
+            Assert.That(_validator.IsValid(save), Is.True);
+        }
+
+        [Test]
+        public void TutorialStepOutOfRangeIsInvalid()
+        {
+            AssertInvalid(save => save.TutorialStep = TutorialService.CompletedStep - 1);
+            AssertInvalid(save => save.TutorialStep = TutorialService.MaxStep + 1);
         }
 
         [Test]

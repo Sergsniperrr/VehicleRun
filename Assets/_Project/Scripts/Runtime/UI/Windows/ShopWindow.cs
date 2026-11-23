@@ -9,6 +9,7 @@ using _Project.Features.Economy;
 using _Project.Features.Effects;
 using _Project.Features.Progression;
 using _Project.Features.Shop;
+using _Project.Features.Tutorial;
 using _Project.UI.Boxes;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,6 +48,7 @@ namespace _Project.UI.Windows
         private IObjectResolver _resolver;
         private ShopRewards _rewards;
         private AdPresenter _ads;
+        private TutorialService _tutorial;
 
         protected override void Awake()
         {
@@ -76,7 +78,8 @@ namespace _Project.UI.Windows
             BoxPurchaseFailureText failureText,
             IObjectResolver resolver,
             ShopRewards rewards,
-            AdPresenter ads)
+            AdPresenter ads,
+            TutorialService tutorial)
         {
             _delivery = delivery ?? throw new ArgumentNullException(nameof(delivery));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
@@ -88,6 +91,7 @@ namespace _Project.UI.Windows
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _rewards = rewards ?? throw new ArgumentNullException(nameof(rewards));
             _ads = ads ?? throw new ArgumentNullException(nameof(ads));
+            _tutorial = tutorial ?? throw new ArgumentNullException(nameof(tutorial));
         }
 
         public override void Show()
@@ -182,7 +186,10 @@ namespace _Project.UI.Windows
 
         private void OnRowBuyClicked(ShopRowView row)
         {
-            _ads.TryShowInterstitial();
+            if (_tutorial.IsActive == false)
+            {
+                _ads.TryShowInterstitial();
+            }
 
             CommandResult result = _delivery.BuyBox(row.Rank);
 
@@ -209,7 +216,7 @@ namespace _Project.UI.Windows
             _freeOfferRank = NoRank;
             _discountOfferRank = NoRank;
 
-            if (_rewards.IsReady == false)
+            if (_tutorial.IsActive || _rewards.IsReady == false)
             {
                 HideAllRewards();
 

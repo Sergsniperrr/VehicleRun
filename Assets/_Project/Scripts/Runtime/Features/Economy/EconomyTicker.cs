@@ -6,6 +6,7 @@ using _Project.Features.Collector;
 using _Project.Features.Shop;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.Features.Tutorial;
 using VContainer.Unity;
 
 namespace _Project.Features.Economy
@@ -19,6 +20,7 @@ namespace _Project.Features.Economy
         private readonly ShopRewards _shopRewards;
         private readonly AdPresenter _ads;
         private readonly CollectorService _collector;
+        private readonly TutorialService _tutorial;
 
         public EconomyTicker(
             ITimeService time,
@@ -27,7 +29,8 @@ namespace _Project.Features.Economy
             BoxDelivery delivery,
             ShopRewards shopRewards,
             AdPresenter ads,
-            CollectorService collector)
+            CollectorService collector,
+            TutorialService tutorial)
         {
             _time = time ?? throw new ArgumentNullException(nameof(time));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
@@ -36,6 +39,7 @@ namespace _Project.Features.Economy
             _shopRewards = shopRewards ?? throw new ArgumentNullException(nameof(shopRewards));
             _ads = ads ?? throw new ArgumentNullException(nameof(ads));
             _collector = collector ?? throw new ArgumentNullException(nameof(collector));
+            _tutorial = tutorial ?? throw new ArgumentNullException(nameof(tutorial));
         }
 
         public void Tick()
@@ -44,7 +48,12 @@ namespace _Project.Features.Economy
 
             _roster.Advance(deltaTime, _turbo);
             _turbo.Advance(deltaTime);
-            _delivery.Advance(deltaTime);
+
+            if (_tutorial.IsActive == false)
+            {
+                _delivery.Advance(deltaTime);
+            }
+
             _shopRewards.Advance(deltaTime);
             _ads.Advance(deltaTime);
             _collector.Advance(deltaTime);

@@ -6,6 +6,7 @@ using _Project.Features.Garage;
 using _Project.Features.Progression;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.Features.Tutorial;
 using _Project.Features.Vehicles;
 using VContainer.Unity;
 
@@ -23,6 +24,7 @@ namespace _Project.Features.Save
         private readonly CollectionMilestones _milestones;
         private readonly PlayerLevel _playerLevel;
         private readonly CatalogNews _catalogNews;
+        private readonly TutorialService _tutorial;
         private readonly ITimeService _time;
 
         private bool _isWriting;
@@ -38,6 +40,7 @@ namespace _Project.Features.Save
             CollectionMilestones milestones,
             PlayerLevel playerLevel,
             CatalogNews catalogNews,
+            TutorialService tutorial,
             ITimeService time)
         {
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -48,6 +51,7 @@ namespace _Project.Features.Save
             _milestones = milestones ?? throw new ArgumentNullException(nameof(milestones));
             _playerLevel = playerLevel ?? throw new ArgumentNullException(nameof(playerLevel));
             _catalogNews = catalogNews ?? throw new ArgumentNullException(nameof(catalogNews));
+            _tutorial = tutorial ?? throw new ArgumentNullException(nameof(tutorial));
             _time = time ?? throw new ArgumentNullException(nameof(time));
         }
 
@@ -72,6 +76,7 @@ namespace _Project.Features.Save
             _milestones.MilestoneClaimed += OnMilestoneClaimed;
             _playerLevel.RewardClaimed += OnRewardClaimed;
             _catalogNews.Seen += OnCatalogSeen;
+            _tutorial.StepChanged += OnTutorialStepChanged;
         }
 
         public void LateTick()
@@ -114,6 +119,7 @@ namespace _Project.Features.Save
             _milestones.MilestoneClaimed -= OnMilestoneClaimed;
             _playerLevel.RewardClaimed -= OnRewardClaimed;
             _catalogNews.Seen -= OnCatalogSeen;
+            _tutorial.StepChanged -= OnTutorialStepChanged;
         }
 
         private void Write(bool isImportant)
@@ -189,6 +195,11 @@ namespace _Project.Features.Save
         }
 
         private void OnCatalogSeen()
+        {
+            MarkImportantChange();
+        }
+
+        private void OnTutorialStepChanged()
         {
             MarkImportantChange();
         }

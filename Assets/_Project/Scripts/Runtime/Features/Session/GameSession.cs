@@ -1,5 +1,6 @@
 using System;
 using _Project.Features.Save;
+using _Project.Features.Tutorial;
 
 namespace _Project.Features.Session
 {
@@ -8,12 +9,14 @@ namespace _Project.Features.Session
         private readonly ProgressLoader _loader;
         private readonly SaveScheduler _saveScheduler;
         private readonly NewGameSetup _newGameSetup;
+        private readonly TutorialService _tutorial;
 
-        public GameSession(ProgressLoader loader, SaveScheduler saveScheduler, NewGameSetup newGameSetup)
+        public GameSession(ProgressLoader loader, SaveScheduler saveScheduler, NewGameSetup newGameSetup, TutorialService tutorial)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
             _saveScheduler = saveScheduler ?? throw new ArgumentNullException(nameof(saveScheduler));
             _newGameSetup = newGameSetup ?? throw new ArgumentNullException(nameof(newGameSetup));
+            _tutorial = tutorial ?? throw new ArgumentNullException(nameof(tutorial));
         }
 
         public bool IsOpen { get; private set; }
@@ -34,6 +37,7 @@ namespace _Project.Features.Session
             if (IsNewGame)
             {
                 _newGameSetup.Apply();
+                _tutorial.Begin();
             }
         }
     }

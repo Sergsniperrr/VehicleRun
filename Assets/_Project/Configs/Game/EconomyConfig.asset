@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 115549933d5ed404fbfc5ee089cddce2, type: 3}
   m_Name: EconomyConfig
   m_EditorClassIdentifier: 
-  _startCoins: 60
+  _startCoins: 80
   _startVehicleRank: 1
   _startVehicleCount: 2
   _shopRankLag: 4

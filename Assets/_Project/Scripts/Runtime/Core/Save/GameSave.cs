@@ -27,5 +27,6 @@ namespace _Project.Core.Save
         public int ClaimedRewardLevel;
         public int CatalogSeenRank;
         public long TotalEarnedCoins;
+        public int TutorialStep;
     }
 }

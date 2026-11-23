@@ -17,6 +17,7 @@ using _Project.Features.Shop;
 using _Project.Features.Sounds;
 using _Project.Features.Track;
 using _Project.Features.Turbo;
+using _Project.Features.Tutorial;
 using _Project.Infrastructure.Audio;
 using _Project.UI.Boxes;
 using _Project.UI.Sounds;
@@ -99,6 +100,7 @@ namespace _Project.Composition
             builder.Register<TrackRoster>(Lifetime.Singleton);
             builder.Register<TurboService>(Lifetime.Singleton);
             builder.Register<CollectorService>(Lifetime.Singleton);
+            builder.Register<TutorialService>(Lifetime.Singleton);
             builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();

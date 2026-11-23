@@ -43,7 +43,7 @@ MonoBehaviour:
   _progressRadius: 3
   _progressAtBottom: 0
   _loadingText: 
-  _fixedAspect: 0
+  _fixedAspect: 1
   _aspectRatio: 9/16
   _freeAspectOnMobile: 0
   _pageUsesLoaderBackground: 0

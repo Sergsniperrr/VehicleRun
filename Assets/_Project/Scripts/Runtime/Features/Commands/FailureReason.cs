@@ -26,5 +26,6 @@ namespace _Project.Features.Commands
         MilestoneUnavailable,
         NoLevelReward,
         CollectorInactive,
+        TutorialSkipUnavailable,
     }
 }

@@ -107,7 +107,8 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects»;
 - окно левелапа игрока ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!», кнопка — `ui.common.claim`;
 - окно новой машины: `popup.newvehicle.title` — «Новая машина!» / «New vehicle!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`;
-- окно лидерборда ([Gameplay.md](Gameplay.md), раздел 13): `popup.leaderboard.title` — «Рейтинг» / «Leaderboard», `popup.leaderboard.loading` — «Загрузка…» / «Loading…», `popup.leaderboard.empty` — «Рейтинг пока пуст» / «No scores yet», `popup.leaderboard.anonymous` — «Игрок» / «Player» (имя игрока без имени).
+- окно лидерборда ([Gameplay.md](Gameplay.md), раздел 13): `popup.leaderboard.title` — «Рейтинг» / «Leaderboard», `popup.leaderboard.loading` — «Загрузка…» / «Loading…», `popup.leaderboard.empty` — «Рейтинг пока пуст» / «No scores yet», `popup.leaderboard.anonymous` — «Игрок» / «Player» (имя игрока без имени);
+- подсказки обучения ([Gameplay.md](Gameplay.md), раздел 15а, задача 2.3): `tutorial.step1`…`tutorial.step6` — текст над подсветкой на каждом шаге; `tutorial.step5.open` — «Откройте купленную коробку» / «Open the box you bought» (вторая фаза шага 5, после покупки); `tutorial.skip` — «Пропустить» / «Skip». Номер в ключе совпадает с `TutorialService.Step`, презентер строит ключ как `tutorial.step` + номер шага и добавляет `.open`, когда купленная коробка ждёт открытия.
 
 Остальные тексты добавляются по мере их появления в игре.
 
