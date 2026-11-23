@@ -9,7 +9,7 @@ namespace _Project.Tests.EditMode.Save
     public class SaveSchedulerTests
     {
         private const float FrameSeconds = 0.02f;
-        private const float LongFrameSeconds = 0.4f;
+        private const float LongFrameSeconds = 2f;
         private const int FramesBeforePeriodicWrite = 2;
 
         private GameConfigFixture _fixture;

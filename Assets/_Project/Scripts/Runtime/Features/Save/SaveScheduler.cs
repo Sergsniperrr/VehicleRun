@@ -13,7 +13,7 @@ namespace _Project.Features.Save
 {
     public class SaveScheduler : ILateTickable, IDisposable
     {
-        private const float PeriodicWriteIntervalSeconds = 1f;
+        private const float PeriodicWriteIntervalSeconds = 5f;
 
         private readonly IProgressStorage _storage;
         private readonly GameSaveFactory _factory;
