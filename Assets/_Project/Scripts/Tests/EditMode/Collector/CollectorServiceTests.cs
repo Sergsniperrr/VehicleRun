@@ -13,6 +13,7 @@ namespace _Project.Tests.EditMode.Collector
         private const int MinCharges = 5;
         private const int MaxCharges = 10;
         private const float TrackSpeed = 4.4f;
+        private const float ChargeRewardMultiplier = 1.5f;
         private const float TickSeconds = 1f;
         private const float DistanceTolerance = 0.01f;
 
@@ -76,14 +77,14 @@ namespace _Project.Tests.EditMode.Collector
         }
 
         [Test]
-        public void ChargeRewardIsTopVehicleCoinsPerLap()
+        public void ChargeRewardIsTopVehicleCoinsPerLapTimesMultiplier()
         {
             _game.PlaceVehicle(0, 1);
             _game.PlaceVehicle(1, 4);
 
             Spawn();
 
-            Assert.That(_game.Collector.ChargeReward, Is.EqualTo(_fixture.Vehicles.GetByRank(4).CoinsPerLap));
+            Assert.That(_game.Collector.ChargeReward, Is.EqualTo(ExpectedReward(4)));
         }
 
         [Test]
@@ -95,7 +96,7 @@ namespace _Project.Tests.EditMode.Collector
 
             Spawn();
 
-            Assert.That(_game.Collector.ChargeReward, Is.EqualTo(_fixture.Vehicles.GetByRank(4).CoinsPerLap));
+            Assert.That(_game.Collector.ChargeReward, Is.EqualTo(ExpectedReward(4)));
         }
 
         [Test]
@@ -146,7 +147,7 @@ namespace _Project.Tests.EditMode.Collector
             _game.PlaceVehicle(0, 2);
             Spawn();
             long coinsBefore = _game.Wallet.Coins;
-            long reward = _fixture.Vehicles.GetByRank(2).CoinsPerLap;
+            long reward = ExpectedReward(2);
 
             CommandResult result = _game.Collector.Collect();
 
@@ -187,7 +188,7 @@ namespace _Project.Tests.EditMode.Collector
         {
             _game.PlaceVehicle(0, 1);
             Spawn();
-            long reward = _fixture.Vehicles.GetByRank(1).CoinsPerLap;
+            long reward = ExpectedReward(1);
             _game.PlaceVehicle(1, 5);
             long coinsBefore = _game.Wallet.Coins;
 
@@ -216,6 +217,11 @@ namespace _Project.Tests.EditMode.Collector
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => _game.Collector.Advance(-1f));
             Assert.Throws<ArgumentOutOfRangeException>(() => _game.Collector.Advance(float.NaN));
+        }
+
+        private long ExpectedReward(int rank)
+        {
+            return (long)Math.Round(_fixture.Vehicles.GetByRank(rank).CoinsPerLap * (double)ChargeRewardMultiplier);
         }
 
         private void Spawn()

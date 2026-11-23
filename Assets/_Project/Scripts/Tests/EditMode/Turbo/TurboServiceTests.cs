@@ -254,11 +254,37 @@ namespace _Project.Tests.EditMode.Turbo
         }
 
         [Test]
-        public void TapBoostDoesNotStackWithTurbo()
+        public void TapIsRejectedDuringTurbo()
         {
             TrackRunner runner = PrepareUnlockedTrack();
             _game.Turbo.StartTurbo();
+
+            CommandResult result = _game.Turbo.BoostRunner(runner);
+
+            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.TurboActive));
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(0f));
+            Assert.That(_game.Turbo.CalculateRunnerSeconds(runner, TickSeconds), Is.EqualTo(TickSeconds * _fixture.Turbo.SpeedMultiplier));
+        }
+
+        [Test]
+        public void TapWorksAgainDuringCooldown()
+        {
+            TrackRunner runner = PrepareUnlockedTrack();
+            _game.Turbo.StartTurbo();
+            _game.Turbo.Advance(_fixture.Turbo.FreeDurationSeconds);
+
+            CommandResult result = _game.Turbo.BoostRunner(runner);
+
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(runner.TapBoostRemainingSeconds, Is.EqualTo(_fixture.Turbo.TapBoostSeconds));
+        }
+
+        [Test]
+        public void TapBoostStartedBeforeTurboDoesNotStack()
+        {
+            TrackRunner runner = PrepareUnlockedTrack();
             _game.Turbo.BoostRunner(runner);
+            _game.Turbo.StartTurbo();
 
             float runnerSeconds = _game.Turbo.CalculateRunnerSeconds(runner, TickSeconds);
 

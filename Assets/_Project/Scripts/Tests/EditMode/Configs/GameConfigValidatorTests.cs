@@ -361,6 +361,16 @@ namespace _Project.Tests.EditMode.Configs
 
         [TestCase(0f)]
         [TestCase(-1f)]
+        [TestCase(float.NaN)]
+        public void CollectorChargeRewardMultiplierNotAboveZeroIsReported(float multiplier)
+        {
+            _fixture.Change(_fixture.Collector, "_chargeRewardMultiplier", property => property.floatValue = multiplier);
+
+            AssertReportedBy(_fixture.Collector);
+        }
+
+        [TestCase(0f)]
+        [TestCase(-1f)]
         public void CollectorSpeedNotAboveZeroIsReported(float trackSpeed)
         {
             _fixture.Change(_fixture.Collector, "_trackSpeed", property => property.floatValue = trackSpeed);

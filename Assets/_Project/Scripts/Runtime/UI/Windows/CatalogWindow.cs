@@ -116,8 +116,14 @@ namespace _Project.UI.Windows
             for (int i = 0; i < _milestones.Length; i++)
             {
                 int rank = rewards[i].Rank;
-                _milestones[i].Show(rank, _collection.GetState(rank));
+                ShowMilestone(_milestones[i], rank);
             }
+        }
+
+        private void ShowMilestone(CatalogMilestoneView milestone, int rank)
+        {
+            string rewardText = _formatter.FormatShort(_collection.GetReward(rank));
+            milestone.Show(rank, _collection.GetState(rank), rewardText);
         }
 
         private void CreateMissingCards(int cardCount)
@@ -179,7 +185,7 @@ namespace _Project.UI.Windows
                 return;
             }
 
-            milestone.Show(milestone.Rank, _collection.GetState(milestone.Rank));
+            ShowMilestone(milestone, milestone.Rank);
             ShowClaimPopup(milestone, reward);
         }
 

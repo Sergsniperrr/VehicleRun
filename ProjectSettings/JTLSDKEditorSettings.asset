@@ -54,6 +54,6 @@ MonoBehaviour:
   _buildOutput: 1
   _buildPath: E:/Builds/VehicleMerge
   _buildNamePattern: '{product}_{configuration}_b{build}'
-  _buildNumber: 5
+  _buildNumber: 6
   _developmentBuild: 0
   _openFolderAfterBuild: 1

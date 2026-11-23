@@ -61,6 +61,7 @@ namespace _Project.Tests.EditMode.Configs
         private const float CollectorLifetimeSeconds = 10f;
         private const int CollectorMinCharges = 5;
         private const int CollectorMaxCharges = 10;
+        private const float CollectorChargeRewardMultiplier = 1.5f;
         private const float CollectorTrackSpeed = 4.4f;
         private const long FirstLevelExperience = 4;
         private const long ExperienceStepPerLevel = 8;
@@ -292,6 +293,7 @@ namespace _Project.Tests.EditMode.Configs
             collector.FindProperty("_lifetimeSeconds").floatValue = CollectorLifetimeSeconds;
             collector.FindProperty("_minCharges").intValue = CollectorMinCharges;
             collector.FindProperty("_maxCharges").intValue = CollectorMaxCharges;
+            collector.FindProperty("_chargeRewardMultiplier").floatValue = CollectorChargeRewardMultiplier;
             collector.FindProperty("_trackSpeed").floatValue = CollectorTrackSpeed;
             collector.ApplyModifiedPropertiesWithoutUndo();
         }

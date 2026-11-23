@@ -17,4 +17,5 @@ MonoBehaviour:
   _lifetimeSeconds: 10
   _minCharges: 5
   _maxCharges: 10
+  _chargeRewardMultiplier: 1.3333334
   _trackSpeed: 4.4

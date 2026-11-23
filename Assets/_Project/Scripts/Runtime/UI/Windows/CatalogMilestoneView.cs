@@ -17,6 +17,7 @@ namespace _Project.UI.Windows
         [SerializeField] private GameObject _lock;
         [SerializeField] private TMP_Text _number;
         [SerializeField] private GameObject _claimedMark;
+        [SerializeField] private TMP_Text _rewardLabel;
         [SerializeField] private Button _button;
 
         public event Action<CatalogMilestoneView> Clicked;
@@ -34,7 +35,7 @@ namespace _Project.UI.Windows
             _button.onClick.RemoveListener(OnButtonClicked);
         }
 
-        public void Show(int rank, MilestoneState state)
+        public void Show(int rank, MilestoneState state, string rewardText)
         {
             bool isLocked = state == MilestoneState.Locked;
             bool isClaimable = state == MilestoneState.Claimable;
@@ -48,6 +49,8 @@ namespace _Project.UI.Windows
             _gift.gameObject.SetActive(isLocked == false);
             _gift.color = isClaimed ? ClaimedGiftColor : Color.white;
             _claimedMark.SetActive(isClaimed);
+            _rewardLabel.text = rewardText;
+            _rewardLabel.gameObject.SetActive(isClaimable);
             _button.interactable = isClaimable;
         }
 

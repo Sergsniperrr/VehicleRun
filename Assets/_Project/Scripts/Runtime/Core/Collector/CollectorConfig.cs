@@ -10,6 +10,7 @@ namespace _Project.Core.Collector
         [SerializeField] private float _lifetimeSeconds;
         [SerializeField] private int _minCharges;
         [SerializeField] private int _maxCharges;
+        [SerializeField] private float _chargeRewardMultiplier;
         [SerializeField] private float _trackSpeed;
 
         public int SpawnIntervalMinSeconds => _spawnIntervalMinSeconds;
@@ -17,6 +18,7 @@ namespace _Project.Core.Collector
         public float LifetimeSeconds => _lifetimeSeconds;
         public int MinCharges => _minCharges;
         public int MaxCharges => _maxCharges;
+        public float ChargeRewardMultiplier => _chargeRewardMultiplier;
         public float TrackSpeed => _trackSpeed;
     }
 }

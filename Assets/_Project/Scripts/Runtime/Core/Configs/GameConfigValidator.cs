@@ -466,6 +466,11 @@ namespace _Project.Core.Configs
                 errors.Add(new ConfigError(collector, $"Максимум зарядов инкассатора {collector.MaxCharges} меньше минимума {collector.MinCharges}"));
             }
 
+            if (float.IsNaN(collector.ChargeRewardMultiplier) || collector.ChargeRewardMultiplier <= 0)
+            {
+                errors.Add(new ConfigError(collector, $"Множитель награды заряда инкассатора {collector.ChargeRewardMultiplier}, должен быть больше 0"));
+            }
+
             if (collector.TrackSpeed <= 0)
             {
                 errors.Add(new ConfigError(collector, $"Скорость инкассатора {collector.TrackSpeed}, должна быть больше 0"));

@@ -90,6 +90,11 @@ namespace _Project.Features.Turbo
                 return new CommandResult(FailureReason.NotOnTrack);
             }
 
+            if (IsActive)
+            {
+                return new CommandResult(FailureReason.TurboActive);
+            }
+
             runner.StartTapBoost(_config.TapBoostSeconds);
             RunnerBoosted?.Invoke(runner);
 

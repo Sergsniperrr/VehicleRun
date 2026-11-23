@@ -138,7 +138,7 @@ namespace _Project.Features.Collector
                 }
             }
 
-            reward = best == null ? 0 : best.CoinsPerLap;
+            reward = best == null ? 0 : (long)Math.Round(best.CoinsPerLap * (double)_config.ChargeRewardMultiplier);
 
             return best != null;
         }

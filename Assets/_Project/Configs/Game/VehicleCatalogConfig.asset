@@ -16,7 +16,7 @@ MonoBehaviour:
   - _id: scooter
     _rank: 1
     _nameKey: vehicle.scooter.name
-    _coinsPerLap: 3
+    _coinsPerLap: 2
     _trackSpeed: 3.965
     _garageSprite: {fileID: -749692788, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 2091854564, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -24,7 +24,7 @@ MonoBehaviour:
   - _id: motorcycle
     _rank: 2
     _nameKey: vehicle.motorcycle.name
-    _coinsPerLap: 4
+    _coinsPerLap: 3
     _trackSpeed: 5.45125
     _garageSprite: {fileID: 398276104, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1807074531, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -32,7 +32,7 @@ MonoBehaviour:
   - _id: atv
     _rank: 3
     _nameKey: vehicle.atv.name
-    _coinsPerLap: 10
+    _coinsPerLap: 7
     _trackSpeed: 4.9665
     _garageSprite: {fileID: -886959382, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 133480130, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -40,7 +40,7 @@ MonoBehaviour:
   - _id: car
     _rank: 4
     _nameKey: vehicle.car.name
-    _coinsPerLap: 20
+    _coinsPerLap: 13
     _trackSpeed: 5.705
     _garageSprite: {fileID: -1258490958, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 809811616, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -48,7 +48,7 @@ MonoBehaviour:
   - _id: taxi
     _rank: 5
     _nameKey: vehicle.taxi.name
-    _coinsPerLap: 42
+    _coinsPerLap: 28
     _trackSpeed: 5.858928
     _garageSprite: {fileID: -527805359, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -908089454, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -56,7 +56,7 @@ MonoBehaviour:
   - _id: police_car
     _rank: 6
     _nameKey: vehicle.police_car.name
-    _coinsPerLap: 84
+    _coinsPerLap: 56
     _trackSpeed: 6.506262
     _garageSprite: {fileID: -2031340353, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -896926812, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -64,7 +64,7 @@ MonoBehaviour:
   - _id: off_roader
     _rank: 7
     _nameKey: vehicle.off_roader.name
-    _coinsPerLap: 205
+    _coinsPerLap: 137
     _trackSpeed: 5.8561316
     _garageSprite: {fileID: 475063169, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1476264254, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -72,7 +72,7 @@ MonoBehaviour:
   - _id: pickup
     _rank: 8
     _nameKey: vehicle.pickup.name
-    _coinsPerLap: 444
+    _coinsPerLap: 296
     _trackSpeed: 5.943993
     _garageSprite: {fileID: -768060521, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 201530925, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -80,7 +80,7 @@ MonoBehaviour:
   - _id: rv
     _rank: 9
     _nameKey: vehicle.rv.name
-    _coinsPerLap: 1045
+    _coinsPerLap: 697
     _trackSpeed: 5.55177
     _garageSprite: {fileID: 1909001089, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1394327480, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -88,7 +88,7 @@ MonoBehaviour:
   - _id: van
     _rank: 10
     _nameKey: vehicle.van.name
-    _coinsPerLap: 2164
+    _coinsPerLap: 1443
     _trackSpeed: 5.8991685
     _garageSprite: {fileID: -1281711103, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1609601331, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -96,7 +96,7 @@ MonoBehaviour:
   - _id: ice_cream_truck
     _rank: 11
     _nameKey: vehicle.ice_cream_truck.name
-    _coinsPerLap: 5105
+    _coinsPerLap: 3403
     _trackSpeed: 5.5004897
     _garageSprite: {fileID: -100590382, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1011971375, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -104,7 +104,7 @@ MonoBehaviour:
   - _id: ambulance
     _rank: 12
     _nameKey: vehicle.ambulance.name
-    _coinsPerLap: 9019
+    _coinsPerLap: 6013
     _trackSpeed: 6.8496284
     _garageSprite: {fileID: 600542862, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1341691640, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -112,7 +112,7 @@ MonoBehaviour:
   - _id: race_car
     _rank: 13
     _nameKey: vehicle.race_car.name
-    _coinsPerLap: 16574
+    _coinsPerLap: 11049
     _trackSpeed: 8.199831
     _garageSprite: {fileID: 1394651023, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 253776870, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -120,7 +120,7 @@ MonoBehaviour:
   - _id: school_bus
     _rank: 14
     _nameKey: vehicle.school_bus.name
-    _coinsPerLap: 49420
+    _coinsPerLap: 32947
     _trackSpeed: 6.0500445
     _garageSprite: {fileID: -1349923729, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1580600608, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -128,7 +128,7 @@ MonoBehaviour:
   - _id: city_bus
     _rank: 15
     _nameKey: vehicle.city_bus.name
-    _coinsPerLap: 106957
+    _coinsPerLap: 71305
     _trackSpeed: 6.1499896
     _garageSprite: {fileID: 93133834, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 385421987, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -136,7 +136,7 @@ MonoBehaviour:
   - _id: tow_truck
     _rank: 16
     _nameKey: vehicle.tow_truck.name
-    _coinsPerLap: 231541
+    _coinsPerLap: 154361
     _trackSpeed: 6.249999
     _garageSprite: {fileID: 826394609, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 132957941, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -144,7 +144,7 @@ MonoBehaviour:
   - _id: fire_truck
     _rank: 17
     _nameKey: vehicle.fire_truck.name
-    _coinsPerLap: 464772
+    _coinsPerLap: 309848
     _trackSpeed: 6.8500013
     _garageSprite: {fileID: -604055847, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1425058431, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -152,7 +152,7 @@ MonoBehaviour:
   - _id: tanker
     _rank: 18
     _nameKey: vehicle.tanker.name
-    _coinsPerLap: 1085910
+    _coinsPerLap: 723940
     _trackSpeed: 6.4500027
     _garageSprite: {fileID: 594645367, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1581887707, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -160,7 +160,7 @@ MonoBehaviour:
   - _id: semi_truck
     _rank: 19
     _nameKey: vehicle.semi_truck.name
-    _coinsPerLap: 2266041
+    _coinsPerLap: 1510694
     _trackSpeed: 6.7999988
     _garageSprite: {fileID: -1351482955, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 212871308, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -168,7 +168,7 @@ MonoBehaviour:
   - _id: dump_truck
     _rank: 20
     _nameKey: vehicle.dump_truck.name
-    _coinsPerLap: 5296869
+    _coinsPerLap: 3531246
     _trackSpeed: 6.4
     _garageSprite: {fileID: 166980316, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 273570105, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -176,7 +176,7 @@ MonoBehaviour:
   - _id: garbage_truck
     _rank: 21
     _nameKey: vehicle.garbage_truck.name
-    _coinsPerLap: 11932786
+    _coinsPerLap: 7955191
     _trackSpeed: 6.25
     _garageSprite: {fileID: 1059607207, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 312859064, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -184,7 +184,7 @@ MonoBehaviour:
   - _id: cement_mixer
     _rank: 22
     _nameKey: vehicle.cement_mixer.name
-    _coinsPerLap: 25838711
+    _coinsPerLap: 17225807
     _trackSpeed: 6.35
     _garageSprite: {fileID: -2107013325, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1391811418, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -192,7 +192,7 @@ MonoBehaviour:
   - _id: tractor
     _rank: 23
     _nameKey: vehicle.tractor.name
-    _coinsPerLap: 60666688
+    _coinsPerLap: 40444459
     _trackSpeed: 5.95
     _garageSprite: {fileID: -1969731705, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -2141296699, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -200,7 +200,7 @@ MonoBehaviour:
   - _id: combine
     _rank: 24
     _nameKey: vehicle.combine.name
-    _coinsPerLap: 136918441
+    _coinsPerLap: 91278961
     _trackSpeed: 5.8
     _garageSprite: {fileID: -1624023886, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -373401529, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -208,7 +208,7 @@ MonoBehaviour:
   - _id: forklift
     _rank: 25
     _nameKey: vehicle.forklift.name
-    _coinsPerLap: 296115136
+    _coinsPerLap: 197410091
     _trackSpeed: 5.9
     _garageSprite: {fileID: -2039404869, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 140348626, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -216,7 +216,7 @@ MonoBehaviour:
   - _id: bulldozer
     _rank: 26
     _nameKey: vehicle.bulldozer.name
-    _coinsPerLap: 668447729
+    _coinsPerLap: 445631819
     _trackSpeed: 5.75
     _garageSprite: {fileID: 916976774, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -115877651, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -224,7 +224,7 @@ MonoBehaviour:
   - _id: road_roller
     _rank: 27
     _nameKey: vehicle.road_roller.name
-    _coinsPerLap: 1445446795
+    _coinsPerLap: 963631197
     _trackSpeed: 5.85
     _garageSprite: {fileID: 283292947, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -917199640, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -232,7 +232,7 @@ MonoBehaviour:
   - _id: excavator
     _rank: 28
     _nameKey: vehicle.excavator.name
-    _coinsPerLap: 3126537844
+    _coinsPerLap: 2084358563
     _trackSpeed: 5.95
     _garageSprite: {fileID: 36161328, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 1199609021, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -240,7 +240,7 @@ MonoBehaviour:
   - _id: tank
     _rank: 29
     _nameKey: vehicle.tank.name
-    _coinsPerLap: 5805160460
+    _coinsPerLap: 3870106973
     _trackSpeed: 7.05
     _garageSprite: {fileID: -769208317, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: -1709484768, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
@@ -248,7 +248,7 @@ MonoBehaviour:
   - _id: armored_rover
     _rank: 30
     _nameKey: vehicle.armored_rover.name
-    _coinsPerLap: 11397220035
+    _coinsPerLap: 7598146690
     _trackSpeed: 7.9
     _garageSprite: {fileID: 1058512369, guid: af39b8ba74250004eab8e0df4a64ac24, type: 3}
     _trackSprite: {fileID: 281877013, guid: b1ee3cf7b166d6743b67e581e65bcfc9, type: 3}
