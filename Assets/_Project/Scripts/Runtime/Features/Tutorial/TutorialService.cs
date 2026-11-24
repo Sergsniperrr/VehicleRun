@@ -8,7 +8,7 @@ using _Project.Features.Vehicles;
 
 namespace _Project.Features.Tutorial
 {
-    public class TutorialService : IDisposable
+    public class TutorialService : IDropRestriction, IDisposable
     {
         public const int CompletedStep = 0;
         public const int SendToTrackStep = 1;
@@ -49,6 +49,7 @@ namespace _Project.Features.Tutorial
         public bool IsActive => Step != CompletedStep;
         public bool CanSkip => IsActive && Step >= UpgradeTrackStep;
         public bool IsPurchasedBoxWaiting => Step == BuyBoxStep && _hasPurchasedBox;
+        public bool IsTrackOnly => Step == SendToTrackStep;
 
         public void Begin()
         {

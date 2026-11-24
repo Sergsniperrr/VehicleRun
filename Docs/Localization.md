@@ -102,13 +102,12 @@ builder.Register<JTLLocalizationService>(Lifetime.Singleton).As<ILocalizationSer
 - подпись на закрытой карточке каталога (задача VEH-32): `popup.catalog.locked` — «Закрыто» / «Closed». Стоит снизу карточки; с 19.11.2026 заменила условие слияния;
 - `popup.catalog.unlock_condition` — «Объедините две машины ранга {0}» / «Merge two rank {0} vehicles». С 19.11.2026 в коде не используется (закрытая карточка показывает «Закрыто»), ключ оставлен в ассете;
 - подпись бесплатной рекламной кнопки в магазине (задача VEH-30): `shop.reward.free` — «беспл.» / «free». Кнопка «−20%» подписывается числом из конфига, своего ключа у неё нет;
-- сообщения об откате сейва ([Gameplay.md](Gameplay.md), раздел 14): `popup.save.title` — «Сохранение» / «Saved game», `popup.save.restored_backup` и `popup.save.new_game`;
 - заглушки разделов: `popup.section.coming_soon` — «Раздел появится позже» / «Coming soon» и названия `popup.catalog.title`, `popup.decor.title`, `popup.shop.title`, `popup.settings.title` — «Достижения» / «Achievements» (задача VEH-21, до 19.11.2026 — «Каталог» / «Catalog»), «Окружение», «Магазин», «Настройки»;
 - окно настроек звука ([Gameplay.md](Gameplay.md), раздел 13): `popup.settings.music` — «Музыка» / «Music», `popup.settings.sfx` — «Эффекты» / «Effects»;
 - окно левелапа игрока ([Gameplay.md](Gameplay.md), раздел 13): `popup.levelup.title` — «Новый уровень!» / «Level up!», кнопка — `ui.common.claim`;
 - окно новой машины: `popup.newvehicle.title` — «Новая машина!» / «New vehicle!». Строки ранга и дохода в нём берутся из `ui.common.rank` и `popup.vehicle.income`, кнопка — `ui.common.ok`;
 - окно лидерборда ([Gameplay.md](Gameplay.md), раздел 13): `popup.leaderboard.title` — «Рейтинг» / «Leaderboard», `popup.leaderboard.loading` — «Загрузка…» / «Loading…», `popup.leaderboard.empty` — «Рейтинг пока пуст» / «No scores yet», `popup.leaderboard.anonymous` — «Игрок» / «Player» (имя игрока без имени);
-- подсказки обучения ([Gameplay.md](Gameplay.md), раздел 15а, задача 2.3): `tutorial.step1`…`tutorial.step6` — текст над подсветкой на каждом шаге; `tutorial.step5.open` — «Откройте купленную коробку» / «Open the box you bought» (вторая фаза шага 5, после покупки); `tutorial.skip` — «Пропустить» / «Skip». Номер в ключе совпадает с `TutorialService.Step`, презентер строит ключ как `tutorial.step` + номер шага и добавляет `.open`, когда купленная коробка ждёт открытия.
+- подсказки обучения ([Gameplay.md](Gameplay.md), раздел 15а, задача 2.3): `tutorial.step1`…`tutorial.step6` — текст над подсветкой на каждом шаге; `tutorial.step5.open` — «Откройте купленную коробку» / «Open the box you bought» (вторая фаза шага 5, после покупки). Ключ `tutorial.skip` («Пропустить» / «Skip») удалён 24.11.2026 вместе с кнопкой. Номер в ключе совпадает с `TutorialService.Step`, презентер строит ключ как `tutorial.step` + номер шага и добавляет `.open`, когда купленная коробка ждёт открытия.
 
 Остальные тексты добавляются по мере их появления в игре.
 

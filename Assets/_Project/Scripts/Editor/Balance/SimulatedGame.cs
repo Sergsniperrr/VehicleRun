@@ -49,7 +49,7 @@ namespace _Project.Editor.Balance
                 new SeededRandomSource(RandomSeed));
             Roster = new TrackRoster(Garage, PlayerLevel, config.Track, Wallet);
             Turbo = new TurboService(config.Turbo, Progress, Roster);
-            Gestures = new GarageGestures(Garage, Roster);
+            Gestures = new GarageGestures(Garage, Roster, new NoDropRestriction());
             Income = new IncomeService(Roster, config.Track, Turbo);
 
             Roster.FinishCrossed += OnFinishCrossed;

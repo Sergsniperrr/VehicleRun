@@ -22,6 +22,7 @@ namespace _Project.Tests.EditMode.Garage
         private RankProgress _progress;
         private PlayerLevel _playerLevel;
         private TrackRoster _roster;
+        private DropRestrictionFake _dropRestriction;
         private GarageGestures _gestures;
 
         [SetUp]
@@ -34,7 +35,8 @@ namespace _Project.Tests.EditMode.Garage
             Wallet wallet = new Wallet(_fixture.Economy);
             _playerLevel = new PlayerLevel(_fixture.PlayerLevel, _fixture.Track, _garage, wallet);
             _roster = new TrackRoster(_garage, _playerLevel, _fixture.Track, wallet);
-            _gestures = new GarageGestures(_garage, _roster);
+            _dropRestriction = new DropRestrictionFake();
+            _gestures = new GarageGestures(_garage, _roster, _dropRestriction);
         }
 
         [TearDown]
@@ -307,6 +309,50 @@ namespace _Project.Tests.EditMode.Garage
             Assert.That(_garage.IsSlotEmpty(1), Is.True);
         }
 
+        [Test]
+        public void TrackOnlyRestrictionLeavesOnlyTrackDrop()
+        {
+            PlaceVehicle(0, 1);
+            PlaceVehicle(1, 1);
+            _dropRestriction.IsTrackOnly = true;
+
+            Assert.That(_gestures.DropOnSlot(0, 1).FailureReason, Is.EqualTo(FailureReason.TutorialDropRestricted));
+            Assert.That(_gestures.DropOnSlot(0, 4).FailureReason, Is.EqualTo(FailureReason.TutorialDropRestricted));
+            Assert.That(_gestures.Recycle(0).FailureReason, Is.EqualTo(FailureReason.TutorialDropRestricted));
+            Assert.That(_gestures.CanMerge(0, 1), Is.False);
+            Assert.That(_gestures.CanRecycle(0), Is.False);
+            Assert.That(_gestures.CanDrag(0), Is.True);
+            Assert.That(_gestures.CanDropOnTrack(0), Is.True);
+            Assert.That(_gestures.DropOnTrack(0).IsSuccess, Is.True);
+            Assert.That(_garage.IsOnTrack(0), Is.True);
+        }
+
+        [Test]
+        public void TrackOnlyRestrictionKeepsBothVehiclesInPlace()
+        {
+            Vehicle source = PlaceVehicle(0, 1);
+            Vehicle target = PlaceVehicle(1, 1);
+            _dropRestriction.IsTrackOnly = true;
+
+            _gestures.DropOnSlot(0, 1);
+
+            Assert.That(_garage.TryGetVehicle(0, out Vehicle keptSource) && keptSource == source, Is.True);
+            Assert.That(_garage.TryGetVehicle(1, out Vehicle keptTarget) && keptTarget == target, Is.True);
+        }
+
+        [Test]
+        public void ReleasedRestrictionReturnsEveryDrop()
+        {
+            PlaceVehicle(0, 1);
+            PlaceVehicle(1, 1);
+            _dropRestriction.IsTrackOnly = true;
+            _dropRestriction.IsTrackOnly = false;
+
+            Assert.That(_gestures.CanMerge(0, 1), Is.True);
+            Assert.That(_gestures.CanRecycle(0), Is.True);
+            Assert.That(_gestures.DropOnSlot(0, 1).IsSuccess, Is.True);
+        }
+
         private Vehicle PlaceVehicle(int slot, int rank)
         {
             Vehicle vehicle = new Vehicle(_instanceIds.Create(), _fixture.Vehicles.GetByRank(rank));
@@ -321,6 +367,11 @@ namespace _Project.Tests.EditMode.Garage
             _garage.PlaceBox(slot, box);
 
             return box;
+        }
+
+        private class DropRestrictionFake : IDropRestriction
+        {
+            public bool IsTrackOnly { get; set; }
         }
     }
 }

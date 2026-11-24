@@ -100,7 +100,7 @@ namespace _Project.Composition
             builder.Register<TrackRoster>(Lifetime.Singleton);
             builder.Register<TurboService>(Lifetime.Singleton);
             builder.Register<CollectorService>(Lifetime.Singleton);
-            builder.Register<TutorialService>(Lifetime.Singleton);
+            builder.Register<TutorialService>(Lifetime.Singleton).AsSelf().As<IDropRestriction>();
             builder.Register<GarageGestures>(Lifetime.Singleton);
             builder.Register<IncomeService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<EconomyTicker>();

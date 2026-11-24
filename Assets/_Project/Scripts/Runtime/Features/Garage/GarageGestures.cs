@@ -10,11 +10,13 @@ namespace _Project.Features.Garage
     {
         private readonly GarageBoard _garage;
         private readonly TrackRoster _roster;
+        private readonly IDropRestriction _dropRestriction;
 
-        public GarageGestures(GarageBoard garage, TrackRoster roster)
+        public GarageGestures(GarageBoard garage, TrackRoster roster, IDropRestriction dropRestriction)
         {
             _garage = garage ?? throw new ArgumentNullException(nameof(garage));
             _roster = roster ?? throw new ArgumentNullException(nameof(roster));
+            _dropRestriction = dropRestriction ?? throw new ArgumentNullException(nameof(dropRestriction));
         }
 
         public bool CanDrag(int slot)
@@ -24,7 +26,7 @@ namespace _Project.Features.Garage
 
         public bool CanMerge(int fromSlot, int toSlot)
         {
-            return _garage.IsMergePair(fromSlot, toSlot);
+            return _dropRestriction.IsTrackOnly == false && _garage.IsMergePair(fromSlot, toSlot);
         }
 
         public bool CanDropOnTrack(int slot)
@@ -34,7 +36,7 @@ namespace _Project.Features.Garage
 
         public bool CanRecycle(int slot)
         {
-            return _garage.CanRecycle(slot);
+            return _dropRestriction.IsTrackOnly == false && _garage.CanRecycle(slot);
         }
 
         public bool TryGetCardVehicle(int slot, out Vehicle vehicle)
@@ -61,6 +63,11 @@ namespace _Project.Features.Garage
 
         public CommandResult DropOnSlot(int fromSlot, int toSlot)
         {
+            if (_dropRestriction.IsTrackOnly)
+            {
+                return new CommandResult(FailureReason.TutorialDropRestricted);
+            }
+
             if (_garage.TryGetVehicle(toSlot, out Vehicle _) == false)
             {
                 return _garage.Move(fromSlot, toSlot);
@@ -82,6 +89,11 @@ namespace _Project.Features.Garage
 
         public CommandResult Recycle(int slot)
         {
+            if (_dropRestriction.IsTrackOnly)
+            {
+                return new CommandResult(FailureReason.TutorialDropRestricted);
+            }
+
             return _garage.Recycle(slot);
         }
 

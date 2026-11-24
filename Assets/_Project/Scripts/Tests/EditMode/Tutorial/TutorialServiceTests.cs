@@ -182,6 +182,24 @@ namespace _Project.Tests.EditMode.Tutorial
         }
 
         [Test]
+        public void OnlyFirstStepRestrictsDropsToTrack()
+        {
+            Assert.That(_tutorial.IsTrackOnly, Is.False);
+
+            _game.PlaceVehicle(0, FirstRank);
+            _game.PlaceVehicle(1, FirstRank);
+            _tutorial.Begin();
+
+            Assert.That(_tutorial.Step, Is.EqualTo(TutorialService.SendToTrackStep));
+            Assert.That(_tutorial.IsTrackOnly, Is.True);
+
+            _game.Roster.SendToTrack(0);
+
+            Assert.That(_tutorial.Step, Is.EqualTo(TutorialService.OpenBoxStep));
+            Assert.That(_tutorial.IsTrackOnly, Is.False);
+        }
+
+        [Test]
         public void SkipBeforeUpgradeStepIsRejected()
         {
             _game.PlaceVehicle(0, FirstRank);

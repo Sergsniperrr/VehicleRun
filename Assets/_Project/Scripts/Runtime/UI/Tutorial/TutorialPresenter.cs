@@ -14,7 +14,6 @@ namespace _Project.UI.Tutorial
         private const int NoSlot = -1;
         private const string CaptionKeyPrefix = "tutorial.step";
         private const string OpenBoxCaptionSuffix = ".open";
-        private const string SkipKey = "tutorial.skip";
         private const int UpgradeRank = 2;
 
         [SerializeField] private TutorialView _view;
@@ -27,16 +26,6 @@ namespace _Project.UI.Tutorial
         private ILocalizationService _localization;
         private IFieldInputBlocker _inputBlocker;
         private string _shownCaptionKey;
-
-        private void Start()
-        {
-            _view.SkipButton.onClick.AddListener(OnSkipClicked);
-        }
-
-        private void OnDestroy()
-        {
-            _view.SkipButton.onClick.RemoveListener(OnSkipClicked);
-        }
 
         private void Update()
         {
@@ -90,8 +79,6 @@ namespace _Project.UI.Tutorial
 
             _shownCaptionKey = key;
             _view.Show(_localization.Get(key), true);
-            _view.ShowSkipLabel(_localization.Get(SkipKey));
-            _view.SkipButton.gameObject.SetActive(_tutorial.CanSkip);
         }
 
         private string CaptionKey()
@@ -109,7 +96,7 @@ namespace _Project.UI.Tutorial
             switch (_tutorial.Step)
             {
                 case TutorialService.SendToTrackStep:
-                    PointSlot(FindVehicleSlot(vehicle => true, false));
+                    PointDragSlot(FindVehicleSlot(vehicle => true, false));
                     break;
 
                 case TutorialService.OpenBoxStep:
@@ -172,6 +159,18 @@ namespace _Project.UI.Tutorial
             _view.PointWorld(_garageView.GetSlot(slot).transform);
         }
 
+        private void PointDragSlot(int slot)
+        {
+            if (slot < 0)
+            {
+                _view.ClearPointer();
+
+                return;
+            }
+
+            _view.PointWorldDrag(_garageView.GetSlot(slot).transform);
+        }
+
         private int FindVehicleSlot(Func<Vehicle, bool> filter, bool isOnTrack)
         {
             for (int slot = 0; slot < _garage.SlotCount; slot++)
@@ -222,11 +221,6 @@ namespace _Project.UI.Tutorial
         private bool IsGarageVehicle(int slot, out Vehicle vehicle)
         {
             return _garage.TryGetVehicle(slot, out vehicle) && _garage.IsOnTrack(slot) == false;
-        }
-
-        private void OnSkipClicked()
-        {
-            _tutorial.Skip();
         }
     }
 }

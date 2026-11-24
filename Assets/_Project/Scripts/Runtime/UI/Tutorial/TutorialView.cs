@@ -1,7 +1,6 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace _Project.UI.Tutorial
 {
@@ -11,12 +10,13 @@ namespace _Project.UI.Tutorial
 
         [SerializeField] private RectTransform _area;
         [SerializeField] private TMP_Text _caption;
-        [SerializeField] private Button _skipButton;
-        [SerializeField] private TMP_Text _skipLabel;
         [SerializeField] private CanvasGroup _dim;
         [SerializeField] private RectTransform _hand;
         [SerializeField] private int _focusSortingOrder = 20;
         [SerializeField] private Vector2 _handOffset = new Vector2(24f, -24f);
+        [SerializeField] private Vector2 _dragHintFrom = new Vector2(-192f, 340f);
+        [SerializeField] private Vector2 _dragHintTo = new Vector2(-480f, 340f);
+        [SerializeField] [Min(0.1f)] private float _dragHintDuration = 1.1f;
         [SerializeField] [Range(0.5f, 1f)] private float _handPressScale = 0.85f;
         [SerializeField] [Min(0.05f)] private float _handPressDuration = 0.45f;
         [SerializeField] [Min(1f)] private float _charactersPerSecond = 45f;
@@ -30,9 +30,8 @@ namespace _Project.UI.Tutorial
         private TutorialFocusTarget _focused;
         private Tween _typing;
         private Tween _press;
+        private Tween _drag;
         private Tween _dimFade;
-
-        public Button SkipButton => _skipButton;
 
         private void Awake()
         {
@@ -45,6 +44,7 @@ namespace _Project.UI.Tutorial
         {
             _typing?.Kill();
             _press?.Kill();
+            _drag?.Kill();
             _dimFade?.Kill();
         }
 
@@ -65,11 +65,6 @@ namespace _Project.UI.Tutorial
             _typing = DOTween.To(() => _caption.maxVisibleCharacters, value => _caption.maxVisibleCharacters = value, caption.Length, caption.Length / _charactersPerSecond).SetEase(Ease.Linear).SetUpdate(true).SetLink(gameObject);
         }
 
-        public void ShowSkipLabel(string text)
-        {
-            _skipLabel.text = text;
-        }
-
         public void Hide()
         {
             ClearPointer();
@@ -88,13 +83,16 @@ namespace _Project.UI.Tutorial
 
         public void PointWorld(Transform target)
         {
-            Focus(null);
-            _worldFocus.Focus(target, _focusSortingLayerId, _focusSortingOrder);
-            ShowDim(true);
-            _dim.blocksRaycasts = false;
+            FocusWorld(target);
             Vector2 screenPoint = _uiCamera.WorldToScreenPoint(target.position);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_area, screenPoint, _uiCamera, out Vector2 center);
             ShowHand(center);
+        }
+
+        public void PointWorldDrag(Transform target)
+        {
+            FocusWorld(target);
+            ShowDragHand();
         }
 
         public void ClearPointer()
@@ -102,22 +100,72 @@ namespace _Project.UI.Tutorial
             Focus(null);
             _worldFocus.Release();
             ShowDim(false);
-            _press?.Kill();
-            _press = null;
-            _hand.localScale = Vector3.one;
+            StopDrag();
+            StopPress();
             _hand.gameObject.SetActive(false);
+        }
+
+        private void FocusWorld(Transform target)
+        {
+            Focus(null);
+            _worldFocus.Focus(target, _focusSortingLayerId, _focusSortingOrder);
+            ShowDim(true);
+            _dim.blocksRaycasts = false;
         }
 
         private void ShowHand(Vector2 center)
         {
-            if (_hand.gameObject.activeSelf == false)
+            StopDrag();
+            ActivateHand();
+            StartPress();
+            _hand.anchoredPosition = center + _handOffset;
+        }
+
+        private void ShowDragHand()
+        {
+            ActivateHand();
+            StopPress();
+
+            if (_drag != null && _drag.IsActive())
             {
-                _hand.gameObject.SetActive(true);
-                _press?.Kill();
-                _press = _hand.DOScale(_handPressScale, _handPressDuration).From(1f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine).SetUpdate(true).SetLink(_hand.gameObject);
+                return;
             }
 
-            _hand.anchoredPosition = center + _handOffset;
+            _hand.anchoredPosition = _dragHintFrom;
+            _drag = DOTween.To(() => _hand.anchoredPosition, value => _hand.anchoredPosition = value, _dragHintTo, _dragHintDuration).SetLoops(-1, LoopType.Restart).SetEase(Ease.InOutSine).SetUpdate(true).SetLink(_hand.gameObject);
+        }
+
+        private void ActivateHand()
+        {
+            if (_hand.gameObject.activeSelf)
+            {
+                return;
+            }
+
+            _hand.gameObject.SetActive(true);
+        }
+
+        private void StartPress()
+        {
+            if (_press != null && _press.IsActive())
+            {
+                return;
+            }
+
+            _press = _hand.DOScale(_handPressScale, _handPressDuration).From(1f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine).SetUpdate(true).SetLink(_hand.gameObject);
+        }
+
+        private void StopPress()
+        {
+            _press?.Kill();
+            _press = null;
+            _hand.localScale = Vector3.one;
+        }
+
+        private void StopDrag()
+        {
+            _drag?.Kill();
+            _drag = null;
         }
 
         private void Focus(TutorialFocusTarget target)

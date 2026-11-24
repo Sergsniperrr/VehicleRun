@@ -27,5 +27,6 @@ namespace _Project.Features.Commands
         NoLevelReward,
         CollectorInactive,
         TutorialSkipUnavailable,
+        TutorialDropRestricted,
     }
 }
