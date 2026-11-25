@@ -26,17 +26,22 @@ namespace _Project.Features.Garage
 
         public bool CanMerge(int fromSlot, int toSlot)
         {
-            return _dropRestriction.IsTrackOnly == false && _garage.IsMergePair(fromSlot, toSlot);
+            return _dropRestriction.IsTrackOnly == false
+                && _dropRestriction.IsRecycleOnly == false
+                && _dropRestriction.IsMergeAllowed(fromSlot, toSlot)
+                && _garage.IsMergePair(fromSlot, toSlot);
         }
 
         public bool CanDropOnTrack(int slot)
         {
-            return _roster.CanSendToTrack(slot);
+            return _dropRestriction.IsRecycleOnly == false && _roster.CanSendToTrack(slot);
         }
 
         public bool CanRecycle(int slot)
         {
-            return _dropRestriction.IsTrackOnly == false && _garage.CanRecycle(slot);
+            return _dropRestriction.IsTrackOnly == false
+                && _dropRestriction.IsRecycleAllowed(slot)
+                && _garage.CanRecycle(slot);
         }
 
         public bool TryGetCardVehicle(int slot, out Vehicle vehicle)
@@ -63,7 +68,7 @@ namespace _Project.Features.Garage
 
         public CommandResult DropOnSlot(int fromSlot, int toSlot)
         {
-            if (_dropRestriction.IsTrackOnly)
+            if (_dropRestriction.IsTrackOnly || _dropRestriction.IsRecycleOnly)
             {
                 return new CommandResult(FailureReason.TutorialDropRestricted);
             }
@@ -75,6 +80,11 @@ namespace _Project.Features.Garage
 
             if (_garage.IsMergePair(fromSlot, toSlot))
             {
+                if (_dropRestriction.IsMergeAllowed(fromSlot, toSlot) == false)
+                {
+                    return new CommandResult(FailureReason.TutorialDropRestricted);
+                }
+
                 TakeOffTrack(fromSlot);
                 TakeOffTrack(toSlot);
             }
@@ -84,12 +94,17 @@ namespace _Project.Features.Garage
 
         public CommandResult DropOnTrack(int fromSlot)
         {
+            if (_dropRestriction.IsRecycleOnly)
+            {
+                return new CommandResult(FailureReason.TutorialDropRestricted);
+            }
+
             return _roster.SendToTrack(fromSlot);
         }
 
         public CommandResult Recycle(int slot)
         {
-            if (_dropRestriction.IsTrackOnly)
+            if (_dropRestriction.IsTrackOnly || _dropRestriction.IsRecycleAllowed(slot) == false)
             {
                 return new CommandResult(FailureReason.TutorialDropRestricted);
             }

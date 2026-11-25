@@ -110,7 +110,8 @@ namespace _Project.Tests.EditMode.Shop
             CommandResult result = _rewards.ClaimDiscount(3);
 
             Assert.That(result.IsSuccess, Is.True);
-            Assert.That(_game.Wallet.Coins, Is.EqualTo(coins - 4560));
+            Assert.That(_rewards.DiscountPercent, Is.EqualTo(50));
+            Assert.That(_game.Wallet.Coins, Is.EqualTo(coins - 2850));
             Assert.That(_rewards.IsReady, Is.False);
         }
 

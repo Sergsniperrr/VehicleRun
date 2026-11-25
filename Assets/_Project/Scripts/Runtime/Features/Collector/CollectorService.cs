@@ -81,6 +81,23 @@ namespace _Project.Features.Collector
             return new CommandResult(FailureReason.None);
         }
 
+        public bool SpawnNow()
+        {
+            if (TryFindChargeReward(out long reward) == false)
+            {
+                return false;
+            }
+
+            if (IsActive)
+            {
+                Disappear();
+            }
+
+            Appear(reward);
+
+            return true;
+        }
+
         private void Drive(float deltaTime)
         {
             Distance = (Distance + _config.TrackSpeed * deltaTime) % _track.LapLength;

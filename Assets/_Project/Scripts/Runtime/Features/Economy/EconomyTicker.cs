@@ -57,6 +57,7 @@ namespace _Project.Features.Economy
             _shopRewards.Advance(deltaTime);
             _ads.Advance(deltaTime);
             _collector.Advance(deltaTime);
+            _tutorial.Advance(deltaTime);
         }
     }
 }

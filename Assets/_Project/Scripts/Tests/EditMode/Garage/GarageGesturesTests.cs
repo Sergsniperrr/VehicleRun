@@ -372,6 +372,17 @@ namespace _Project.Tests.EditMode.Garage
         private class DropRestrictionFake : IDropRestriction
         {
             public bool IsTrackOnly { get; set; }
+            public bool IsRecycleOnly { get; set; }
+
+            public bool IsMergeAllowed(int fromSlot, int toSlot)
+            {
+                return true;
+            }
+
+            public bool IsRecycleAllowed(int slot)
+            {
+                return true;
+            }
         }
     }
 }

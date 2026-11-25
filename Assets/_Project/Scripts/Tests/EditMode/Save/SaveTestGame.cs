@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using _Project.Features.Boxes;
 using _Project.Features.Collector;
 using _Project.Features.Economy;
@@ -13,6 +14,7 @@ using _Project.Features.Tutorial;
 using _Project.Features.Vehicles;
 using _Project.Tests.EditMode.Boxes;
 using _Project.Tests.EditMode.Configs;
+using Cysharp.Threading.Tasks;
 
 namespace _Project.Tests.EditMode.Save
 {
@@ -36,9 +38,11 @@ namespace _Project.Tests.EditMode.Save
             Turbo = new TurboService(fixture.Turbo, Progress, Roster);
             ShopRewards = new ShopRewards(fixture.Economy, Wallet, Delivery, Random);
             Collector = new CollectorService(fixture.Collector, fixture.Track, Garage, Wallet, Random);
+            TimeService = new FakeTimeService();
             Milestones = new CollectionMilestones(Progress, Wallet, fixture.Economy);
             News = new CatalogNews(Progress, Milestones, fixture.Economy);
-            Tutorial = new TutorialService(Garage, Roster, Delivery, News);
+            Confirmation = new FakeRecycleConfirmation();
+            Tutorial = new TutorialService(Garage, Roster, Delivery, Confirmation, Turbo, Collector, TimeService);
             Factory = new GameSaveFactory(fixture.Config, InstanceIds, Garage, Progress, Wallet, Pricing, Delivery, Roster, Turbo, Milestones, Level, News, Tutorial);
             Restorer = new GameStateRestorer(
                 fixture.Vehicles,
@@ -70,8 +74,10 @@ namespace _Project.Tests.EditMode.Save
         public TurboService Turbo { get; }
         public ShopRewards ShopRewards { get; }
         public CollectorService Collector { get; }
+        public FakeTimeService TimeService { get; }
         public CollectionMilestones Milestones { get; }
         public CatalogNews News { get; }
+        public FakeRecycleConfirmation Confirmation { get; }
         public TutorialService Tutorial { get; }
         public GameSaveFactory Factory { get; }
         public GameStateRestorer Restorer { get; }
@@ -103,6 +109,36 @@ namespace _Project.Tests.EditMode.Save
             News.Dispose();
             Level.Dispose();
             Progress.Dispose();
+        }
+
+        public class FakeRecycleConfirmation : IRecycleConfirmation
+        {
+            public event Action PromptOpened;
+            public event Action<bool, bool> PromptAnswered;
+
+            public UniTask<bool> ConfirmVehicleAsync(Vehicle vehicle, CancellationToken cancellationToken)
+            {
+                PromptOpened?.Invoke();
+
+                return UniTask.FromResult(false);
+            }
+
+            public UniTask<bool> ConfirmBoxAsync(Box box, CancellationToken cancellationToken)
+            {
+                PromptOpened?.Invoke();
+
+                return UniTask.FromResult(false);
+            }
+
+            public void OpenPrompt()
+            {
+                PromptOpened?.Invoke();
+            }
+
+            public void AnswerPrompt(bool isConfirmed, bool isNoButton)
+            {
+                PromptAnswered?.Invoke(isConfirmed, isNoButton);
+            }
         }
     }
 }

@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "_Project.Core",
         "_Project.Features",
-        "_Project.UI"
+        "_Project.UI",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"

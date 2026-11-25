@@ -1,6 +1,7 @@
 using System;
 using _Project.Features.Garage;
 using _Project.Features.Track;
+using _Project.Features.Tutorial;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer;
@@ -16,6 +17,7 @@ namespace _Project.Features.Collector
         private CollectorService _collector;
         private TrackPath _path;
         private IFieldInputBlocker _inputBlocker;
+        private TutorialService _tutorial;
 
         private void Start()
         {
@@ -40,11 +42,12 @@ namespace _Project.Features.Collector
         }
 
         [Inject]
-        public void Construct(CollectorService collector, TrackPath path, IFieldInputBlocker inputBlocker)
+        public void Construct(CollectorService collector, TrackPath path, IFieldInputBlocker inputBlocker, TutorialService tutorial)
         {
             _collector = collector ?? throw new ArgumentNullException(nameof(collector));
             _path = path ?? throw new ArgumentNullException(nameof(path));
             _inputBlocker = inputBlocker ?? throw new ArgumentNullException(nameof(inputBlocker));
+            _tutorial = tutorial ?? throw new ArgumentNullException(nameof(tutorial));
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -55,6 +58,11 @@ namespace _Project.Features.Collector
             }
 
             if (_inputBlocker.IsBlocking)
+            {
+                return;
+            }
+
+            if (_tutorial.Step == TutorialService.CollectorStep && _tutorial.IsCollectorPaused == false)
             {
                 return;
             }

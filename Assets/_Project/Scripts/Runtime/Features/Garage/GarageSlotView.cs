@@ -52,11 +52,15 @@ namespace _Project.Features.Garage
 
         private BoxCollider2D _collider;
         private int _restingSortingOrder;
+        private int _sortingLayerBeforeLift;
+        private int _sortingOrderBeforeLift;
         private IAudioService _audio;
         private GameSoundsConfig _sounds;
         private Tween _boxShake;
         private Tween _merge;
         private bool _isMergeResultShown;
+        private bool _isOnTrack;
+        private bool _isFocusBrightened;
 
         public event Action<int, PointerEventData> Tapped;
         public event Action<int, PointerEventData> DragStarted;
@@ -123,7 +127,8 @@ namespace _Project.Features.Garage
                 throw new ArgumentNullException(nameof(vehicle));
             }
 
-            float alpha = isOnTrack ? _onTrackAlpha : OpaqueAlpha;
+            _isOnTrack = isOnTrack;
+            float alpha = isOnTrack && _isFocusBrightened == false ? _onTrackAlpha : OpaqueAlpha;
             ShowPlace(_openPlaceColor, false);
             _vehicle.sprite = vehicle.Definition.GarageSprite;
             _vehicle.color = WithAlpha(Color.white, alpha);
@@ -133,6 +138,26 @@ namespace _Project.Features.Garage
             StopMerge();
             ShowRank(vehicle.Definition, alpha);
             _content.gameObject.SetActive(true);
+        }
+
+        public void SetFocusBrightened(bool isBrightened)
+        {
+            if (_isFocusBrightened == isBrightened)
+            {
+                return;
+            }
+
+            _isFocusBrightened = isBrightened;
+
+            if (_vehicle.gameObject.activeSelf == false)
+            {
+                return;
+            }
+
+            float alpha = _isOnTrack && isBrightened == false ? _onTrackAlpha : OpaqueAlpha;
+            _vehicle.color = WithAlpha(_vehicle.color, alpha);
+            _rankBadgeBack.color = WithAlpha(_rankBadgeBack.color, alpha);
+            _rankValue.alpha = alpha;
         }
 
         public void ShowBox(Box box)
@@ -188,6 +213,8 @@ namespace _Project.Features.Garage
             _shadow.transform.localPosition = item.transform.localPosition;
             _shadow.transform.localScale = item.transform.localScale;
             _shadow.gameObject.SetActive(true);
+            _sortingLayerBeforeLift = _contentSorting.sortingLayerID;
+            _sortingOrderBeforeLift = _contentSorting.sortingOrder;
             _contentSorting.sortingOrder = _liftedSortingOrder;
             StopBoxShake();
         }
@@ -200,7 +227,9 @@ namespace _Project.Features.Garage
         public void Land()
         {
             _content.localPosition = Vector3.zero;
-            _contentSorting.sortingOrder = _restingSortingOrder;
+            _contentSorting.sortingOrder = _contentSorting.sortingLayerID == _sortingLayerBeforeLift
+                ? _sortingOrderBeforeLift
+                : _restingSortingOrder;
             _shadow.gameObject.SetActive(false);
 
             if (_content.gameObject.activeSelf && _box.gameObject.activeSelf)

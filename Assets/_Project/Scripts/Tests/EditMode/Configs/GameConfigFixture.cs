@@ -40,7 +40,7 @@ namespace _Project.Tests.EditMode.Configs
         private const float FreeBoxIntervalSeconds = 20f;
         private const float RewardAdCooldownSeconds = 180f;
         private const float InterstitialCooldownSeconds = 180f;
-        private const int RewardAdDiscountPercent = 20;
+        private const int RewardAdDiscountPercent = 50;
         private const float OfflineMinAwaySeconds = 60f;
         private const float OfflineMaxAwaySeconds = 14400f;
         private const double OfflineIncomeRate = 0.5;

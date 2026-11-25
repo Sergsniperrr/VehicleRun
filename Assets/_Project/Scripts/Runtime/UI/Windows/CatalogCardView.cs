@@ -9,6 +9,7 @@ namespace _Project.UI.Windows
     public class CatalogCardView : MonoBehaviour
     {
         [SerializeField] private Image _icon;
+        [SerializeField] private TMP_Text _rankLabel;
         [SerializeField] private TMP_Text _caption;
         [SerializeField] private TMP_Text _income;
 
@@ -39,6 +40,7 @@ namespace _Project.UI.Windows
             }
 
             Rank = definition.Rank;
+            _rankLabel.text = Rank.ToString();
             _icon.sprite = definition.GarageSprite;
         }
     }

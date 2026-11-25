@@ -32,7 +32,7 @@ namespace _Project.Core.Economy
         [SerializeField] private float _freeBoxIntervalSeconds;
         [SerializeField] private float _rewardAdCooldownSeconds = 180f;
         [SerializeField] private float _interstitialCooldownSeconds = 180f;
-        [SerializeField] private int _rewardAdDiscountPercent = 20;
+        [SerializeField] private int _rewardAdDiscountPercent = 50;
         [SerializeField] private float _offlineMinAwaySeconds;
         [SerializeField] private float _offlineMaxAwaySeconds;
         [SerializeField] private double _offlineIncomeRate;

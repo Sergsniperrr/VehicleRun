@@ -26,6 +26,9 @@ namespace _Project.UI.Windows
 
         private bool IsAsking => _answer != null;
 
+        public event Action PromptOpened;
+        public event Action<bool, bool> PromptAnswered;
+
         protected override void Awake()
         {
             base.Awake();
@@ -73,7 +76,7 @@ namespace _Project.UI.Windows
 
         public override void Dismiss()
         {
-            Answer(false);
+            Answer(false, false);
         }
 
         private async UniTask<bool> AskAsync(string question, CancellationToken cancellationToken)
@@ -86,6 +89,7 @@ namespace _Project.UI.Windows
             _answer = new UniTaskCompletionSource<bool>();
             _question.text = question;
             Open();
+            PromptOpened?.Invoke();
 
             try
             {
@@ -102,19 +106,25 @@ namespace _Project.UI.Windows
             }
         }
 
-        private void Answer(bool isConfirmed)
+        private void Answer(bool isConfirmed, bool isNoButton)
         {
-            _answer?.TrySetResult(isConfirmed);
+            if (_answer == null)
+            {
+                return;
+            }
+
+            PromptAnswered?.Invoke(isConfirmed, isNoButton);
+            _answer.TrySetResult(isConfirmed);
         }
 
         private void OnYesClicked()
         {
-            Answer(true);
+            Answer(true, false);
         }
 
         private void OnNoClicked()
         {
-            Answer(false);
+            Answer(false, true);
         }
     }
 }

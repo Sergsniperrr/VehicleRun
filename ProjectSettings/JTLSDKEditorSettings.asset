@@ -18,8 +18,8 @@ MonoBehaviour:
   _loaderBackground:
     _kind: 1
     _color: {r: 0.102, g: 0.102, b: 0.102, a: 1}
-    _gradientFrom: {r: 0.9386792, g: 0.97536135, b: 1, a: 1}
-    _gradientTo: {r: 0.6556604, g: 0.80665296, b: 1, a: 1}
+    _gradientFrom: {r: 1, g: 0.95686275, b: 0.6509804, a: 1}
+    _gradientTo: {r: 0.99215686, g: 0.6627451, b: 0.33333334, a: 1}
     _radial: 1
     _angle: 140
     _image: {fileID: 0}
@@ -39,21 +39,21 @@ MonoBehaviour:
   _progressBorderColor: {r: 1, g: 1, b: 1, a: 0.3}
   _progressPadding: 0
   _progressWidthPercent: 40
-  _progressHeight: 6
+  _progressHeight: 10
   _progressRadius: 3
   _progressAtBottom: 0
   _loadingText: 
   _fixedAspect: 1
   _aspectRatio: 9/16
-  _freeAspectOnMobile: 0
-  _pageUsesLoaderBackground: 0
-  _desktopPixelRatioMode: 2
-  _desktopPixelRatio: 2
-  _mobilePixelRatioMode: 2
-  _mobilePixelRatio: 3
+  _freeAspectOnMobile: 1
+  _pageUsesLoaderBackground: 1
+  _desktopPixelRatioMode: 0
+  _desktopPixelRatio: 1
+  _mobilePixelRatioMode: 0
+  _mobilePixelRatio: 1
   _buildOutput: 1
   _buildPath: E:/Builds/VehicleMerge
   _buildNamePattern: '{product}_{configuration}_b{build}'
-  _buildNumber: 7
+  _buildNumber: 10
   _developmentBuild: 0
   _openFolderAfterBuild: 1

@@ -64,6 +64,22 @@ namespace _Project.Tests.EditMode.Collector
         }
 
         [Test]
+        public void SpawnNowStartsFreshCollectorWithoutWaitingForTimer()
+        {
+            Assert.That(_game.Collector.SpawnNow(), Is.False);
+            _game.PlaceVehicle(0, 2);
+
+            Assert.That(_game.Collector.SpawnNow(), Is.True);
+            _game.Collector.Advance(2f);
+            Assert.That(_game.Collector.SpawnNow(), Is.True);
+
+            Assert.That(_appearedCount, Is.EqualTo(2));
+            Assert.That(_disappearedCount, Is.EqualTo(1));
+            Assert.That(_game.Collector.Distance, Is.Zero);
+            Assert.That(_game.Collector.RemainingSeconds, Is.EqualTo(LifetimeSeconds));
+        }
+
+        [Test]
         public void CollectorDoesNotAppearWithoutVehicles()
         {
             _game.Collector.Advance(SpawnIntervalSeconds);

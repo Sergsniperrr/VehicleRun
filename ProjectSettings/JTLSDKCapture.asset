@@ -12,23 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ec4fe8232fc48c7b07a76b77cd925f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outputPath: Captures
-  _takeScreenshots: 1
-  _recordVideo: 0
+  _outputPath: E:/ScreenVideo
+  _takeScreenshots: 0
+  _recordVideo: 1
   _source: 0
   _cameraName: 
   _includeOverlayUi: 1
   _resolutionIndex: 2
   _customSize: {x: 1920, y: 1080}
-  _everyLanguageOfConfiguration: 1
-  _languages: 
+  _everyLanguageOfConfiguration: 0
+  _languages: 00000000
   _frameRate: 30
   _recordMode: 0
   _videoSeconds: 15
-  _exitPlayMode: 0
+  _exitPlayMode: 1
   _recordAudio: 1
   _hiddenLayers:
     serializedVersion: 2
     m_Bits: 0
-  _hiddenObjects: []
+  _hiddenObjects:
+  - Vehicle Merge
   _captureKey: 290

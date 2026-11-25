@@ -19,7 +19,11 @@ namespace _Project.UI.Tutorial
         [SerializeField] private TutorialView _view;
         [SerializeField] private GarageView _garageView;
         [SerializeField] private RectTransform _boxButton;
-        [SerializeField] private RectTransform _catalogButton;
+        [SerializeField] private Collider2D _recycleZone;
+        [SerializeField] private RectTransform _recycleNoButton;
+        [SerializeField] private Transform _trackRoad;
+        [SerializeField] private Transform _trackVehicles;
+        [SerializeField] private Collider2D _collectorBody;
 
         private TutorialService _tutorial;
         private GarageBoard _garage;
@@ -34,7 +38,9 @@ namespace _Project.UI.Tutorial
                 return;
             }
 
-            if (_tutorial.IsActive == false || _inputBlocker.IsBlocking)
+            if (_tutorial.IsActive == false
+                || (_inputBlocker.IsBlocking && _tutorial.Step != TutorialService.RecycleConfirmStep)
+                || (_tutorial.Step == TutorialService.CollectorStep && _tutorial.IsCollectorPaused == false))
             {
                 HideView();
 
@@ -104,7 +110,7 @@ namespace _Project.UI.Tutorial
                     break;
 
                 case TutorialService.MergeStep:
-                    PointSlot(FindMergeableSlot());
+                    PointMergePair();
                     break;
 
                 case TutorialService.UpgradeTrackStep:
@@ -115,8 +121,20 @@ namespace _Project.UI.Tutorial
                     PointPurchase();
                     break;
 
-                case TutorialService.CatalogStep:
-                    _view.Point(_catalogButton);
+                case TutorialService.RecycleStep:
+                    PointRecycle();
+                    break;
+
+                case TutorialService.RecycleConfirmStep:
+                    _view.Point(_recycleNoButton);
+                    break;
+
+                case TutorialService.TrackTapStep:
+                    _view.PointTrack(_trackRoad, _trackVehicles);
+                    break;
+
+                case TutorialService.CollectorStep:
+                    _view.PointCollector(_collectorBody);
                     break;
             }
         }
@@ -144,7 +162,7 @@ namespace _Project.UI.Tutorial
                 return;
             }
 
-            PointSlot(FindVehicleSlot(vehicle => vehicle.Rank >= UpgradeRank, false));
+            PointDragSlot(FindVehicleSlot(vehicle => vehicle.Rank >= UpgradeRank, false));
         }
 
         private void PointSlot(int slot)
@@ -169,6 +187,30 @@ namespace _Project.UI.Tutorial
             }
 
             _view.PointWorldDrag(_garageView.GetSlot(slot).transform);
+        }
+
+        private void PointMergePair()
+        {
+            if (_tutorial.TryGetMergePair(out int sourceSlot, out int targetSlot) == false)
+            {
+                _view.ClearPointer();
+
+                return;
+            }
+
+            _view.PointWorldPairDrag(_garageView.GetSlot(sourceSlot), _garageView.GetSlot(targetSlot));
+        }
+
+        private void PointRecycle()
+        {
+            if (_tutorial.TryGetRecycleSlot(out int slot) == false)
+            {
+                _view.ClearPointer();
+
+                return;
+            }
+
+            _view.PointWorldToWorldDrag(_garageView.GetSlot(slot).transform, _recycleZone);
         }
 
         private int FindVehicleSlot(Func<Vehicle, bool> filter, bool isOnTrack)
@@ -197,30 +239,5 @@ namespace _Project.UI.Tutorial
             return NoSlot;
         }
 
-        private int FindMergeableSlot()
-        {
-            for (int left = 0; left < _garage.SlotCount; left++)
-            {
-                if (IsGarageVehicle(left, out Vehicle leftVehicle) == false)
-                {
-                    continue;
-                }
-
-                for (int right = left + 1; right < _garage.SlotCount; right++)
-                {
-                    if (IsGarageVehicle(right, out Vehicle rightVehicle) && rightVehicle.Rank == leftVehicle.Rank)
-                    {
-                        return left;
-                    }
-                }
-            }
-
-            return NoSlot;
-        }
-
-        private bool IsGarageVehicle(int slot, out Vehicle vehicle)
-        {
-            return _garage.TryGetVehicle(slot, out vehicle) && _garage.IsOnTrack(slot) == false;
-        }
     }
 }

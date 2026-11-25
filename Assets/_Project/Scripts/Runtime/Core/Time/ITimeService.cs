@@ -5,5 +5,9 @@ namespace _Project.Core.Time
         float DeltaTime { get; }
 
         float Time { get; }
+
+        float Scale { get; set; }
+
+        bool CanSetScale { get; }
     }
 }

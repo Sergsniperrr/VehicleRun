@@ -27,7 +27,7 @@ MonoBehaviour:
   _freeBoxIntervalSeconds: 20
   _rewardAdCooldownSeconds: 180
   _interstitialCooldownSeconds: 180
-  _rewardAdDiscountPercent: 20
+  _rewardAdDiscountPercent: 50
   _offlineMinAwaySeconds: 60
   _offlineMaxAwaySeconds: 14400
   _offlineIncomeRate: 0.5
