@@ -14,6 +14,7 @@
 | [Docs/Analytics-Ads-Saves.md](Docs/Analytics-Ads-Saves.md) | аналитика (JTL SDK + Яндекс.Метрика), реклама, покупки, сохранения `JTLSDK.Data` |
 | [Docs/Localization.md](Docs/Localization.md) | `LocalizationConfig`, ключи, `LocalizedText`, `ILocalizationService` |
 | [Docs/Audio.md](Docs/Audio.md) | `AudioService`, `AudioAsset`, микшер и громкость |
+| [Docs/StorePage.md](Docs/StorePage.md) | тексты страницы игры для консоли Яндекс Игр: название, описания, «Как играть», лимиты символов |
 | [.claude/CODE_STYLE.md](.claude/CODE_STYLE.md) | стиль C#/Unity-кода: именование, порядок членов, скобки, события, UniTask, VContainer, ошибки, запрещённые запахи |
 | [JTL SDK](https://meepifiev.github.io/com.jtlstudio.sdk/) | официальная документация SDK; полный справочник API одним файлом: [llms.txt](https://meepifiev.github.io/com.jtlstudio.sdk/llms.txt) |
 
